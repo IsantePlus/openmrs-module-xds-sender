@@ -1,0 +1,72 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.openmrs.maven.parents</groupId>
+        <artifactId>maven-parent-openmrs-module</artifactId>
+        <version>1.1.1</version>
+    </parent>
+
+	<groupId>org.openmrs.module</groupId>
+	<artifactId>xds-sender</artifactId>
+	<version>1.0.0</version>
+	<packaging>pom</packaging>
+	<name>XDS Sender</name>
+	<description>Module for sending XDS.b documents for encounters</description>
+
+	<scm>
+		<connection>scm:git:git@github.com:IsantePlus/openmrs-module-xds-sender.git</connection>
+		<developerConnection>scm:git:git@github.com:IsantePlus/openmrs-module-xds-sender.git</developerConnection>
+		<url>https://github.com/IsantePlus/openmrs-module-xds-sender/</url>
+	</scm>
+
+	<modules>
+		<module>api</module>
+		<module>omod</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.marc.everest</groupId>
+				<artifactId>everest-core</artifactId>
+				<version>1.0.17</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.marc.everest</groupId>
+				<artifactId>everest-rmim-uv-cdar2</artifactId>
+				<version>1.1.0</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<repositories>
+		<repository>
+			<id>openmrs-repo</id>
+			<name>OpenMRS Nexus Repository</name>
+			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+		</repository>
+		<repository>
+			<id>central</id>
+			<name>Maven Repository Switchboard</name>
+			<layout>default</layout>
+			<url>http://repo1.maven.org/maven2</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>openmrs-repo</id>
+			<name>OpenMRS Nexus Repository</name>
+			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+    <properties>
+        <openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
+    </properties>
+</project>
