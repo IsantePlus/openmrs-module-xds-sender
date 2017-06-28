@@ -1,33 +1,33 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.openmrs.module</groupId>
-		<artifactId>xds-sender</artifactId>
-		<version>1.0.0</version>
-	</parent>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>xds-sender</artifactId>
+        <version>1.0.0</version>
+    </parent>
 
-	<artifactId>xds-sender-api</artifactId>
-	<packaging>jar</packaging>
-	<name>XDS Sender API</name>
-	<description>API project for XDS Sender</description>
+    <artifactId>xds-sender-api</artifactId>
+    <packaging>jar</packaging>
+    <name>XDS Sender API</name>
+    <description>API project for XDS Sender</description>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.marc.everest</groupId>
-			<artifactId>everest-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.marc.everest</groupId>
-			<artifactId>everest-rmim-uv-cdar2</artifactId>
-			<version>1.1.0</version>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.marc.everest</groupId>
+            <artifactId>everest-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.marc.everest</groupId>
+            <artifactId>everest-rmim-uv-cdar2</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+    </dependencies>
 
-	<repositories>
-		<repository>
-			<id>marc-te-main</id>
-			<url>http://te.marc-hi.ca/mvn</url>
-		</repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <id>marc-te-main</id>
+            <url>http://te.marc-hi.ca/mvn</url>
+        </repository>
+    </repositories>
 </project>

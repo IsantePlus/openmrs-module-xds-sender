@@ -46,36 +46,37 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * A generic clinical document builder which does not assign any template
- * information
+ * A generic clinical document builder which does not assign any template information
+ * 
  * @author JustinFyfe
- *
  */
 public class DocumentBuilderImpl implements DocumentBuilder {
-
+	
 	// Log
 	private final Log log = LogFactory.getLog(this.getClass());
-
+	
 	// Record target
 	private Patient recordTarget;
+	
 	// Encounter
 	private Encounter encounter;
+	
 	// CDA data utility
 	private CdaDataUtil cdaDataUtil;
-
+	
 	public DocumentBuilderImpl(Patient recordTarget, Encounter encounter, CdaDataUtil cdaDataUtil) {
 		this.recordTarget = recordTarget;
 		this.encounter = encounter;
 		this.cdaDataUtil = cdaDataUtil;
 	}
-
+	
 	/**
 	 * Get the document type code
 	 */
-    public String getTypeCode() {
+	public String getTypeCode() {
 		return "34133-9";
-    }
-
+	}
+	
 	/**
 	 * Get the document format code
 	 */
@@ -84,19 +85,24 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 	}
 	
 	/**
-	 * Set the Encounter this document builder will  be representing
+	 * Get the encounter event
 	 */
-	public void setEncounterEvent(Encounter enc)
-	{
+	public Encounter getEncounterEvent() {
+		return this.encounter;
+	}
+	
+	/**
+	 * Set the Encounter this document builder will be representing
+	 */
+	public void setEncounterEvent(Encounter enc) {
 		this.encounter = enc;
 	}
 	
 	/**
-	 * Get the encounter event
+	 * Gets the currently assigned record target
 	 */
-	public Encounter getEncounterEvent()
-	{
-		return this.encounter;
+	public Patient getRecordTarget() {
+		return this.recordTarget;
 	}
 	
 	/**
@@ -105,21 +111,12 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 	public void setRecordTarget(Patient recordTarget) {
 		this.recordTarget = recordTarget;
 	}
-
-	/**
-	 * Gets the currently assigned record target
-	 */
-	public Patient getRecordTarget() {
-		return this.recordTarget;
-	}
-
-
+	
 	/**
 	 * Generate the CDA
 	 */
 	public ClinicalDocument generate(Section... sections) {
-		try
-		{
+		try {
 			ClinicalDocument retVal = new ClinicalDocument();
 			retVal.setTypeId(new II("2.16.840.1.113883.1.3", "POCD_HD000040"));
 			retVal.setRealmCode(SET.createSET(new CS<BindingRealm>(BindingRealm.UniversalRealmOrContextUsedInEveryInstance)));
@@ -141,7 +138,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			custodian.setAssignedCustodian(new AssignedCustodian());
 			custodian.getAssignedCustodian().setRepresentedCustodianOrganization(cdaDataUtil.getCustodianOrganization());
 			retVal.setCustodian(custodian);
-
+			
 			// Create documentation of
 			// TODO: Do we only need one of these for all events that occur in the CDA or one for each?
 			ServiceEvent event = new ServiceEvent(new CS<String>("PCPR")); // CCD CONF-3 & CONF-2
@@ -153,17 +150,15 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 				if (visit != null) {
 					earliestRecord = visit.getStartDatetime();
 					lastRecord = visit.getStopDatetime();
-				}
-				else {
+				} else {
 					lastRecord = earliestRecord = encounter.getEncounterDatetime();
 				}
-					
+				
 				// Now add participants
 				for (Entry<EncounterRole, Set<Provider>> encounterProvider : encounter.getProvidersByRoles().entrySet()) {
 					
-					if(encounterProvider.getKey().getName().equals("AUT"))
-						for(Provider pvdr : encounterProvider.getValue())
-						{
+					if (encounterProvider.getKey().getName().equals("AUT"))
+						for (Provider pvdr : encounterProvider.getValue()) {
 							Author aut = new Author(ContextControl.OverridingPropagating);
 							aut.setTime(new TS());
 							aut.getTime().setNullFlavor(NullFlavor.NoInformation);
@@ -174,8 +169,10 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 						;
 					else {
 						for (Provider pvdr : encounterProvider.getValue()) {
-							Performer1 performer = new Performer1(x_ServiceEventPerformer.PRF, cdaDataUtil.createAssignedEntity(pvdr));
-							performer.setFunctionCode((CE<ParticipationFunction>) cdaDataUtil.parseCodeFromString(encounterProvider.getKey().getDescription(), CE.class));
+							Performer1 performer = new Performer1(x_ServiceEventPerformer.PRF,
+							        cdaDataUtil.createAssignedEntity(pvdr));
+							performer.setFunctionCode((CE<ParticipationFunction>) cdaDataUtil.parseCodeFromString(
+							    encounterProvider.getKey().getDescription(), CE.class));
 							event.getPerformer().add(performer);
 						}
 					}
@@ -184,7 +181,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 				earliestRecord = recordTarget.getDateCreated();
 				lastRecord = recordTarget.getDateChanged();
 				
-				Person person= Context.getAuthenticatedUser().getPerson();
+				Person person = Context.getAuthenticatedUser().getPerson();
 				Collection<Provider> provider = Context.getProviderService().getProvidersByPerson(person);
 				if (provider.size() > 0) {
 					Author aut = new Author(ContextControl.OverridingPropagating);
@@ -197,8 +194,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			}
 			
 			// Set the effective time of records
-			Calendar earliestCal = Calendar.getInstance(), 
-					latestCal = Calendar.getInstance();
+			Calendar earliestCal = Calendar.getInstance(), latestCal = Calendar.getInstance();
 			earliestCal.setTime(earliestRecord);
 			
 			if (lastRecord != null)
@@ -218,32 +214,31 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			}
 			
 			retVal.setComponent(new Component2(ActRelationshipHasComponent.HasComponent, BL.TRUE, new StructuredBody()));
-			for (Section sct : sections)
-			{
+			for (Section sct : sections) {
 				if (sct == null) {
 					continue;
 				}
 				
-				retVal.getComponent().getBodyChoiceIfStructuredBody().getComponent().add(
-						new Component3(ActRelationshipHasComponent.HasComponent, BL.TRUE, sct)
-						);
+				retVal.getComponent().getBodyChoiceIfStructuredBody().getComponent()
+				        .add(new Component3(ActRelationshipHasComponent.HasComponent, BL.TRUE, sct));
 				
 				// Minify authors
 				for (Author aut : sct.getAuthor()) {
-					if(!cdaDataUtil.containsAuthor(retVal.getAuthor(), aut)) {
+					if (!cdaDataUtil.containsAuthor(retVal.getAuthor(), aut)) {
 						retVal.getAuthor().add(aut);
 					}
-
+					
 				}
 				sct.getAuthor().clear();
 			}
 			
 			return retVal;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error(e);
 			log.error(ExceptionUtils.getStackTrace(e));
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 }
