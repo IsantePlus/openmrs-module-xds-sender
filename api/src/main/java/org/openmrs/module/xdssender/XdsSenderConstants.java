@@ -23,6 +23,8 @@ public final class XdsSenderConstants {
     public static final String CODE_SYSTEM_CPT4 = "2.16.840.1.113883.6.12";
     public static final String CODE_SYSTEM_ICD_10 = "2.16.840.1.113883.6.3";
 
+    public static final String DOC_TEMPLATE_MEDICAL_DOCUMENTS = "1.3.6.1.4.1.19376.1.5.3.1.1.1";
+
     private XdsSenderConstants() {
     }
 }

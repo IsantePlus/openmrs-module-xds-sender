@@ -36,6 +36,7 @@ import org.openmrs.Provider;
 import org.openmrs.Relationship;
 import org.openmrs.Visit;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -122,7 +123,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			ClinicalDocument retVal = new ClinicalDocument();
 			retVal.setTypeId(new II("2.16.840.1.113883.1.3", "POCD_HD000040"));
 			retVal.setRealmCode(SET.createSET(new CS<BindingRealm>(BindingRealm.UniversalRealmOrContextUsedInEveryInstance)));
-			retVal.setTemplateId(LIST.createLIST(new II(CdaHandlerConstants.DOC_TEMPLATE_MEDICAL_DOCUMENTS)));
+			retVal.setTemplateId(LIST.createLIST(new II(XdsSenderConstants.DOC_TEMPLATE_MEDICAL_DOCUMENTS)));
 			// Identifier is the SHR root of the odd document ODD ID + Current Time (making the UUID of the ODD)
 			TS idDate = TS.now();
 			idDate.setDateValuePrecision(TS.SECONDNOTIMEZONE);
@@ -133,12 +134,12 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			
 			// Set to Normal, anything above a normal will not be included in the extract
 			retVal.setConfidentialityCode(new CE<x_BasicConfidentialityKind>(x_BasicConfidentialityKind.Normal));
-			retVal.setLanguageCode(Context.getLocale().toString(); // CONF-5
+			retVal.setLanguageCode(Context.getLocale().toString()); // CONF-5
 			
 			// Custodian
 			Custodian custodian = new Custodian();
 			custodian.setAssignedCustodian(new AssignedCustodian());
-			custodian.getAssignedCustodian().setRepresentedCustodianOrganization(this.cdaDataUtil.getCustodianOrganization());
+			custodian.getAssignedCustodian().setRepresentedCustodianOrganization(cdaDataUtil.getCustodianOrganization());
 			retVal.setCustodian(custodian);
 
 			// Create documentation of
@@ -147,22 +148,18 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			Date earliestRecord, lastRecord;
 			
 			// Assign data form the encounter
-			if(this.encounter != null)
-			{
-				Visit visit = this.encounter.getVisit();
-				if(visit != null)
-				{
+			if (encounter != null) {
+				Visit visit = encounter.getVisit();
+				if (visit != null) {
 					earliestRecord = visit.getStartDatetime();
 					lastRecord = visit.getStopDatetime();
 				}
-				else
-				{
-					lastRecord = earliestRecord = this.encounter.getEncounterDatetime();
+				else {
+					lastRecord = earliestRecord = encounter.getEncounterDatetime();
 				}
 					
 				// Now add participants
-				for(Entry<EncounterRole, Set<Provider>> encounterProvider : this.encounter.getProvidersByRoles().entrySet())
-				{
+				for (Entry<EncounterRole, Set<Provider>> encounterProvider : encounter.getProvidersByRoles().entrySet()) {
 					
 					if(encounterProvider.getKey().getName().equals("AUT"))
 						for(Provider pvdr : encounterProvider.getValue())
@@ -170,34 +167,30 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 							Author aut = new Author(ContextControl.OverridingPropagating);
 							aut.setTime(new TS());
 							aut.getTime().setNullFlavor(NullFlavor.NoInformation);
-							aut.setAssignedAuthor(this.cdaDataUtil.createAuthorPerson(pvdr));
+							aut.setAssignedAuthor(cdaDataUtil.createAuthorPerson(pvdr));
 							retVal.getAuthor().add(aut);
 						}
-					else if(encounterProvider.getKey().getName().equals("LA")) // There technically are no "legal" attesters to the document here as it is an auto-generated document
+					else if (encounterProvider.getKey().getName().equals("LA")) // There technically are no "legal" attesters to the document here as it is an auto-generated document
 						;
-					else
-						for(Provider pvdr : encounterProvider.getValue())
-						{
-							Performer1 performer = new Performer1(x_ServiceEventPerformer.PRF, this.cdaDataUtil.createAssignedEntity(pvdr));
-							performer.setFunctionCode((CE<ParticipationFunction>) this.cdaDataUtil.parseCodeFromString(encounterProvider.getKey().getDescription(), CE.class));
+					else {
+						for (Provider pvdr : encounterProvider.getValue()) {
+							Performer1 performer = new Performer1(x_ServiceEventPerformer.PRF, cdaDataUtil.createAssignedEntity(pvdr));
+							performer.setFunctionCode((CE<ParticipationFunction>) cdaDataUtil.parseCodeFromString(encounterProvider.getKey().getDescription(), CE.class));
 							event.getPerformer().add(performer);
 						}
+					}
 				}
-		
-			}
-			else
-			{
-				earliestRecord = this.recordTarget.getDateCreated();
-				lastRecord = this.recordTarget.getDateChanged();
+			} else {
+				earliestRecord = recordTarget.getDateCreated();
+				lastRecord = recordTarget.getDateChanged();
 				
 				Person person= Context.getAuthenticatedUser().getPerson();
 				Collection<Provider> provider = Context.getProviderService().getProvidersByPerson(person);
-				if(provider.size() > 0)
-				{
+				if (provider.size() > 0) {
 					Author aut = new Author(ContextControl.OverridingPropagating);
 					aut.setTime(new TS());
 					aut.getTime().setNullFlavor(NullFlavor.NoInformation);
-					aut.setAssignedAuthor(this.cdaDataUtil.createAuthorPerson(provider.iterator().next()));
+					aut.setAssignedAuthor(cdaDataUtil.createAuthorPerson(provider.iterator().next()));
 					retVal.getAuthor().add(aut);
 				}
 				
@@ -208,7 +201,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 					latestCal = Calendar.getInstance();
 			earliestCal.setTime(earliestRecord);
 			
-			if(lastRecord != null)
+			if (lastRecord != null)
 				latestCal.setTime(lastRecord);
 			event.setEffectiveTime(new TS(earliestCal), new TS(latestCal)); // CCD CONF-4
 			
@@ -216,39 +209,37 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			retVal.getDocumentationOf().add(new DocumentationOf(event));
 			
 			// Record target
-			retVal.getRecordTarget().add(this.cdaDataUtil.createRecordTarget(this.recordTarget));
+			retVal.getRecordTarget().add(cdaDataUtil.createRecordTarget(recordTarget));
 			
 			// NOK (those within the time covered by this document)
-			for(Relationship relatedPerson : Context.getPersonService().getRelationshipsByPerson(this.recordTarget))
-			{
+			for (Relationship relatedPerson : Context.getPersonService().getRelationshipsByPerson(recordTarget)) {
 				// Periodic hull
-				retVal.getParticipant().add(this.cdaDataUtil.createRelatedPerson(relatedPerson, this.recordTarget));
+				retVal.getParticipant().add(cdaDataUtil.createRelatedPerson(relatedPerson, recordTarget));
 			}
 			
 			retVal.setComponent(new Component2(ActRelationshipHasComponent.HasComponent, BL.TRUE, new StructuredBody()));
-			for(Section sct : sections)
+			for (Section sct : sections)
 			{
-				if(sct == null) continue;
+				if (sct == null) {
+					continue;
+				}
 				
 				retVal.getComponent().getBodyChoiceIfStructuredBody().getComponent().add(
 						new Component3(ActRelationshipHasComponent.HasComponent, BL.TRUE, sct)
 						);
 				
 				// Minify authors
-				for(Author aut : sct.getAuthor())
-				{
-					if(!this.cdaDataUtil.containsAuthor(retVal.getAuthor(), aut))
+				for (Author aut : sct.getAuthor()) {
+					if(!cdaDataUtil.containsAuthor(retVal.getAuthor(), aut)) {
 						retVal.getAuthor().add(aut);
+					}
 
 				}
 				sct.getAuthor().clear();
 			}
 			
 			return retVal;
-		}
-		catch(Exception e)
-		{
-			
+		} catch (Exception e) {
 			log.error(e);
 			log.error(ExceptionUtils.getStackTrace(e));
 			throw new RuntimeException(e);
