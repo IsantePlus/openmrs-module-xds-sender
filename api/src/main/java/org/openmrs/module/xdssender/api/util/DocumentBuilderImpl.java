@@ -1,4 +1,4 @@
-package org.openmrs.module.xdssender.api.util.impl;
+package org.openmrs.module.xdssender.api.util;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
@@ -36,8 +36,6 @@ import org.openmrs.Provider;
 import org.openmrs.Relationship;
 import org.openmrs.Visit;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.openhie.client.util.CdaDataUtil;
-import org.openmrs.module.xdssender.api.util.DocumentBuilder;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -54,18 +52,24 @@ import java.util.UUID;
  */
 public class DocumentBuilderImpl implements DocumentBuilder {
 
-	// Record target
-	private Patient m_recordTarget;
-	// Encounter
-	private Encounter m_encounter;
 	// Log
-	protected final Log log = LogFactory.getLog(this.getClass());
-	// CDA data utility 
-	private CdaDataUtil m_cdaDataUtil = CdaDataUtil.getInstance();
-	
+	private final Log log = LogFactory.getLog(this.getClass());
+
+	// Record target
+	private Patient recordTarget;
+	// Encounter
+	private Encounter encounter;
+	// CDA data utility
+	private CdaDataUtil cdaDataUtil;
+
+	public DocumentBuilderImpl(Patient recordTarget, Encounter encounter, CdaDataUtil cdaDataUtil) {
+		this.recordTarget = recordTarget;
+		this.encounter = encounter;
+		this.cdaDataUtil = cdaDataUtil;
+	}
+
 	/**
 	 * Get the document type code
-	 * @see org.openmrs.module.shr.odd.generator.DocumentGenerator#getDocumentTypeCode()
 	 */
     public String getTypeCode() {
 		return "34133-9";
@@ -73,7 +77,6 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 
 	/**
 	 * Get the document format code
-	 * @see org.openmrs.module.shr.odd.generator.DocumentGenerator#getFormatCode()
 	 */
 	public String getFormatCode() {
 		return "2.16.840.1.113883.10.20.1";
@@ -84,7 +87,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 	 */
 	public void setEncounterEvent(Encounter enc)
 	{
-		this.m_encounter = enc;
+		this.encounter = enc;
 	}
 	
 	/**
@@ -92,21 +95,21 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 	 */
 	public Encounter getEncounterEvent()
 	{
-		return this.m_encounter;
+		return this.encounter;
 	}
 	
 	/**
 	 * Sets the record target
 	 */
 	public void setRecordTarget(Patient recordTarget) {
-		this.m_recordTarget = recordTarget;
+		this.recordTarget = recordTarget;
 	}
 
 	/**
 	 * Gets the currently assigned record target
 	 */
 	public Patient getRecordTarget() {
-		return this.m_recordTarget;
+		return this.recordTarget;
 	}
 
 
@@ -130,24 +133,23 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			
 			// Set to Normal, anything above a normal will not be included in the extract
 			retVal.setConfidentialityCode(new CE<x_BasicConfidentialityKind>(x_BasicConfidentialityKind.Normal));
-			retVal.setLanguageCode(Context.getLocale().toLanguageTag()); // CONF-5
+			retVal.setLanguageCode(Context.getLocale().toString(); // CONF-5
 			
 			// Custodian
 			Custodian custodian = new Custodian();
 			custodian.setAssignedCustodian(new AssignedCustodian());
-			custodian.getAssignedCustodian().setRepresentedCustodianOrganization(this.m_cdaDataUtil.getCustodianOrganization());
+			custodian.getAssignedCustodian().setRepresentedCustodianOrganization(this.cdaDataUtil.getCustodianOrganization());
 			retVal.setCustodian(custodian);
 
 			// Create documentation of
 			// TODO: Do we only need one of these for all events that occur in the CDA or one for each?
 			ServiceEvent event = new ServiceEvent(new CS<String>("PCPR")); // CCD CONF-3 & CONF-2
-			Date earliestRecord = new Date(),
-					lastRecord = new Date(0);
+			Date earliestRecord, lastRecord;
 			
 			// Assign data form the encounter
-			if(this.m_encounter != null)
+			if(this.encounter != null)
 			{
-				Visit visit = this.m_encounter.getVisit();
+				Visit visit = this.encounter.getVisit();
 				if(visit != null)
 				{
 					earliestRecord = visit.getStartDatetime();
@@ -155,11 +157,11 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 				}
 				else
 				{
-					lastRecord = earliestRecord = this.m_encounter.getEncounterDatetime();
+					lastRecord = earliestRecord = this.encounter.getEncounterDatetime();
 				}
 					
 				// Now add participants
-				for(Entry<EncounterRole, Set<Provider>> encounterProvider : this.m_encounter.getProvidersByRoles().entrySet())
+				for(Entry<EncounterRole, Set<Provider>> encounterProvider : this.encounter.getProvidersByRoles().entrySet())
 				{
 					
 					if(encounterProvider.getKey().getName().equals("AUT"))
@@ -168,7 +170,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 							Author aut = new Author(ContextControl.OverridingPropagating);
 							aut.setTime(new TS());
 							aut.getTime().setNullFlavor(NullFlavor.NoInformation);
-							aut.setAssignedAuthor(this.m_cdaDataUtil.createAuthorPerson(pvdr));
+							aut.setAssignedAuthor(this.cdaDataUtil.createAuthorPerson(pvdr));
 							retVal.getAuthor().add(aut);
 						}
 					else if(encounterProvider.getKey().getName().equals("LA")) // There technically are no "legal" attesters to the document here as it is an auto-generated document
@@ -176,8 +178,8 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 					else
 						for(Provider pvdr : encounterProvider.getValue())
 						{
-							Performer1 performer = new Performer1(x_ServiceEventPerformer.PRF, this.m_cdaDataUtil.createAssignedEntity(pvdr));
-							performer.setFunctionCode((CE<ParticipationFunction>)this.m_cdaDataUtil.parseCodeFromString(encounterProvider.getKey().getDescription(), CE.class));
+							Performer1 performer = new Performer1(x_ServiceEventPerformer.PRF, this.cdaDataUtil.createAssignedEntity(pvdr));
+							performer.setFunctionCode((CE<ParticipationFunction>) this.cdaDataUtil.parseCodeFromString(encounterProvider.getKey().getDescription(), CE.class));
 							event.getPerformer().add(performer);
 						}
 				}
@@ -185,8 +187,8 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			}
 			else
 			{
-				earliestRecord = this.m_recordTarget.getDateCreated();
-				lastRecord = this.m_recordTarget.getDateChanged();
+				earliestRecord = this.recordTarget.getDateCreated();
+				lastRecord = this.recordTarget.getDateChanged();
 				
 				Person person= Context.getAuthenticatedUser().getPerson();
 				Collection<Provider> provider = Context.getProviderService().getProvidersByPerson(person);
@@ -195,7 +197,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 					Author aut = new Author(ContextControl.OverridingPropagating);
 					aut.setTime(new TS());
 					aut.getTime().setNullFlavor(NullFlavor.NoInformation);
-					aut.setAssignedAuthor(this.m_cdaDataUtil.createAuthorPerson(provider.iterator().next()));
+					aut.setAssignedAuthor(this.cdaDataUtil.createAuthorPerson(provider.iterator().next()));
 					retVal.getAuthor().add(aut);
 				}
 				
@@ -214,13 +216,13 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			retVal.getDocumentationOf().add(new DocumentationOf(event));
 			
 			// Record target
-			retVal.getRecordTarget().add(this.m_cdaDataUtil.createRecordTarget(this.m_recordTarget));
+			retVal.getRecordTarget().add(this.cdaDataUtil.createRecordTarget(this.recordTarget));
 			
 			// NOK (those within the time covered by this document)
-			for(Relationship relatedPerson : Context.getPersonService().getRelationshipsByPerson(this.m_recordTarget))
+			for(Relationship relatedPerson : Context.getPersonService().getRelationshipsByPerson(this.recordTarget))
 			{
 				// Periodic hull
-				retVal.getParticipant().add(this.m_cdaDataUtil.createRelatedPerson(relatedPerson, this.m_recordTarget));
+				retVal.getParticipant().add(this.cdaDataUtil.createRelatedPerson(relatedPerson, this.recordTarget));
 			}
 			
 			retVal.setComponent(new Component2(ActRelationshipHasComponent.HasComponent, BL.TRUE, new StructuredBody()));
@@ -235,7 +237,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 				// Minify authors
 				for(Author aut : sct.getAuthor())
 				{
-					if(!this.m_cdaDataUtil.containsAuthor(retVal.getAuthor(), aut))
+					if(!this.cdaDataUtil.containsAuthor(retVal.getAuthor(), aut))
 						retVal.getAuthor().add(aut);
 
 				}
