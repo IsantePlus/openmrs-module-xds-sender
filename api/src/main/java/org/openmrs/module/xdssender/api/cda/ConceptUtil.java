@@ -1,4 +1,4 @@
-package org.openmrs.module.xdssender.api.util;
+package org.openmrs.module.xdssender.api.cda;
 
 import org.openmrs.ConceptNumeric;
 import org.openmrs.module.xdssender.XdsSenderConstants;

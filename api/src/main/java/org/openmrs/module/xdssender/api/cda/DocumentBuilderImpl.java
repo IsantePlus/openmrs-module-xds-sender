@@ -1,4 +1,4 @@
-package org.openmrs.module.xdssender.api.util;
+package org.openmrs.module.xdssender.api.cda;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
@@ -36,7 +36,7 @@ import org.openmrs.Provider;
 import org.openmrs.Relationship;
 import org.openmrs.Visit;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.xdssender.XdsSenderConstants;
+import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -52,17 +52,16 @@ import java.util.UUID;
  */
 public class DocumentBuilderImpl implements DocumentBuilder {
 	
-	// Log
 	private final Log log = LogFactory.getLog(this.getClass());
 	
-	// Record target
 	private Patient recordTarget;
 	
-	// Encounter
 	private Encounter encounter;
 	
-	// CDA data utility
 	private CdaDataUtil cdaDataUtil;
+	
+	public DocumentBuilderImpl() {
+	}
 	
 	public DocumentBuilderImpl(Patient recordTarget, Encounter encounter, CdaDataUtil cdaDataUtil) {
 		this.recordTarget = recordTarget;
@@ -120,7 +119,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			ClinicalDocument retVal = new ClinicalDocument();
 			retVal.setTypeId(new II("2.16.840.1.113883.1.3", "POCD_HD000040"));
 			retVal.setRealmCode(SET.createSET(new CS<BindingRealm>(BindingRealm.UniversalRealmOrContextUsedInEveryInstance)));
-			retVal.setTemplateId(LIST.createLIST(new II(XdsSenderConstants.DOC_TEMPLATE_MEDICAL_DOCUMENTS)));
+			retVal.setTemplateId(LIST.createLIST(new II(CdaHandlerConstants.DOC_TEMPLATE_MEDICAL_DOCUMENTS)));
 			// Identifier is the SHR root of the odd document ODD ID + Current Time (making the UUID of the ODD)
 			TS idDate = TS.now();
 			idDate.setDateValuePrecision(TS.SECONDNOTIMEZONE);

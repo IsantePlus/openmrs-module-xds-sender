@@ -43,26 +43,6 @@ public class XdsSenderConfig {
 		return getProperty(ID_PATTERN, "%2$s^^^&%1$s&ISO");
 	}
 	
-	public String getProviderRoot() {
-		return getProperty(PROVIDER_ROOT, "1.2.3.4.5.7");
-	}
-	
-	public String getUserRoot() {
-		return getProperty(USER_ROOT, "1.2.3.4.5.10");
-	}
-	
-	public String getLocationRoot() {
-		return getProperty(LOCATION_ROOT, "1.2.3.4.5.8");
-	}
-	
-	public String getShrRoot() {
-		return getProperty(SHR_ROOT, "1.2.3.4.5");
-	}
-	
-	public String getPatientRoot() {
-		return getProperty(PATIENT_ROOT, "1.2.3.4.9");
-	}
-	
 	private String getProperty(String name, String defaultVal) {
 		return administrationService.getGlobalProperty(name, defaultVal);
 	}

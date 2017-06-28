@@ -1,4 +1,4 @@
-package org.openmrs.module.xdssender.api.util;
+package org.openmrs.module.xdssender.api.cda;
 
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalDocument;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Section;
@@ -14,46 +14,36 @@ public interface DocumentBuilder {
 	
 	/**
 	 * Get the classcode
-	 * 
-	 * @return
 	 */
-	public String getTypeCode();
+	String getTypeCode();
 	
 	/**
 	 * Get the format code
-	 * 
-	 * @return
 	 */
-	public String getFormatCode();
+	String getFormatCode();
 	
 	/**
 	 * Get the encounter event
 	 */
-	public Encounter getEncounterEvent();
+	Encounter getEncounterEvent();
 	
 	/**
 	 * Set the Encounter this document builder will be representing
 	 */
-	public void setEncounterEvent(Encounter enc);
+	void setEncounterEvent(Encounter enc);
 	
 	/**
 	 * Get the record target of this document
-	 * 
-	 * @return
 	 */
-	public Patient getRecordTarget();
+	Patient getRecordTarget();
 	
 	/**
 	 * Set the record target of this document
-	 * 
-	 * @param recordTarget
 	 */
-	public void setRecordTarget(Patient recordTarget);
+	void setRecordTarget(Patient recordTarget);
 	
 	/**
 	 * Generate the document
-	 * 
-	 * @return
 	 */
 	ClinicalDocument generate(Section... sections);
 	

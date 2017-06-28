@@ -1,4 +1,4 @@
-package org.openmrs.module.xdssender.api.util;
+package org.openmrs.module.xdssender.api.cda;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +27,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 /**
- * The On-Demand document metadata util
+ * The On-Demand document metadata cda
  */
 @Component("xdssender.CdaMetadataUtil")
 public class CdaMetadataUtil {
