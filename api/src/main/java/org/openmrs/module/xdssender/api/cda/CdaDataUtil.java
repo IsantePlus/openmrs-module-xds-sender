@@ -65,14 +65,12 @@ import org.openmrs.PersonName;
 import org.openmrs.Provider;
 import org.openmrs.Relationship;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
-import org.openmrs.module.shr.cdahandler.configuration.CdaHandlerConfiguration;
 import org.openmrs.module.xdssender.XdsSenderConfig;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.xml.stream.XMLInputFactory;
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
@@ -95,11 +93,7 @@ public class CdaDataUtil {
 	private static final List<String> nextOfKinRelations = Arrays.asList("MTH", "FTH", "GRMTH", "GRFTH", "SIB", "CHILD",
 	    "AUNT", "UNCLE", "PGRMTH", "MGRMTH", "PGRFTH", "MGRFTH", "SON", "DAU", "BRO", "SIS", "DOMPART", "FAMMEMB");
 	
-	private static CdaDataUtil s_instance;
-	
-	// Cda Handler Configuration
-	private Pattern idPattern;
-	
+
 	@Autowired
 	private XdsSenderConfig config;
 	
@@ -109,19 +103,13 @@ public class CdaDataUtil {
 	@Autowired
 	private CdaMetadataUtil metadataUtil;
 	
-	private CdaHandlerConfiguration cdaHandlerConfig = CdaHandlerConfiguration.getInstance();
-	
-	@PostConstruct
-	public void init() {
-		idPattern = Pattern.compile(config.getIdPattern(), Pattern.CASE_INSENSITIVE);
-	}
-	
+
 	/**
 	 * Parse an II from a string
 	 */
 	public II parseIIFromString(String iiString) {
 		II retVal = new II();
-		Matcher matcher = idPattern.matcher(iiString);
+		Matcher matcher = getIdPattern().matcher(iiString);
 		if (matcher.matches()) {
 			retVal.setExtension(matcher.group(1));
 			if (retVal.getExtension().equals("null"))
@@ -135,7 +123,7 @@ public class CdaDataUtil {
 	 * Parse an II from a string
 	 */
 	public <T extends CS<?>> T parseCodeFromString(String codeString, Class<T> clazz) {
-		Matcher matcher = idPattern.matcher(codeString);
+		Matcher matcher = getIdPattern().matcher(codeString);
 		if (matcher.matches()) {
 			try {
 				T retVal = clazz.newInstance();
@@ -170,7 +158,7 @@ public class CdaDataUtil {
 		AssignedEntity retVal = new AssignedEntity();
 		
 		// Get the ID
-		retVal.setId(SET.createSET(new II(cdaHandlerConfig.getProviderRoot(), pvdr.getId().toString())));
+		retVal.setId(SET.createSET(new II(config.getProviderRoot(), pvdr.getId().toString())));
 		
 		// Telecoms
 		retVal.setTelecom(createTelecomSet(pvdr.getPerson()));
@@ -181,7 +169,7 @@ public class CdaDataUtil {
 		// Get names
 		retVal.setAssignedPerson(new Person(createNameSet(pvdr.getPerson())));
 		
-		PersonAttribute orgAttribute = pvdr.getPerson().getAttribute(CdaHandlerConstants.ATTRIBUTE_NAME_ORGANIZATION);
+		PersonAttribute orgAttribute = pvdr.getPerson().getAttribute(XdsSenderConstants.ATTRIBUTE_NAME_ORGANIZATION);
 		if (orgAttribute != null)
 			retVal.setRepresentedOrganization(createOrganization((Location) orgAttribute.getHydratedObject()));
 		
@@ -197,7 +185,7 @@ public class CdaDataUtil {
 		SET<TEL> retVal = new SET<TEL>();
 		if (person != null)
 			for (PersonAttribute patt : person.getAttributes()) {
-				if (patt.getAttributeType().getName().equals(CdaHandlerConstants.ATTRIBUTE_NAME_TELECOM)) {
+				if (patt.getAttributeType().getName().equals(XdsSenderConstants.ATTRIBUTE_NAME_TELECOM)) {
 					TEL tel = new TEL();
 					if (patt.getValue().contains(":")) {
 						String[] parts = { patt.getValue().substring(0, patt.getValue().indexOf(":")),
@@ -289,9 +277,8 @@ public class CdaDataUtil {
 		AssignedAuthor retVal = new AssignedAuthor();
 		
 		// Get the ID
-		retVal.setId(SET.createSET(new II(cdaHandlerConfig.getProviderRoot(), pvdr.getId().toString()), new II(
-		        cdaHandlerConfig.getUserRoot(), Context.getUserService().getUsersByPerson(pvdr.getPerson(), false).get(0)
-		                .getId().toString())));
+		retVal.setId(SET.createSET(new II(config.getProviderRoot(), pvdr.getId().toString()), new II(config.getUserRoot(),
+		        Context.getUserService().getUsersByPerson(pvdr.getPerson(), false).get(0).getId().toString())));
 		
 		// Set telecom
 		if (pvdr.getPerson() != null) {
@@ -303,7 +290,7 @@ public class CdaDataUtil {
 			// Get names
 			retVal.setAssignedAuthorChoice(new Person(createNameSet(pvdr.getPerson())));
 			
-			PersonAttribute orgAttribute = pvdr.getPerson().getAttribute(CdaHandlerConstants.ATTRIBUTE_NAME_ORGANIZATION);
+			PersonAttribute orgAttribute = pvdr.getPerson().getAttribute(XdsSenderConstants.ATTRIBUTE_NAME_ORGANIZATION);
 			if (orgAttribute != null)
 				retVal.setRepresentedOrganization(createOrganization((Location) orgAttribute.getHydratedObject()));
 		} else
@@ -320,10 +307,10 @@ public class CdaDataUtil {
 		// Identifiers
 		retVal.setId(new SET<II>());
 		LocationAttribute externalId = metadataUtil.getLocationAttribute(location,
-		    CdaHandlerConstants.ATTRIBUTE_NAME_EXTERNAL_ID);
+		    XdsSenderConstants.ATTRIBUTE_NAME_EXTERNAL_ID);
 		if (externalId != null)
 			retVal.getId().add(parseIIFromString(externalId.getValue().toString()));
-		retVal.getId().add(new II(cdaHandlerConfig.getLocationRoot(), location.getId().toString()));
+		retVal.getId().add(new II(config.getLocationRoot(), location.getId().toString()));
 		
 		// Name , etc. ?
 		if (location.getName() != null)
@@ -342,11 +329,11 @@ public class CdaDataUtil {
 			retVal.getAsOrganizationPartOf().setClassCode(RoleClassPart.Part);
 			retVal.getAsOrganizationPartOf().setId(new SET<II>());
 			externalId = metadataUtil.getLocationAttribute(location.getParentLocation(),
-			    CdaHandlerConstants.ATTRIBUTE_NAME_EXTERNAL_ID);
+			    XdsSenderConstants.ATTRIBUTE_NAME_EXTERNAL_ID);
 			if (externalId != null)
 				retVal.getAsOrganizationPartOf().getId().add(parseIIFromString(externalId.getValue().toString()));
 			retVal.getAsOrganizationPartOf().getId()
-			        .add(new II(cdaHandlerConfig.getLocationRoot(), location.getParentLocation().getId().toString()));
+			        .add(new II(config.getLocationRoot(), location.getParentLocation().getId().toString()));
 			
 			if (location.getParentLocation().getRetired())
 				retVal.getAsOrganizationPartOf().setStatusCode(RoleStatus.Terminated);
@@ -375,7 +362,7 @@ public class CdaDataUtil {
 		} else {
 			// Set Id
 			retVal.getAssignedAuthor().setId(
-			    SET.createSET(new II(cdaHandlerConfig.getShrRoot(), implementation.getImplementationId())));
+			    SET.createSET(new II(config.getShrRoot(), implementation.getImplementationId())));
 		}
 		AuthoringDevice device = new AuthoringDevice();
 		device.setSoftwareName(new SC("OpenSHR"));
@@ -436,12 +423,12 @@ public class CdaDataUtil {
 			retVal.getName().getParts().add(new ENXP(shrLocation.getName()));
 			// TODO: Get a root assigned for OpenMRS implementation IDs? Or make the id long enough for an OID
 			LocationAttribute idAttribute = metadataUtil.getLocationAttribute(shrLocation,
-			    CdaHandlerConstants.ATTRIBUTE_NAME_EXTERNAL_ID);
+			    XdsSenderConstants.ATTRIBUTE_NAME_EXTERNAL_ID);
 			if (idAttribute != null)
 				retVal.setId(SET.createSET(parseIIFromString(idAttribute.getValue().toString()),
-				    new II(cdaHandlerConfig.getLocationRoot(), shrLocation.getId().toString())));
+				    new II(config.getLocationRoot(), shrLocation.getId().toString())));
 			else
-				retVal.setId(SET.createSET(new II(cdaHandlerConfig.getLocationRoot(), shrLocation.getId().toString())));
+				retVal.setId(SET.createSET(new II(config.getLocationRoot(), shrLocation.getId().toString())));
 			
 			retVal.setAddr(createAddressSet(shrLocation));
 			// TODO
@@ -469,7 +456,7 @@ public class CdaDataUtil {
 				patientRole.getId().add(ii);
 		}
 		
-		II meId = new II(cdaHandlerConfig.getPatientRoot(), patient.getId().toString());
+		II meId = new II(config.getPatientRoot(), patient.getId().toString());
 		if (!patientRole.getId().contains(meId))
 			patientRole.getId().add(meId);
 		
@@ -480,10 +467,10 @@ public class CdaDataUtil {
 		patientRole.setTelecom(createTelecomSet(patient));
 		
 		// Marital status?
-		PersonAttribute civilStatusCode = patient.getAttribute(CdaHandlerConstants.ATTRIBUTE_NAME_CIVIL_STATUS);
+		PersonAttribute civilStatusCode = patient.getAttribute(XdsSenderConstants.ATTRIBUTE_NAME_CIVIL_STATUS);
 		if (civilStatusCode != null)
 			hl7Patient.setMaritalStatusCode(metadataUtil.getStandardizedCode((Concept) civilStatusCode.getHydratedObject(),
-			    CdaHandlerConstants.CODE_SYSTEM_MARITAL_STATUS, CE.class));
+			    XdsSenderConstants.CODE_SYSTEM_MARITAL_STATUS, CE.class));
 		
 		// Names
 		hl7Patient.setName(createNameSet(patient));
@@ -716,5 +703,8 @@ public class CdaDataUtil {
 		}
 		return match;
 	}
-	
+
+	private Pattern getIdPattern() {
+		return Pattern.compile(config.getIdPattern(), Pattern.CASE_INSENSITIVE);
+	}
 }

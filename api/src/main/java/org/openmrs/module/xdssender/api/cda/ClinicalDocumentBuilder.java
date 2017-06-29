@@ -9,7 +9,7 @@ import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.cda.section.impl.ActiveProblemsSectionBuilder;
 import org.openmrs.module.xdssender.api.cda.section.impl.AntepartumFlowsheetPanelSectionBuilder;
 import org.openmrs.module.xdssender.api.cda.section.impl.EstimatedDeliveryDateSectionBuilder;
@@ -64,11 +64,11 @@ public class ClinicalDocumentBuilder {
 			relevantObs = Context.getObsService().getObservationsByPerson(builder.getRecordTarget());
 		
 		for (Obs obs : relevantObs) {
-			CD<String> loincCode = metadataUtil.getStandardizedCode(obs.getConcept(), CdaHandlerConstants.CODE_SYSTEM_LOINC,
+			CD<String> loincCode = metadataUtil.getStandardizedCode(obs.getConcept(), XdsSenderConstants.CODE_SYSTEM_LOINC,
 			    CD.class);
 			int conceptId = obs.getConcept().getId();
 			// EDD Stuff
-			if (obs.getConcept().getId().equals(CdaHandlerConstants.CONCEPT_ID_MEDICATION_HISTORY))
+			if (obs.getConcept().getId().equals(XdsSenderConstants.CONCEPT_ID_MEDICATION_HISTORY))
 				medicationObs.add(obs);
 			else if ((conceptId == 5596 || loincCode.getCode() != null && loincCode.getCode().equals("11778-8"))
 			        && (estimatedDeliveryDateObs == null || obs.getDateCreated().after(

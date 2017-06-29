@@ -10,7 +10,7 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Section;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntry;
 import org.openmrs.ConceptNumeric;
 import org.openmrs.Obs;
-import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.cda.entry.impl.AntepartumFlowsheetBatteryEntryBuilder;
 import org.openmrs.module.xdssender.api.cda.entry.impl.SimpleObservationEntryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +37,10 @@ public class AntepartumFlowsheetPanelSectionBuilder extends SectionBuilderImpl {
 	public Section generate(Entry... entries) {
 		Section retVal = super.generate(entries);
 		retVal.setTemplateId(LIST.createLIST(new II(
-		        CdaHandlerConstants.SCT_TEMPLATE_ANTEPARTUM_TEMPLATE_VISIT_SUMMARY_FLOWSHEET)));
+		        XdsSenderConstants.SCT_TEMPLATE_ANTEPARTUM_TEMPLATE_VISIT_SUMMARY_FLOWSHEET)));
 		retVal.setTitle("Antepartum Visist Summary Flowsheet Panel");
-		retVal.setCode(new CE<String>("11369-6", CdaHandlerConstants.CODE_SYSTEM_LOINC,
-		        CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null, "PREGNANCY SUMMARY", null));
+		retVal.setCode(new CE<String>("11369-6", XdsSenderConstants.CODE_SYSTEM_LOINC,
+		        XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null, "PREGNANCY SUMMARY", null));
 		return retVal;
 	}
 	
@@ -56,7 +56,7 @@ public class AntepartumFlowsheetPanelSectionBuilder extends SectionBuilderImpl {
 		    gestgationalAgeObs, fundalHeightObs, presentationObs, systolicBpObs, diastolicBpObs, weightObs)), prepregnancyWeight = null;
 		if (prepregnancyWeightObs != null) {
 			prepregnancyWeight = new Entry(x_ActRelationshipEntry.HasComponent, BL.TRUE, obsBuilder.generate(new CD<String>(
-			        "8348-5", CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+			        "8348-5", XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 			        "Prepregnancy Weight", null), prepregnancyWeightObs));
 			return this.generate(prepregnancyWeight, flowsheetBattery);
 		} else

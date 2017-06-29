@@ -8,7 +8,7 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Observation;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntryRelationship;
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Obs;
-import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -32,15 +32,15 @@ public class EstimatedDeliveryDateObservationBuilder extends EntryBuilderImpl {
 			throw new IllegalArgumentException("lastMenstrualPeriodObs must carry Date value");
 		
 		Observation deliveryDateObs = super.createObservation(Arrays
-		        .asList(CdaHandlerConstants.ENT_TEMPLATE_SIMPLE_OBSERVATION), new CD<String>("11779-6",
-		        CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+		        .asList(XdsSenderConstants.ENT_TEMPLATE_SIMPLE_OBSERVATION), new CD<String>("11779-6",
+		        XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 		        "Delivery date estimated from date of last menstrual period", null), estimatedDeliveryDateObs), eddObs = super
-		        .createObservation(Arrays.asList(CdaHandlerConstants.ENT_TEMPLATE_SIMPLE_OBSERVATION,
-		            CdaHandlerConstants.ENT_TEMPLATE_DELIVERY_DATE_OBSERVATION), new CD<String>("11778-8",
-		                CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+		        .createObservation(Arrays.asList(XdsSenderConstants.ENT_TEMPLATE_SIMPLE_OBSERVATION,
+		            XdsSenderConstants.ENT_TEMPLATE_DELIVERY_DATE_OBSERVATION), new CD<String>("11778-8",
+		                XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 		                "Delivery Date - Estimate", null), estimatedDeliveryDateObs), lmpObs = super.createObservation(
-		    Arrays.asList(CdaHandlerConstants.ENT_TEMPLATE_SIMPLE_OBSERVATION), new CD<String>("8655-2",
-		            CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+		    Arrays.asList(XdsSenderConstants.ENT_TEMPLATE_SIMPLE_OBSERVATION), new CD<String>("8655-2",
+		            XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 		            "Date of last menstrual period - reported", null), lastMenstrualPeriodObs);
 		eddObs.getEntryRelationship().add(
 		    new EntryRelationship(x_ActRelationshipEntryRelationship.SPRT, BL.TRUE, deliveryDateObs));

@@ -13,7 +13,7 @@ import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActClassDocumentEntryOrganize
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
-import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -46,39 +46,38 @@ public class VitalSignsBatteryEntryBuilder extends EntryBuilderImpl {
 		        && !batteryEnc.getId().equals(weightObs.getEncounter().getId()))
 			throw new IllegalArgumentException("All arguments for the flowsheet panel must come from the same encounter");
 		
-		Organizer batteryOrganizer = super.createOrganizer(x_ActClassDocumentEntryOrganizer.BATTERY, Arrays.asList(
-		    CdaHandlerConstants.ENT_TEMPLATE_VITAL_SIGNS_ORGANIZER,
-		    CdaHandlerConstants.ENT_TEMPLATE_CCD_VITAL_SIGNS_ORGANIZER), new CD<String>("46680005",
-		        CdaHandlerConstants.CODE_SYSTEM_SNOMED, "SNOMED CT", null, "Vital Signs", null), new II(
-		        getCdaConfiguration().getEncounterRoot(), batteryEnc.getId().toString()), ActStatus.Completed, batteryEnc
-		        .getEncounterDatetime());
+		Organizer batteryOrganizer = super.createOrganizer(x_ActClassDocumentEntryOrganizer.BATTERY, Arrays
+		        .asList(XdsSenderConstants.ENT_TEMPLATE_VITAL_SIGNS_ORGANIZER,
+		            XdsSenderConstants.ENT_TEMPLATE_CCD_VITAL_SIGNS_ORGANIZER), new CD<String>("46680005",
+		        XdsSenderConstants.CODE_SYSTEM_SNOMED, "SNOMED CT", null, "Vital Signs", null), new II(getConfiguration()
+		        .getEncounterRoot(), batteryEnc.getId().toString()), ActStatus.Completed, batteryEnc.getEncounterDatetime());
 		
 		SimpleObservationEntryBuilder obsBuilder = new SimpleObservationEntryBuilder();
 		
 		batteryOrganizer.getComponent().add(
 		    new Component4(ActRelationshipHasComponent.HasComponent, BL.TRUE, obsBuilder.generate(new CD<String>("8480-6",
-		            CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+		            XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 		            "Blood pressure - Systolic", null), systolicBpObs)));
 		
 		if (diastolicBpObs != null)
 			batteryOrganizer.getComponent().add(
 			    new Component4(ActRelationshipHasComponent.HasComponent, BL.TRUE, obsBuilder.generate(new CD<String>(
-			            "8462-4", CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+			            "8462-4", XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 			            "Blood pressure - Diastolic", null), diastolicBpObs)));
 		if (weightObs != null)
 			batteryOrganizer.getComponent().add(
 			    new Component4(ActRelationshipHasComponent.HasComponent, BL.TRUE, obsBuilder.generate(new CD<String>(
-			            "3141-9", CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+			            "3141-9", XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 			            "Body weight measured", null), weightObs)));
 		if (heightObs != null)
 			batteryOrganizer.getComponent().add(
 			    new Component4(ActRelationshipHasComponent.HasComponent, BL.TRUE, obsBuilder.generate(new CD<String>(
-			            "8302-2", CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+			            "8302-2", XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 			            "Body height measured", null), heightObs)));
 		if (temperatureObs != null)
 			batteryOrganizer.getComponent().add(
 			    new Component4(ActRelationshipHasComponent.HasComponent, BL.TRUE, obsBuilder.generate(new CD<String>(
-			            "8310-5", CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+			            "8310-5", XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 			            "Body Temperature", null), temperatureObs)));
 		
 		return batteryOrganizer;

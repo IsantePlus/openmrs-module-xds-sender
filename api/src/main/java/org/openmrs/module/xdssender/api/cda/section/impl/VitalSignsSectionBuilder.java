@@ -8,7 +8,7 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Entry;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Section;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntry;
 import org.openmrs.Obs;
-import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.cda.entry.impl.VitalSignsBatteryEntryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,11 +30,11 @@ public class VitalSignsSectionBuilder extends SectionBuilderImpl {
 	@Override
 	public Section generate(Entry... entries) {
 		Section retVal = super.generate(entries);
-		retVal.setTemplateId(LIST.createLIST(new II(CdaHandlerConstants.SCT_TEMPLATE_CCD_VITAL_SIGNS), new II(
-		        CdaHandlerConstants.SCT_TEMPLATE_VITAL_SIGNS)));
+		retVal.setTemplateId(LIST.createLIST(new II(XdsSenderConstants.SCT_TEMPLATE_CCD_VITAL_SIGNS), new II(
+		        XdsSenderConstants.SCT_TEMPLATE_VITAL_SIGNS)));
 		retVal.setTitle("Vital Signs");
-		retVal.setCode(new CE<String>("8716-3", CdaHandlerConstants.CODE_SYSTEM_LOINC,
-		        CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null, "VITAL SIGNS", null));
+		retVal.setCode(new CE<String>("8716-3", XdsSenderConstants.CODE_SYSTEM_LOINC,
+		        XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null, "VITAL SIGNS", null));
 		return retVal;
 	}
 	

@@ -13,7 +13,7 @@ import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActClassDocumentEntryOrganize
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
-import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -41,36 +41,36 @@ public class AntepartumFlowsheetBatteryEntryBuilder extends EntryBuilderImpl {
 			throw new IllegalArgumentException("All arguments for the flowsheet panel must come from the same encounter");
 		
 		Organizer batteryOrganizer = super.createOrganizer(x_ActClassDocumentEntryOrganizer.BATTERY, Collections
-		        .singletonList(CdaHandlerConstants.ENT_TEMPLATE_ANTEPARTUM_FLOWSHEET_PANEL), new CD<String>("57061-4",
-		        CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
-		        "Antepartum Flowsheet Panel", null), new II(getCdaConfiguration().getEncounterRoot(), batteryEnc.getId()
+		        .singletonList(XdsSenderConstants.ENT_TEMPLATE_ANTEPARTUM_FLOWSHEET_PANEL), new CD<String>("57061-4",
+		        XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
+		        "Antepartum Flowsheet Panel", null), new II(getConfiguration().getEncounterRoot(), batteryEnc.getId()
 		        .toString()), ActStatus.Completed, batteryEnc.getEncounterDatetime());
 		
 		SimpleObservationEntryBuilder obsBuilder = new SimpleObservationEntryBuilder();
 		batteryOrganizer.getComponent().add(
 		    new Component4(ActRelationshipHasComponent.HasComponent, BL.TRUE, obsBuilder.generate(new CD<String>("11884-4",
-		            CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+		            XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 		            "Gestational Age", null), gestgationalAgeObs)));
 		
 		if (fundalHeightObs != null)
 			batteryOrganizer.getComponent().add(
 			    new Component4(ActRelationshipHasComponent.HasComponent, BL.TRUE, obsBuilder.generate(new CD<String>(
-			            "11881-0", CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+			            "11881-0", XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 			            "Fundal Height by tapemeasure", null), fundalHeightObs)));
 		if (systolicBpObs != null)
 			batteryOrganizer.getComponent().add(
 			    new Component4(ActRelationshipHasComponent.HasComponent, BL.TRUE, obsBuilder.generate(new CD<String>(
-			            "8480-6", CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+			            "8480-6", XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 			            "Blood pressure - Systolic", null), systolicBpObs)));
 		if (diastolicBpObs != null)
 			batteryOrganizer.getComponent().add(
 			    new Component4(ActRelationshipHasComponent.HasComponent, BL.TRUE, obsBuilder.generate(new CD<String>(
-			            "8462-4", CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+			            "8462-4", XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 			            "Blood pressure - Diastolic", null), diastolicBpObs)));
 		if (weightObs != null)
 			batteryOrganizer.getComponent().add(
 			    new Component4(ActRelationshipHasComponent.HasComponent, BL.TRUE, obsBuilder.generate(new CD<String>(
-			            "3141-9", CdaHandlerConstants.CODE_SYSTEM_LOINC, CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null,
+			            "3141-9", XdsSenderConstants.CODE_SYSTEM_LOINC, XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null,
 			            "Body weight measured", null), weightObs)));
 		
 		return batteryOrganizer;

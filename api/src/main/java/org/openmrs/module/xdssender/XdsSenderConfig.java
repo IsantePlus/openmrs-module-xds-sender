@@ -9,6 +9,7 @@
  */
 package org.openmrs.module.xdssender;
 
+import ca.uhn.hl7v2.model.v25.segment.LOC;
 import org.openmrs.api.AdministrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,6 +35,10 @@ public class XdsSenderConfig {
 	
 	private static final String PATIENT_ROOT = "xdssender.patientRoot";
 	
+	private static final String ENCOUNTER_ROOT = "xdssender.encounterRoot";
+	
+	private static final String OBS_ROOT = "xdssender.obsRoot";
+	
 	@Autowired
 	@Qualifier("adminService")
 	private AdministrationService administrationService;
@@ -41,6 +46,34 @@ public class XdsSenderConfig {
 	public String getIdPattern() {
 		// TODO - change default
 		return getProperty(ID_PATTERN, "%2$s^^^&%1$s&ISO");
+	}
+	
+	public String getShrRoot() {
+		return getProperty(SHR_ROOT, "1.2.3.4.5");
+	}
+	
+	public String getEncounterRoot() {
+		return getProperty(ENCOUNTER_ROOT, "1.2.3.4.5.2");
+	}
+	
+	public String getObsRoot() {
+		return getProperty(ENCOUNTER_ROOT, "1.2.3.4.5.3");
+	}
+	
+	public String getProviderRoot() {
+		return getProperty(PROVIDER_ROOT, "1.2.3.4.5.7");
+	}
+	
+	public String getLocationRoot() {
+		return getProperty(LOCATION_ROOT, "1.2.3.4.5.8");
+	}
+	
+	public String getPatientRoot() {
+		return getProperty(PATIENT_ROOT, "1.2.3.4.5.9");
+	}
+	
+	public String getUserRoot() {
+		return getProperty(USER_ROOT, "1.2.3.4.5.10");
 	}
 	
 	private String getProperty(String name, String defaultVal) {

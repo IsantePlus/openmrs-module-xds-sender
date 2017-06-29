@@ -5,7 +5,7 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalStatement;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.SubstanceAdministration;
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Obs;
-import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -24,8 +24,8 @@ public class MedicationEntryBuilder extends EntryBuilderImpl {
 	 * @return
 	 */
 	public SubstanceAdministration generateUnknown() {
-		return this.createNoSubstanceAdministration(Arrays.asList(CdaHandlerConstants.ENT_TEMPLATE_MEDICATIONS,
-		    CdaHandlerConstants.ENT_TEMPLATE_CCD_MEDICATION_ACTIVITY));
+		return this.createNoSubstanceAdministration(Arrays.asList(XdsSenderConstants.ENT_TEMPLATE_MEDICATIONS,
+		    XdsSenderConstants.ENT_TEMPLATE_CCD_MEDICATION_ACTIVITY));
 	}
 	
 	/**
@@ -35,8 +35,8 @@ public class MedicationEntryBuilder extends EntryBuilderImpl {
 	 * @return
 	 */
 	public SubstanceAdministration generate(Obs medicationObs) {
-		return this.createSubstanceAdministration(Arrays.asList(CdaHandlerConstants.ENT_TEMPLATE_MEDICATIONS,
-		    CdaHandlerConstants.ENT_TEMPLATE_CCD_MEDICATION_ACTIVITY), medicationObs);
+		return this.createSubstanceAdministration(Arrays.asList(XdsSenderConstants.ENT_TEMPLATE_MEDICATIONS,
+		    XdsSenderConstants.ENT_TEMPLATE_CCD_MEDICATION_ACTIVITY), medicationObs);
 	}
 	
 	/**

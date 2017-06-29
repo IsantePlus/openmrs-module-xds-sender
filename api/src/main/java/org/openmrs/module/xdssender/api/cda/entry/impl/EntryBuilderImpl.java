@@ -60,13 +60,12 @@ import org.openmrs.Drug;
 import org.openmrs.Obs;
 import org.openmrs.Provider;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
-import org.openmrs.module.shr.cdahandler.api.CdaImportService;
-import org.openmrs.module.shr.cdahandler.configuration.CdaHandlerConfiguration;
-import org.openmrs.module.shr.cdahandler.obs.ExtendedObs;
+import org.openmrs.module.xdssender.XdsSenderConfig;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.cda.CdaDataUtil;
 import org.openmrs.module.xdssender.api.cda.CdaMetadataUtil;
 import org.openmrs.module.xdssender.api.cda.entry.EntryBuilder;
+import org.openmrs.module.xdssender.api.cda.obs.ExtendedObs;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -95,11 +94,12 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 	@Autowired
 	private CdaMetadataUtil cdaMetadataUtil;
 	
-	private CdaHandlerConfiguration cdaConfiguration = CdaHandlerConfiguration.getInstance();
+	@Autowired
+	private XdsSenderConfig config;
 	
 	// Unknown codes
 	private static final CD<String> s_drugTreatmentUnknownCode = new CD<String>("182904002",
-	        CdaHandlerConstants.CODE_SYSTEM_SNOMED, null, null, "Drug Treatment Unknown", null);
+	        XdsSenderConstants.CODE_SYSTEM_SNOMED, null, null, "Drug Treatment Unknown", null);
 	
 	// log
 	protected final Log log = LogFactory.getLog(this.getClass());
@@ -119,7 +119,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 				if (ii.getRoot() != null && !ii.getRoot().isEmpty())
 					retVal.add(ii);
 			}
-			retVal.add(new II(this.cdaConfiguration.getObsRoot(), sourceObs.getId().toString()));
+			retVal.add(new II(this.config.getObsRoot(), sourceObs.getId().toString()));
 		}
 		
 		return retVal;
@@ -177,7 +177,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 			    sourceData.getChangedBy().getPerson());
 			Provider pvdr = providers.iterator().next();
 			retVal.setAssignedAuthor(this.cdaDataUtil.createAuthorPerson(pvdr));
-			//			retVal.setAssignedAuthor(new AssignedAuthor(SET.createSET(new II(this.cdaConfiguration.getUserRoot(), sourceData.getChangedBy().getId().toString()))));
+			//			retVal.setAssignedAuthor(new AssignedAuthor(SET.createSET(new II(this.config.getUserRoot(), sourceData.getChangedBy().getId().toString()))));
 		} else {
 			retVal.setTime(this.cdaDataUtil.createTS(sourceData.getDateCreated()));
 			Collection<Provider> providers = Context.getProviderService().getProvidersByPerson(
@@ -189,7 +189,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 			} else {
 				log.error("No provider is found for this observation");
 			}
-			//retVal.setAssignedAuthor(new AssignedAuthor(SET.createSET(new II(this.cdaConfiguration.getUserRoot(), sourceData.getCreator().getId().toString()))));
+			//retVal.setAssignedAuthor(new AssignedAuthor(SET.createSET(new II(this.config.getUserRoot(), sourceData.getCreator().getId().toString()))));
 		}
 		return retVal;
 	}
@@ -201,8 +201,8 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 		// Create the product
 		Consumable consumable = new Consumable();
 		ManufacturedProduct product = new ManufacturedProduct(RoleClassManufacturedProduct.ManufacturedProduct);
-		product.setTemplateId(LIST.createLIST(new II(CdaHandlerConstants.ENT_TEMPLATE_CCD_MEDICATION_PRODUCT), new II(
-		        CdaHandlerConstants.ENT_TEMPLATE_PRODUCT)));
+		product.setTemplateId(LIST.createLIST(new II(XdsSenderConstants.ENT_TEMPLATE_CCD_MEDICATION_PRODUCT), new II(
+		        XdsSenderConstants.ENT_TEMPLATE_PRODUCT)));
 		
 		Material manufacturedMaterial = new Material();
 		product.setManufacturedDrugOrOtherMaterial(manufacturedMaterial);
@@ -355,16 +355,16 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 		retVal.setMoodCode(this.getMoodCode(sourceObs, x_ActMoodDocumentObservation.class));
 		
 		// Extended observation stuff
-		ExtendedObs extendedObs = Context.getService(CdaImportService.class).getExtendedObs(sourceObs.getId());
-		if (extendedObs != null)
-			this.setExtendedObservationProperties(retVal, extendedObs);
+		/*		ExtendedObs extendedObs = Context.getService(CdaImportService.class).getExtendedObs(sourceObs.getId());
+				if (extendedObs != null)
+					this.setExtendedObservationProperties(retVal, extendedObs);*/
 		
 		// Replacement?
 		if (sourceObs.getPreviousVersion() != null) {
 			Reference prevRef = new Reference(x_ActRelationshipExternalReference.RPLC);
 			ExternalAct externalAct = new ExternalAct(new CD<String>("OBS"));
-			externalAct.setId(SET.createSET(new II(this.cdaConfiguration.getObsRoot(), sourceObs.getPreviousVersion()
-			        .getId().toString())));
+			externalAct.setId(SET.createSET(new II(this.config.getObsRoot(), sourceObs.getPreviousVersion().getId()
+			        .toString())));
 			if (sourceObs.getPreviousVersion().getAccessionNumber() != null)
 				externalAct.getId().add(
 				    this.cdaDataUtil.parseIIFromString(sourceObs.getPreviousVersion().getAccessionNumber()));
@@ -440,7 +440,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 		    		activeListItem.getStartObs().getAccessionNumber().isEmpty())
 		    	retVal.getId().add(this.cdaDataUtil.parseIIFromString(activeListItem.getStartObs().getAccessionNumber()));
 		    
-		    retVal.getId().add(new II(this.cdaConfiguration.getProblemRoot(), activeListItem.getId().toString()));
+		    retVal.getId().add(new II(this.config.getProblemRoot(), activeListItem.getId().toString()));
 		    // Add the code
 		    retVal.setCode(new CD<String>());
 		    retVal.getCode().setNullFlavor(NullFlavor.NotApplicable);
@@ -497,7 +497,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 		SubstanceAdministration retVal = new SubstanceAdministration();
 		
 		// Set the mood code
-		ExtendedObs extendedObs = Context.getService(CdaImportService.class).getExtendedObs(sourceObs.getId());
+		//ExtendedObs extendedObs = Context.getService(CdaImportService.class).getExtendedObs(sourceObs.getId());
 		
 		retVal.setMoodCode(x_DocumentSubstanceMood.Eventoccurrence);
 		
@@ -518,14 +518,14 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 		retVal.setStatusCode(ActStatus.Completed);
 		
 		// Effective time and extended observation properties
-		if (extendedObs != null) {
-			if (extendedObs.getObsRepeatNumber() != null)
-				retVal.setRepeatNumber(new INT(extendedObs.getObsRepeatNumber()));
-			
-			// Set times
-			effectiveTimePeriod = this.getEffectiveTime(extendedObs);
-			effectiveTimeInstant.setValue(effectiveTimePeriod.getValue());
-		}
+		/*		if (extendedObs != null) {
+					if (extendedObs.getObsRepeatNumber() != null)
+						retVal.setRepeatNumber(new INT(extendedObs.getObsRepeatNumber()));
+					
+					// Set times
+					effectiveTimePeriod = this.getEffectiveTime(extendedObs);
+					effectiveTimeInstant.setValue(effectiveTimePeriod.getValue());
+				}*/
 		
 		// Now sub-observations
 		Set<Obs> componentObs = sourceObs.getGroupMembers();
@@ -535,13 +535,13 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 		// Process the sub-observations
 		for (Obs component : componentObs) {
 			switch (component.getConcept().getId()) {
-				case CdaHandlerConstants.CONCEPT_ID_MEDICATION_TEXT:
+				case XdsSenderConstants.CONCEPT_ID_MEDICATION_TEXT:
 					if (component.getValueText().startsWith("Instructions")) {
 						Act instructionsAct = new Act(x_ActClassDocumentEntryAct.Act, x_DocumentActMood.Eventoccurrence,
-						        new CD<String>("PINSTRUCT", CdaHandlerConstants.CODE_SYSTEM_IHE_ACT_CODE));
+						        new CD<String>("PINSTRUCT", XdsSenderConstants.CODE_SYSTEM_IHE_ACT_CODE));
 						instructionsAct.setTemplateId(LIST.createLIST(new II(
-						        CdaHandlerConstants.ENT_TEMPLATE_CCD_INSTRUCTIONS), new II(
-						        CdaHandlerConstants.ENT_TEMPLATE_MEDICATION_INSTRUCTIONS)));
+						        XdsSenderConstants.ENT_TEMPLATE_CCD_INSTRUCTIONS), new II(
+						        XdsSenderConstants.ENT_TEMPLATE_MEDICATION_INSTRUCTIONS)));
 						instructionsAct.setText(new ED(component.getValueText()));
 					} else if (component.getValueText().startsWith("Pre-Condition")) {
 						Precondition condition = new Precondition();
@@ -550,53 +550,53 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 						retVal.getPrecondition().add(condition);
 					} else if (retVal.getText() == null)
 						retVal.setText(new ED(component.getValueText()));
-				case CdaHandlerConstants.CONCEPT_ID_MEDICATION_START_DATE:
-					if (extendedObs == null) {
-						effectiveTimePeriod.setLow(this.cdaDataUtil.createTS(component.getValueDate()));
-						effectiveTimePeriod.getLow().setDateValuePrecision(TS.DAY);
-					}
+				case XdsSenderConstants.CONCEPT_ID_MEDICATION_START_DATE:
+					//if (extendedObs == null) {
+					effectiveTimePeriod.setLow(this.cdaDataUtil.createTS(component.getValueDate()));
+					effectiveTimePeriod.getLow().setDateValuePrecision(TS.DAY);
+					//}
 					break;
-				case CdaHandlerConstants.CONCEPT_ID_MEDICATION_STOP_DATE:
-					if (extendedObs == null) {
-						effectiveTimePeriod.setHigh(this.cdaDataUtil.createTS(component.getValueDate()));
-						effectiveTimePeriod.getHigh().setDateValuePrecision(TS.DAY);
-					}
+				case XdsSenderConstants.CONCEPT_ID_MEDICATION_STOP_DATE:
+					//if (extendedObs == null) {
+					effectiveTimePeriod.setHigh(this.cdaDataUtil.createTS(component.getValueDate()));
+					effectiveTimePeriod.getHigh().setDateValuePrecision(TS.DAY);
+					//}
 					break;
-				case CdaHandlerConstants.CONCEPT_ID_IMMUNIZATION_DATE:
-					if (extendedObs == null) {
-						effectiveTimeInstant.setValue(this.cdaDataUtil.createTS(component.getValueDate()));
-						effectiveTimeInstant.getValue().setDateValuePrecision(TS.DAY);
-					}
+				case XdsSenderConstants.CONCEPT_ID_IMMUNIZATION_DATE:
+					//if (extendedObs == null) {
+					effectiveTimeInstant.setValue(this.cdaDataUtil.createTS(component.getValueDate()));
+					effectiveTimeInstant.getValue().setDateValuePrecision(TS.DAY);
+					//}
 					break;
 				
-				case CdaHandlerConstants.CONCEPT_ID_MEDICATION_DRUG: {
+				case XdsSenderConstants.CONCEPT_ID_MEDICATION_DRUG: {
 					Drug valueDrug = component.getValueDrug();
 					Concept concept = component.getValueCoded();
 					if (valueDrug != null)
 						concept = valueDrug.getConcept();
-					retVal.setConsumable(this.createConsumable(concept, valueDrug, CdaHandlerConstants.CODE_SYSTEM_RXNORM));
+					retVal.setConsumable(this.createConsumable(concept, valueDrug, XdsSenderConstants.CODE_SYSTEM_RXNORM));
 				}
 					break;
-				case CdaHandlerConstants.CONCEPT_ID_IMMUNIZATION_DRUG: {
+				case XdsSenderConstants.CONCEPT_ID_IMMUNIZATION_DRUG: {
 					Drug valueDrug = component.getValueDrug();
 					Concept concept = component.getValueCoded();
 					if (valueDrug != null)
 						concept = valueDrug.getConcept();
-					retVal.setConsumable(this.createConsumable(concept, valueDrug, CdaHandlerConstants.CODE_SYSTEM_CVX));
+					retVal.setConsumable(this.createConsumable(concept, valueDrug, XdsSenderConstants.CODE_SYSTEM_CVX));
 				}
 					break;
-				case CdaHandlerConstants.CONCEPT_ID_IMMUNIZATION_SEQUENCE:
+				case XdsSenderConstants.CONCEPT_ID_IMMUNIZATION_SEQUENCE:
 					Observation seriesObservation = new Observation(x_ActMoodDocumentObservation.Eventoccurrence);
 					seriesObservation.setTemplateId(LIST.createLIST(new II(
-					        CdaHandlerConstants.ENT_TEMPLATE_IMMUNIZATION_SERIES)));
+					        XdsSenderConstants.ENT_TEMPLATE_IMMUNIZATION_SERIES)));
 					seriesObservation.setStatusCode(ActStatus.Completed);
-					seriesObservation.setCode(new CD<String>("30973-2", CdaHandlerConstants.CODE_SYSTEM_LOINC,
-					        CdaHandlerConstants.CODE_SYSTEM_NAME_LOINC, null, "Dose Number", null));
+					seriesObservation.setCode(new CD<String>("30973-2", XdsSenderConstants.CODE_SYSTEM_LOINC,
+					        XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, null, "Dose Number", null));
 					seriesObservation.setValue(new INT(component.getValueNumeric().intValue()));
 					retVal.getEntryRelationship().add(
 					    new EntryRelationship(x_ActRelationshipEntryRelationship.SUBJ, BL.TRUE, seriesObservation));
 					break;
-				case CdaHandlerConstants.CONCEPT_ID_SIGN_SYMPTOM_PRESENT:
+				case XdsSenderConstants.CONCEPT_ID_SIGN_SYMPTOM_PRESENT:
 					if (component
 					        .getValueCoded()
 					        .getId()
@@ -606,30 +606,30 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 					                OpenmrsConstants.GLOBAL_PROPERTY_FALSE_CONCEPT)))
 						retVal.setNegationInd(BL.TRUE);
 					break;
-				case CdaHandlerConstants.CONCEPT_ID_MEDICATION_QUANTITY: // Quantity is a numeric value and means we don't have / need units because of the form
+				case XdsSenderConstants.CONCEPT_ID_MEDICATION_QUANTITY: // Quantity is a numeric value and means we don't have / need units because of the form
 					if (retVal.getDoseQuantity() == null)
 						retVal.setDoseQuantity(new PQ(BigDecimal.valueOf(component.getValueNumeric()), null));
 					break;
-				case CdaHandlerConstants.CONCEPT_ID_SUPPLY: {
+				case XdsSenderConstants.CONCEPT_ID_SUPPLY: {
 					
 					EntryRelationship supplyRelationship = new EntryRelationship();
 					Supply supply = new Supply();
-					supply.setTemplateId(LIST.createLIST(new II(CdaHandlerConstants.ENT_TEMPLATE_CCD_SUPPLY_ACTIVITY),
-					    new II(CdaHandlerConstants.ENT_TEMPLATE_SUPPLY)));
+					supply.setTemplateId(LIST.createLIST(new II(XdsSenderConstants.ENT_TEMPLATE_CCD_SUPPLY_ACTIVITY),
+					    new II(XdsSenderConstants.ENT_TEMPLATE_SUPPLY)));
 					supplyRelationship.setClinicalStatement(supply);
 					retVal.getEntryRelationship().add(supplyRelationship);
 					
 					// Obs for processing extended properties
-					ExtendedObs supplyExtended = Context.getService(CdaImportService.class)
-					        .getExtendedObs(component.getId());
-					if (supplyExtended != null) {
-						if (supplyExtended.getObsRepeatNumber() != null)
-							supply.setRepeatNumber(new INT(supplyExtended.getObsRepeatNumber()));
-						if (supplyExtended.getObsMood() != null)
-							supply.setMoodCode(this.cdaMetadataUtil.getStandardizedCode(supplyExtended.getObsMood(),
-							    x_ActMoodDocumentObservation.Definition.getCodeSystem(), CS.class));
-					}
-					
+					/*					ExtendedObs supplyExtended = Context.getService(CdaImportService.class)
+										        .getExtendedObs(component.getId());
+										if (supplyExtended != null) {
+											if (supplyExtended.getObsRepeatNumber() != null)
+												supply.setRepeatNumber(new INT(supplyExtended.getObsRepeatNumber()));
+											if (supplyExtended.getObsMood() != null)
+												supply.setMoodCode(this.cdaMetadataUtil.getStandardizedCode(supplyExtended.getObsMood(),
+												    x_ActMoodDocumentObservation.Definition.getCodeSystem(), CS.class));
+										}
+										*/
 					// Identifiers
 					retVal.setId(this.getIdentifierList(sourceObs));
 					
@@ -640,14 +640,14 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 					Set<Obs> supplyChildren = component.getGroupMembers(); // ODD TYPE: this.m_service.getObsGroupMembers(component);
 					for (Obs supplyComponent : supplyChildren) {
 						switch (supplyComponent.getConcept().getId()) {
-							case CdaHandlerConstants.CONCEPT_ID_DATE_OF_EVENT:
+							case XdsSenderConstants.CONCEPT_ID_DATE_OF_EVENT:
 								if (supply.getPerformer().size() == 0)
 									supply.getPerformer().add(new Performer2());
 								supply.getPerformer().get(0)
 								        .setTime(this.cdaDataUtil.createTS(supplyComponent.getValueDate()));
 								supply.getPerformer().get(0).getTime().getValue().setDateValuePrecision(TS.DAY);
 								break;
-							case CdaHandlerConstants.CONCEPT_ID_PROVIDER_NAME:
+							case XdsSenderConstants.CONCEPT_ID_PROVIDER_NAME:
 								if (supply.getPerformer().size() == 0)
 									supply.getPerformer().add(new Performer2());
 								// Get the provider
@@ -657,25 +657,25 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 									supply.getPerformer().get(0)
 									        .setAssignedEntity(this.cdaDataUtil.createAssignedEntity(provider));
 								break;
-							case CdaHandlerConstants.CONCEPT_ID_MEDICATION_DISPENSED:
+							case XdsSenderConstants.CONCEPT_ID_MEDICATION_DISPENSED:
 								if (supply.getQuantity() == null)
 									supply.setQuantity(new PQ(new BigDecimal(supplyComponent.getValueNumeric()), null));
 								break;
-							case CdaHandlerConstants.CONCEPT_ID_MEDICATION_STRENGTH:
+							case XdsSenderConstants.CONCEPT_ID_MEDICATION_STRENGTH:
 								IVL<PQ> quantity = this.parseDoseQuantity(supplyComponent.getValueText());
 								if (quantity != null && quantity.getValue() != null)
 									supply.setQuantity(quantity.getValue());
 								break;
-							case CdaHandlerConstants.CONCEPT_ID_MEDICATION_TREATMENT_NUMBER:
+							case XdsSenderConstants.CONCEPT_ID_MEDICATION_TREATMENT_NUMBER:
 								supplyRelationship.setSequenceNumber(supplyComponent.getValueNumeric().intValue());
 								break;
-							case CdaHandlerConstants.CONCEPT_ID_MEDICATION_DRUG: {
+							case XdsSenderConstants.CONCEPT_ID_MEDICATION_DRUG: {
 								Drug valueDrug = supplyComponent.getValueDrug();
 								Concept concept = supplyComponent.getValueCoded();
 								if (valueDrug != null)
 									concept = valueDrug.getConcept();
 								Consumable cons = this.createConsumable(concept, supplyComponent.getValueDrug(),
-								    CdaHandlerConstants.CODE_SYSTEM_RXNORM);
+								    XdsSenderConstants.CODE_SYSTEM_RXNORM);
 								supply.setProduct(new Product(cons.getManufacturedProduct()));
 							}
 								break;
@@ -686,73 +686,73 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 					}
 					break;
 				}
-				case CdaHandlerConstants.CONCEPT_ID_MEDICATION_FREQUENCY:
+				case XdsSenderConstants.CONCEPT_ID_MEDICATION_FREQUENCY:
 					switch (component.getValueCoded().getId()) {
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_ONCE:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_ONCE:
 							frequencyExpression = null;
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_30_MINS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_30_MINS:
 							frequencyExpression = new PIVL<TS>(null, new PQ(new BigDecimal("30"), "min"));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_8_HOURS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_8_HOURS:
 							frequencyExpression = new PIVL<TS>(null, new PQ(new BigDecimal("8"), "h"));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_12_HOURS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_12_HOURS:
 							frequencyExpression = new PIVL<TS>(null, new PQ(new BigDecimal("12"), "h"));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_24_HOURS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_24_HOURS:
 							frequencyExpression = new PIVL<TS>(null, new PQ(new BigDecimal("24"), "h"));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_36_HOURS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_36_HOURS:
 							frequencyExpression = new PIVL<TS>(null, new PQ(new BigDecimal("36"), "h"));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_48_HOURS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_48_HOURS:
 							frequencyExpression = new PIVL<TS>(null, new PQ(new BigDecimal("48"), "h"));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_72_HOURS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_72_HOURS:
 							frequencyExpression = new PIVL<TS>(null, new PQ(new BigDecimal("72"), "h"));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_ONCE_DAILY:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_ONCE_DAILY:
 							frequencyExpression = new PIVL<TS>(null, new PQ(new BigDecimal("1"), "d"));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_AT_BEDTIME:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_AT_BEDTIME:
 							frequencyExpression = new EIVL<TS>(DomainTimingEvent.HourOfSleep, null);
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_ONCE_DAILY_EVENING:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_ONCE_DAILY_EVENING:
 							frequencyExpression = new EIVL<TS>(DomainTimingEvent.BetweenDinnerAndSleep, null);
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_ONCE_DAILY_MORNING:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_ONCE_DAILY_MORNING:
 							frequencyExpression = new EIVL<TS>(DomainTimingEvent.BeforeBreakfast, null);
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_TWICE_DAILY_AFTER_MEALS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_TWICE_DAILY_AFTER_MEALS:
 							frequencyExpression = new EIVL<TS>(DomainTimingEvent.AfterMeal, new IVL<PQ>(new PQ(
 							        new BigDecimal("12"), "h")));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_THRICE_DAILY_AFTER_MEALS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_THRICE_DAILY_AFTER_MEALS:
 							frequencyExpression = new EIVL<TS>(DomainTimingEvent.AfterMeal, new IVL<PQ>(new PQ(
 							        new BigDecimal("8"), "h")));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_FOUR_TIMES_DAILY_AFTER_MEALS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_FOUR_TIMES_DAILY_AFTER_MEALS:
 							frequencyExpression = new EIVL<TS>(DomainTimingEvent.AfterMeal, new IVL<PQ>(new PQ(
 							        new BigDecimal("6"), "h")));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_TWICE_DAILY_BEFORE_MEALS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_TWICE_DAILY_BEFORE_MEALS:
 							frequencyExpression = new EIVL<TS>(DomainTimingEvent.BeforeMeal, new IVL<PQ>(new PQ(
 							        new BigDecimal("12"), "h")));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_THRICE_DAILY_BEFORE_MEALS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_THRICE_DAILY_BEFORE_MEALS:
 							frequencyExpression = new EIVL<TS>(DomainTimingEvent.BeforeMeal, new IVL<PQ>(new PQ(
 							        new BigDecimal("8"), "h")));
 							break;
-						case CdaHandlerConstants.MEDICATION_FREQUENCY_FOUR_TIMES_DAILY_BEFORE_MEALS:
+						case XdsSenderConstants.MEDICATION_FREQUENCY_FOUR_TIMES_DAILY_BEFORE_MEALS:
 							frequencyExpression = new EIVL<TS>(DomainTimingEvent.BeforeMeal, new IVL<PQ>(new PQ(
 							        new BigDecimal("6"), "h")));
 							break;
 						default:
-							if (component.getValueCoded().getId() > CdaHandlerConstants.MEDICATION_FREQUENCY_30_MINS
-							        && component.getValueCoded().getId() < CdaHandlerConstants.MEDICATION_FREQUENCY_8_HOURS)
+							if (component.getValueCoded().getId() > XdsSenderConstants.MEDICATION_FREQUENCY_30_MINS
+							        && component.getValueCoded().getId() < XdsSenderConstants.MEDICATION_FREQUENCY_8_HOURS)
 								frequencyExpression = new PIVL<TS>(null, new PQ(new BigDecimal(component.getValueCoded()
-								        .getId() - CdaHandlerConstants.MEDICATION_FREQUENCY_30_MINS), "h"));
+								        .getId() - XdsSenderConstants.MEDICATION_FREQUENCY_30_MINS), "h"));
 							else {
 								EIVL<TS> other = new EIVL<TS>();
 								CV<String> domainTimingEvent = this.cdaMetadataUtil.getStandardizedCode(
@@ -764,7 +764,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 							break;
 					}
 					break;
-				case CdaHandlerConstants.CONCEPT_ID_MEDICATION_STRENGTH: // use strength
+				case XdsSenderConstants.CONCEPT_ID_MEDICATION_STRENGTH: // use strength
 					// Strength is measured as a IVL<PQ> which is serialized to a string when stored in OpenMRS
 					// This string is in the following format:
 					// 0[.##] XX - Exact dose
@@ -773,7 +773,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 					// { .. 0.[##] YY} - AT most Y dose
 					retVal.setDoseQuantity(this.parseDoseQuantity(component.getValueText()));
 					break;
-				case CdaHandlerConstants.CONCEPT_ID_MEDICATION_HISTORY: // A sub-observation
+				case XdsSenderConstants.CONCEPT_ID_MEDICATION_HISTORY: // A sub-observation
 				{
 					SubstanceAdministration statement = this.createSubstanceAdministration(templateIds, component);
 					EntryRelationship entryRelation = new EntryRelationship(x_ActRelationshipEntryRelationship.HasComponent,
@@ -784,11 +784,11 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 					
 					break;
 				}
-				case CdaHandlerConstants.CONCEPT_ID_MEDICATION_FORM:
+				case XdsSenderConstants.CONCEPT_ID_MEDICATION_FORM:
 					retVal.setAdministrationUnitCode(this.cdaMetadataUtil.getStandardizedCode(component.getValueCoded(),
-					    CdaHandlerConstants.CODE_SYSTEM_SNOMED, CE.class));
+					    XdsSenderConstants.CODE_SYSTEM_SNOMED, CE.class));
 					break;
-				case CdaHandlerConstants.CONCEPT_ID_PROCEDURE:
+				case XdsSenderConstants.CONCEPT_ID_PROCEDURE:
 					retVal.setCode(this.cdaMetadataUtil.getStandardizedCode(component.getValueCoded(), null, CD.class));
 					
 					// Treatment is unknown?
@@ -797,15 +797,14 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 					break;
 				default:
 					// The codes that need to be determined at runtime
-					if (component.getConcept().getUuid().equals(CdaHandlerConstants.RMIM_CONCEPT_UUID_ROUTE_OF_ADM))
+					if (component.getConcept().getUuid().equals(XdsSenderConstants.RMIM_CONCEPT_UUID_ROUTE_OF_ADM))
 						retVal.setRouteCode(this.cdaMetadataUtil.getStandardizedCode(component.getValueCoded(),
-						    CdaHandlerConstants.CODE_SYSTEM_ROUTE_OF_ADMINISTRATION, CE.class));
-					else if (component.getConcept().getUuid().equals(CdaHandlerConstants.RMIM_CONCEPT_UUID_REASON)) {
+						    XdsSenderConstants.CODE_SYSTEM_ROUTE_OF_ADMINISTRATION, CE.class));
+					else if (component.getConcept().getUuid().equals(XdsSenderConstants.RMIM_CONCEPT_UUID_REASON)) {
 						EntryRelationship reasonRelation = new EntryRelationship(
 						        x_ActRelationshipEntryRelationship.HasReason, BL.TRUE);
 						Act reasonAct = new Act(x_ActClassDocumentEntryAct.Act, x_DocumentActMood.Eventoccurrence);
-						reasonAct
-						        .setTemplateId(LIST.createLIST(new II(CdaHandlerConstants.ENT_TEMPLATE_INTERNAL_REFERENCE)));
+						reasonAct.setTemplateId(LIST.createLIST(new II(XdsSenderConstants.ENT_TEMPLATE_INTERNAL_REFERENCE)));
 						reasonAct.setId(SET.createSET(this.cdaDataUtil.parseIIFromString(component.getValueText())));
 						reasonRelation.setClinicalStatement(reasonAct);
 						retVal.getEntryRelationship().add(reasonRelation);
@@ -816,7 +815,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 		}
 		
 		// We have medication history  
-		if (sourceObs.getConcept().getId().equals(CdaHandlerConstants.CONCEPT_ID_MEDICATION_HISTORY)) {
+		if (sourceObs.getConcept().getId().equals(XdsSenderConstants.CONCEPT_ID_MEDICATION_HISTORY)) {
 			retVal.getEffectiveTime().add(effectiveTimePeriod);
 			if (frequencyExpression != null) {
 				((SXCM<TS>) frequencyExpression).setOperator(SetOperator.Intersect);
@@ -858,8 +857,8 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 		retVal.getConsumable()
 		        .getManufacturedProduct()
 		        .setTemplateId(
-		            this.getTemplateIdList(Arrays.asList(CdaHandlerConstants.ENT_TEMPLATE_PRODUCT,
-		                CdaHandlerConstants.ENT_TEMPLATE_CCD_MEDICATION_PRODUCT)));
+		            this.getTemplateIdList(Arrays.asList(XdsSenderConstants.ENT_TEMPLATE_PRODUCT,
+		                XdsSenderConstants.ENT_TEMPLATE_CCD_MEDICATION_PRODUCT)));
 		retVal.getConsumable().getManufacturedProduct().setManufacturedDrugOrOtherMaterial(new Material());
 		retVal.getConsumable().getManufacturedProduct().getManufacturedDrugOrOtherMaterialIfManufacturedMaterial()
 		        .setCode(new CE<String>());
@@ -880,7 +879,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 		return cdaMetadataUtil;
 	}
 	
-	protected CdaHandlerConfiguration getCdaConfiguration() {
-		return cdaConfiguration;
+	protected XdsSenderConfig getConfiguration() {
+		return config;
 	}
 }

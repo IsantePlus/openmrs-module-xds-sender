@@ -5,7 +5,7 @@ import org.marc.everest.datatypes.generic.CE;
 import org.marc.everest.datatypes.generic.LIST;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Entry;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Section;
-import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,10 +22,10 @@ public class ActiveProblemsSectionBuilder extends SectionBuilderImpl {
 	@Override
 	public Section generate(Entry... entries) {
 		Section retVal = super.generate(entries);
-		retVal.setTemplateId(LIST.createLIST(new II(CdaHandlerConstants.SCT_TEMPLATE_ACTIVE_PROBLEMS), new II(
-		        CdaHandlerConstants.SCT_TEMPLATE_CCD_PROBLEM)));
+		retVal.setTemplateId(LIST.createLIST(new II(XdsSenderConstants.SCT_TEMPLATE_ACTIVE_PROBLEMS), new II(
+		        XdsSenderConstants.SCT_TEMPLATE_CCD_PROBLEM)));
 		retVal.setTitle("Active Problems");
-		retVal.setCode(new CE<String>("11450-4", CdaHandlerConstants.CODE_SYSTEM_LOINC, "LOINC", null, "PROBLEM LIST", null));
+		retVal.setCode(new CE<String>("11450-4", XdsSenderConstants.CODE_SYSTEM_LOINC, "LOINC", null, "PROBLEM LIST", null));
 		return retVal;
 	}
 }

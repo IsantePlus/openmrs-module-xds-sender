@@ -12,14 +12,4 @@
 
     <context:component-scan base-package="org.openmrs.module.xdssender"/>
 
-    <!-- AXdsSenderServicevice to OpenMRS context so it can be accessed
-    calling Context.getServXdsSenderServicevice.class) -->
-    <bean parent="serviceContext">
-        <property name="moduleService">
-            <list>
-                <value>org.openmrs.module.xdssender.api.XdsSenderService</value>
-                <ref bean="xdssender.XdsSenderService"/>
-            </list>
-        </property>
-    </bean>
 </beans>
