@@ -12,26 +12,6 @@
 
     <context:component-scan base-package="org.openmrs.module.xdssender"/>
 
-    <!-- WrXdsSenderServicevice methods in DB transactions and OpenMRS interceptors,
-    which set audit info like dateCreated, changedBy, etc.-->
-    <bean id="xdssender.XdsSenderService"
-          class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <bean class="org.openmrs.module.xdssender.api.impl.XdsSenderServiceImpl">
-                <property name="dao" ref="xdssender.XdsSenderDao"/>
-            </bean>
-        </property>
-        <property name="preInterceptors">
-            <ref bean="serviceInterceptors"/>
-        </property>
-        <property name="transactionAttributeSource">
-            <ref bean="transactionAttributeSource"/>
-        </property>
-    </bean>
-
     <!-- AXdsSenderServicevice to OpenMRS context so it can be accessed
     calling Context.getServXdsSenderServicevice.class) -->
     <bean parent="serviceContext">
