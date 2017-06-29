@@ -17,5 +17,4 @@ public interface SectionBuilder {
 	 * @return
 	 */
 	Section generate(Entry... entries);
-	
 }

@@ -16,5 +16,5 @@ public interface EntryBuilder {
 	 * @param data
 	 * @return
 	 */
-	public ClinicalStatement generate(BaseOpenmrsData data);
+	ClinicalStatement generate(BaseOpenmrsData data);
 }
