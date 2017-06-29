@@ -9,23 +9,24 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Observation;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Section;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntry;
 import org.openmrs.Obs;
-import org.openmrs.module.openhie.client.cda.entry.impl.EstimatedDeliveryDateObservationBuilder;
 import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
+import org.openmrs.module.xdssender.api.cda.entry.impl.EstimatedDeliveryDateObservationBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * EDD section builder
  * 
  * @author JustinFyfe
  */
+@Component("xdssender.EstimatedDeliveryDateSectionBuilder")
 public class EstimatedDeliveryDateSectionBuilder extends SectionBuilderImpl {
 	
-	/**
-	 * Generate the section
-	 */
+	@Autowired
+	private EstimatedDeliveryDateObservationBuilder eddObsBuilder;
+	
 	@Override
 	public Section generate(Entry... entries) {
-		// TODO: Verify entries
-		
 		Section retVal = super.generate(entries);
 		retVal.setTemplateId(LIST.createLIST(new II(CdaHandlerConstants.SCT_TEMPLATE_ESTIMATED_DELIVERY_DATES)));
 		retVal.setTitle("Estimated Date of Delivery");
@@ -34,12 +35,6 @@ public class EstimatedDeliveryDateSectionBuilder extends SectionBuilderImpl {
 		return retVal;
 	}
 	
-	/**
-	 * Generate from an estimated delivery date obs
-	 * 
-	 * @param estimatedDeliveryDateObs
-	 * @return
-	 */
 	public Section generate(Obs estimatedDeliveryDateObs, Obs lastMenstrualPeriodObs) {
 		
 		if (estimatedDeliveryDateObs.getValueDate() == null)
@@ -47,7 +42,6 @@ public class EstimatedDeliveryDateSectionBuilder extends SectionBuilderImpl {
 		else if (lastMenstrualPeriodObs.getValueDate() == null)
 			throw new IllegalArgumentException("lastMenstrualPeriodObs must carry Date value");
 		
-		EstimatedDeliveryDateObservationBuilder eddObsBuilder = new EstimatedDeliveryDateObservationBuilder();
 		Observation eddObservation = eddObsBuilder.generate(estimatedDeliveryDateObs, lastMenstrualPeriodObs);
 		
 		Entry entry = new Entry(x_ActRelationshipEntry.HasComponent, BL.TRUE, eddObservation);

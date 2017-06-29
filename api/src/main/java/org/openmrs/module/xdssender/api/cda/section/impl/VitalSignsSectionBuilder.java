@@ -8,23 +8,27 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Entry;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Section;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntry;
 import org.openmrs.Obs;
-import org.openmrs.module.openhie.client.cda.entry.impl.VitalSignsBatteryEntryBuilder;
 import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
+import org.openmrs.module.xdssender.api.cda.entry.impl.VitalSignsBatteryEntryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Vital signs section builder
  * 
  * @author JustinFyfe
  */
+@Component("xdssender.VitalSignsSectionBuilder")
 public class VitalSignsSectionBuilder extends SectionBuilderImpl {
+	
+	@Autowired
+	private VitalSignsBatteryEntryBuilder batteryBuilder;
 	
 	/**
 	 * Generate the vital signs section
 	 */
 	@Override
 	public Section generate(Entry... entries) {
-		// TODO: Verify entries
-		
 		Section retVal = super.generate(entries);
 		retVal.setTemplateId(LIST.createLIST(new II(CdaHandlerConstants.SCT_TEMPLATE_CCD_VITAL_SIGNS), new II(
 		        CdaHandlerConstants.SCT_TEMPLATE_VITAL_SIGNS)));
@@ -38,11 +42,8 @@ public class VitalSignsSectionBuilder extends SectionBuilderImpl {
 	 * Generate vital signs section with the specified data
 	 */
 	public Section generate(Obs systolicBpObs, Obs diastolicBpObs, Obs weightObs, Obs heightObs, Obs temperatureObs) {
-		VitalSignsBatteryEntryBuilder batteryBuilder = new VitalSignsBatteryEntryBuilder();
 		Entry vitalSignsBattery = new Entry(x_ActRelationshipEntry.HasComponent, BL.TRUE, batteryBuilder.generate(
 		    systolicBpObs, diastolicBpObs, weightObs, heightObs, temperatureObs));
 		return this.generate(vitalSignsBattery);
-		
 	}
-	
 }

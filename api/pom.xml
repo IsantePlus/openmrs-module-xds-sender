@@ -26,7 +26,6 @@
             <groupId>org.openmrs.module</groupId>
             <artifactId>shr-cdahandler-api</artifactId>
             <version>1.0.1-SNAPSHOT</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.openmrs.api</groupId>

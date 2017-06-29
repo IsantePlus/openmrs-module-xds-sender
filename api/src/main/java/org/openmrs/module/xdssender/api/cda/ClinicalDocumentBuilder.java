@@ -11,7 +11,6 @@ import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.shr.cdahandler.CdaHandlerConstants;
 import org.openmrs.module.xdssender.api.cda.section.impl.ActiveProblemsSectionBuilder;
-import org.openmrs.module.xdssender.api.cda.section.impl.AllergiesIntolerancesSectionBuilder;
 import org.openmrs.module.xdssender.api.cda.section.impl.AntepartumFlowsheetPanelSectionBuilder;
 import org.openmrs.module.xdssender.api.cda.section.impl.EstimatedDeliveryDateSectionBuilder;
 import org.openmrs.module.xdssender.api.cda.section.impl.MedicationsSectionBuilder;
@@ -25,18 +24,34 @@ import java.util.List;
 
 @Component("xdsender.ClinicalDocumentBuilder")
 public class ClinicalDocumentBuilder {
-
+	
 	private final Log log = LogFactory.getLog(this.getClass());
-
+	
 	@Autowired
 	private CdaMetadataUtil metadataUtil;
-
+	
+	@Autowired
+	private EstimatedDeliveryDateSectionBuilder eddSectionBuilder;
+	
+	@Autowired
+	private AntepartumFlowsheetPanelSectionBuilder flowsheetSectionBuilder;
+	
+	@Autowired
+	private VitalSignsSectionBuilder vitalSignsSectionBuilder;
+	
+	@Autowired
+	private MedicationsSectionBuilder medSectionBuilder;
+	
+	@Autowired
+	private ActiveProblemsSectionBuilder probBuilder;
+	
 	public ClinicalDocument buildDocument(Patient patient, Encounter encounter) throws InstantiationException,
 	        IllegalAccessException {
 		
 		DocumentBuilder builder = new DocumentBuilderImpl();
 		
 		builder.setRecordTarget(patient);
+		builder.setEncounterEvent(encounter);
 		
 		Obs estimatedDeliveryDateObs = null, lastMenstrualPeriodObs = null, prepregnancyWeightObs = null, gestgationalAgeObs = null, fundalHeightObs = null, systolicBpObs = null, diastolicBpObs = null, weightObs = null, heightObs = null, presentationObs = null, temperatureObs = null;
 		List<Obs> medicationObs = new ArrayList<Obs>();
@@ -49,8 +64,8 @@ public class ClinicalDocumentBuilder {
 			relevantObs = Context.getObsService().getObservationsByPerson(builder.getRecordTarget());
 		
 		for (Obs obs : relevantObs) {
-			CD<String> loincCode = metadataUtil.getStandardizedCode(obs.getConcept(),
-			    CdaHandlerConstants.CODE_SYSTEM_LOINC, CD.class);
+			CD<String> loincCode = metadataUtil.getStandardizedCode(obs.getConcept(), CdaHandlerConstants.CODE_SYSTEM_LOINC,
+			    CD.class);
 			int conceptId = obs.getConcept().getId();
 			// EDD Stuff
 			if (obs.getConcept().getId().equals(CdaHandlerConstants.CONCEPT_ID_MEDICATION_HISTORY))
@@ -95,13 +110,6 @@ public class ClinicalDocumentBuilder {
 			
 		}
 		
-		EstimatedDeliveryDateSectionBuilder eddSectionBuilder = new EstimatedDeliveryDateSectionBuilder();
-		AntepartumFlowsheetPanelSectionBuilder flowsheetSectionBuilder = new AntepartumFlowsheetPanelSectionBuilder();
-		VitalSignsSectionBuilder vitalSignsSectionBuilder = new VitalSignsSectionBuilder();
-		MedicationsSectionBuilder medSectionBuilder = new MedicationsSectionBuilder();
-		ActiveProblemsSectionBuilder probBuilder = new ActiveProblemsSectionBuilder();
-		AllergiesIntolerancesSectionBuilder allergyBuilder = new AllergiesIntolerancesSectionBuilder();
-		
 		Section eddSection = null, flowsheetSection = null, vitalSignsSection = null, medicationsSection = null, probSection = null, allergySection = null;
 		
 		if (estimatedDeliveryDateObs != null && lastMenstrualPeriodObs != null)
@@ -118,21 +126,21 @@ public class ClinicalDocumentBuilder {
 		
 		medicationsSection = medSectionBuilder.generate(medicationObs.toArray(new Obs[] {}));
 		
-/*		Problem[] problems = Context.getActiveListService()
-		        .getActiveListItems(builder.getRecordTarget(), Problem.ACTIVE_LIST_TYPE).toArray(new Problem[] {});
-		Allergy[] allergies = Context.getActiveListService()
-		        .getActiveListItems(builder.getRecordTarget(), Allergy.ACTIVE_LIST_TYPE).toArray(new Allergy[] {});*//*
-		
-		if (problems.length > 0)
-			probSection = probBuilder.generate(problems);
-		
-		if (allergies.length > 0)
-			allergySection = allergyBuilder.generate(allergies);*/
+		/*		Problem[] problems = Context.getActiveListService()
+				        .getActiveListItems(builder.getRecordTarget(), Problem.ACTIVE_LIST_TYPE).toArray(new Problem[] {});
+				Allergy[] allergies = Context.getActiveListService()
+				        .getActiveListItems(builder.getRecordTarget(), Allergy.ACTIVE_LIST_TYPE).toArray(new Allergy[] {});*//*
+		                                                                                                               
+		                                                                                                               if (problems.length > 0)
+		                                                                                                               probSection = probBuilder.generate(problems);
+		                                                                                                               
+		                                                                                                               if (allergies.length > 0)
+		                                                                                                               allergySection = allergyBuilder.generate(allergies);*/
 		
 		// Formatter
 		try {
-			return builder.generate(eddSection, flowsheetSection, vitalSignsSection,
-			    medicationsSection, probSection, allergySection);
+			return builder.generate(eddSection, flowsheetSection, vitalSignsSection, medicationsSection, probSection,
+			    allergySection);
 		}
 		catch (Exception e) {
 			log.error("Error generating document:", e);

@@ -11,9 +11,10 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.EntryRelationship;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Organizer;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Section;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntry;
-import org.openmrs.module.openhie.client.cda.section.SectionBuilder;
-import org.openmrs.module.openhie.client.util.CdaDataUtil;
-import org.openmrs.module.openhie.client.util.CdaTextUtil;
+import org.openmrs.module.xdssender.api.cda.CdaDataUtil;
+import org.openmrs.module.xdssender.api.cda.CdaTextUtil;
+import org.openmrs.module.xdssender.api.cda.section.SectionBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -25,10 +26,11 @@ import java.util.UUID;
  */
 public abstract class SectionBuilderImpl implements SectionBuilder {
 	
-	// CDA Text utility
-	private CdaTextUtil m_cdaTextUtil = CdaTextUtil.getInstance();
+	@Autowired
+	private CdaTextUtil cdaTextUtil;
 	
-	private CdaDataUtil m_cdaDataUtil = CdaDataUtil.getInstance();
+	@Autowired
+	private CdaDataUtil cdaDataUtil;
 	
 	/**
 	 * Generate the Level 3 content text
@@ -46,7 +48,7 @@ public abstract class SectionBuilderImpl implements SectionBuilder {
 				// Force the generation of new context
 				context = null;
 			}
-			StructDocElementNode genNode = this.m_cdaTextUtil.generateText(ent.getClinicalStatement(), context);
+			StructDocElementNode genNode = this.cdaTextUtil.generateText(ent.getClinicalStatement(), context);
 			
 			// Set the context node
 			if (context == null)
@@ -87,7 +89,7 @@ public abstract class SectionBuilderImpl implements SectionBuilder {
 	private void minifyAuthors(ClinicalStatement clinicalStatement, ArrayList<Author> author) {
 		
 		for (Author aut : clinicalStatement.getAuthor()) {
-			if (!this.m_cdaDataUtil.containsAuthor(author, aut))
+			if (!this.cdaDataUtil.containsAuthor(author, aut))
 				author.add(aut);
 			aut.setAssignedAuthor(new AssignedAuthor(aut.getAssignedAuthor().getId()));
 			
@@ -102,4 +104,11 @@ public abstract class SectionBuilderImpl implements SectionBuilder {
 		
 	}
 	
+	protected CdaTextUtil getCdaTextUtil() {
+		return cdaTextUtil;
+	}
+	
+	protected CdaDataUtil getCdaDataUtil() {
+		return cdaDataUtil;
+	}
 }

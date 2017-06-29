@@ -5,13 +5,14 @@ import org.openmrs.BaseOpenmrsData;
 
 /**
  * Entry generator
+ * 
  * @author JustinFyfe
- *
  */
 public interface EntryBuilder {
-
+	
 	/**
 	 * Generate entry based on OpenMRS data
+	 * 
 	 * @param data
 	 * @return
 	 */
