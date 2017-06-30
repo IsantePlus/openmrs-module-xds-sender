@@ -93,7 +93,6 @@ public class CdaDataUtil {
 	private static final List<String> nextOfKinRelations = Arrays.asList("MTH", "FTH", "GRMTH", "GRFTH", "SIB", "CHILD",
 	    "AUNT", "UNCLE", "PGRMTH", "MGRMTH", "PGRFTH", "MGRFTH", "SON", "DAU", "BRO", "SIS", "DOMPART", "FAMMEMB");
 	
-
 	@Autowired
 	private XdsSenderConfig config;
 	
@@ -103,7 +102,6 @@ public class CdaDataUtil {
 	@Autowired
 	private CdaMetadataUtil metadataUtil;
 	
-
 	/**
 	 * Parse an II from a string
 	 */
@@ -703,7 +701,7 @@ public class CdaDataUtil {
 		}
 		return match;
 	}
-
+	
 	private Pattern getIdPattern() {
 		return Pattern.compile(config.getIdPattern(), Pattern.CASE_INSENSITIVE);
 	}

@@ -11,7 +11,10 @@ package org.openmrs.module.xdssender;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Encounter;
+import org.openmrs.event.Event;
 import org.openmrs.module.BaseModuleActivator;
+import org.openmrs.module.xdssender.api.cda.EncounterEventListener;
 
 /**
  * This class contains the logic that is run every time this module is either started or shutdown
@@ -25,6 +28,9 @@ public class XdsSenderActivator extends BaseModuleActivator {
 	 */
 	public void started() {
 		log.info("Started Xds Sender");
+		
+		EncounterEventListener listener = new EncounterEventListener();
+		Event.subscribe(Encounter.class, null, listener);
 	}
 	
 	/**
