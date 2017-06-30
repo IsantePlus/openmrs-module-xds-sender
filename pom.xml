@@ -54,6 +54,10 @@
 			<layout>default</layout>
 			<url>http://repo1.maven.org/maven2</url>
 		</repository>
+		<repository>
+			<id>dcm4che</id>
+			<url>http://dcm4che.org/maven2</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -68,5 +72,6 @@
 
     <properties>
         <openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
+		<everestVersion>1.1.0</everestVersion>
     </properties>
 </project>

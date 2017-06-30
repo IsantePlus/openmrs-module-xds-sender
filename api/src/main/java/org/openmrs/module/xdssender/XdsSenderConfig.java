@@ -39,6 +39,10 @@ public class XdsSenderConfig {
 	
 	private static final String OBS_ROOT = "xdssender.obsRoot";
 	
+	private static final String ECID_ROOT = "xdssender.ecidRoot";
+	
+	private static final String XDS_REPO_ENDPOINT = "xdssender.repositoryEndpoint";
+	
 	@Autowired
 	@Qualifier("adminService")
 	private AdministrationService administrationService;
@@ -74,6 +78,14 @@ public class XdsSenderConfig {
 	
 	public String getUserRoot() {
 		return getProperty(USER_ROOT, "1.2.3.4.5.10");
+	}
+	
+	public String getEcidRoot() {
+		return getProperty(ECID_ROOT, "");
+	}
+	
+	public String getXdsRepositoryEndpoint() {
+		return administrationService.getGlobalProperty(XDS_REPO_ENDPOINT);
 	}
 	
 	private String getProperty(String name, String defaultVal) {

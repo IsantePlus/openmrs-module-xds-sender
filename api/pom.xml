@@ -1,6 +1,18 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <parent>
         <groupId>org.openmrs.module</groupId>
         <artifactId>xds-sender</artifactId>
@@ -16,11 +28,44 @@
         <dependency>
             <groupId>org.marc.everest</groupId>
             <artifactId>everest-core</artifactId>
+            <version>${everestVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.marc.everest</groupId>
             <artifactId>everest-rmim-uv-cdar2</artifactId>
-            <version>1.1.0</version>
+            <version>${everestVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.marc.everest</groupId>
+            <artifactId>everest-formatters-xml-its1</artifactId>
+            <version>${everestVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.marc.everest</groupId>
+            <artifactId>everest-formatters-xml-dt-r1</artifactId>
+            <version>${everestVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.marc.everest</groupId>
+            <artifactId>everest-rmim-uv-cdar2</artifactId>
+            <version>${everestVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dcm4che</groupId>
+            <artifactId>dcm4chee-xds2-common</artifactId>
+            <version>2.0.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.spec.javax.servlet</groupId>
+                    <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- DCM4CHEE modules (for JAX-b classes and InfoSetUtil) -->
+        <dependency>
+            <groupId>org.dcm4che</groupId>
+            <artifactId>dcm4chee-xds2-infoset</artifactId>
+            <version>2.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.openmrs</groupId>

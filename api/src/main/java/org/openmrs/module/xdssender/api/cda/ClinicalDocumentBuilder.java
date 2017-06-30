@@ -3,6 +3,7 @@ package org.openmrs.module.xdssender.api.cda;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.marc.everest.datatypes.generic.CD;
+import org.marc.everest.formatters.xml.its1.XmlIts1Formatter;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalDocument;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Section;
 import org.openmrs.Encounter;
@@ -10,14 +11,17 @@ import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.xdssender.XdsSenderConstants;
+import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
 import org.openmrs.module.xdssender.api.cda.section.impl.ActiveProblemsSectionBuilder;
 import org.openmrs.module.xdssender.api.cda.section.impl.AntepartumFlowsheetPanelSectionBuilder;
 import org.openmrs.module.xdssender.api.cda.section.impl.EstimatedDeliveryDateSectionBuilder;
 import org.openmrs.module.xdssender.api.cda.section.impl.MedicationsSectionBuilder;
 import org.openmrs.module.xdssender.api.cda.section.impl.VitalSignsSectionBuilder;
+import org.openmrs.module.xdssender.api.everest.EverestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,7 +49,7 @@ public class ClinicalDocumentBuilder {
 	@Autowired
 	private ActiveProblemsSectionBuilder probBuilder;
 	
-	public ClinicalDocument buildDocument(Patient patient, Encounter encounter) throws InstantiationException,
+	public DocumentModel buildDocument(Patient patient, Encounter encounter) throws InstantiationException,
 	        IllegalAccessException {
 		
 		DocumentBuilder builder = new DocumentBuilderImpl();
@@ -130,19 +134,23 @@ public class ClinicalDocumentBuilder {
 				        .getActiveListItems(builder.getRecordTarget(), Problem.ACTIVE_LIST_TYPE).toArray(new Problem[] {});
 				Allergy[] allergies = Context.getActiveListService()
 				        .getActiveListItems(builder.getRecordTarget(), Allergy.ACTIVE_LIST_TYPE).toArray(new Allergy[] {});*//*
-		                                                                                                               
-		                                                                                                               if (problems.length > 0)
-		                                                                                                               probSection = probBuilder.generate(problems);
-		                                                                                                               
-		                                                                                                               if (allergies.length > 0)
-		                                                                                                               allergySection = allergyBuilder.generate(allergies);*/
-		
+
+	   if (problems.length > 0)
+	   probSection = probBuilder.generate(problems);
+
+	   if (allergies.length > 0)
+	   allergySection = allergyBuilder.generate(allergies);*/
+
 		// Formatter
-		try {
-			return builder.generate(eddSection, flowsheetSection, vitalSignsSection, medicationsSection, probSection,
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			ClinicalDocument doc = builder.generate(eddSection, flowsheetSection, vitalSignsSection, medicationsSection, probSection,
 			    allergySection);
-		}
-		catch (Exception e) {
+
+			XmlIts1Formatter formatter = EverestUtil.createFormatter();
+			formatter.graph(baos, doc);
+
+			return DocumentModel.createInstance(baos.toByteArray(), builder.getTypeCode(), builder.getFormatCode(), doc);
+		} catch (Exception e) {
 			log.error("Error generating document:", e);
 			throw new RuntimeException(e);
 		}
