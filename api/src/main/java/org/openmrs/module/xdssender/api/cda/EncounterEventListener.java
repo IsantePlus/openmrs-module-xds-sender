@@ -4,7 +4,7 @@ import org.openmrs.Encounter;
 import org.openmrs.api.context.Context;
 import org.openmrs.event.Event;
 import org.openmrs.event.EventListener;
-import org.openmrs.module.xdssender.api.service.XdsExportSerivce;
+import org.openmrs.module.xdssender.api.service.XdsExportService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.jms.JMSException;
@@ -12,9 +12,9 @@ import javax.jms.MapMessage;
 import javax.jms.Message;
 
 public class EncounterEventListener implements EventListener {
-
+	
 	@Autowired
-	private XdsExportSerivce exportSerivce;
+	private XdsExportService exportSerivce;
 	
 	@Override
 	public void onMessage(Message message) {
