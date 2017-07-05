@@ -12,4 +12,9 @@
 
     <context:component-scan base-package="org.openmrs.module.xdssender"/>
 
+    <bean id="AuthenticationHandler" class="org.openmrs.module.xdssender.api.handler.AuthenticationHandler">
+        <property name="username" value="admin"/>
+        <property name="password" value="Admin123"/>
+    </bean>
+
 </beans>
