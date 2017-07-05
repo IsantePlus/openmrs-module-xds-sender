@@ -7,7 +7,7 @@ import org.dcm4chee.xds2.infoset.ihe.RetrieveDocumentSetRequestType.DocumentRequ
 import org.dcm4chee.xds2.infoset.ihe.RetrieveDocumentSetResponseType;
 import org.openmrs.module.xdssender.api.model.DocumentInfo;
 import org.openmrs.module.xdssender.api.service.XdsImportService;
-import org.openmrs.module.xdssender.api.xds.XdsReceiver;
+import org.openmrs.module.xdssender.api.xds.XdsRetriever;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
@@ -16,7 +16,7 @@ import java.io.IOException;
 @Component("xdsSender.XdsImportService")
 public class XdsImportServiceImpl implements XdsImportService {
 	
-	private final XdsReceiver xdsReceiver = new XdsReceiver();
+	private final XdsRetriever xdsRetriever = new XdsRetriever();
 	
 	@Override
 	public byte[] retrieveCCD(DocumentInfo documentInfo) throws XDSException, NotFoundException, IOException {
@@ -29,7 +29,7 @@ public class XdsImportServiceImpl implements XdsImportService {
 		
 		request.getDocumentRequest().add(documentRequest);
 		
-		RetrieveDocumentSetResponseType response = xdsReceiver.sendRetrieveCCD(request);
+		RetrieveDocumentSetResponseType response = xdsRetriever.sendRetrieveCCD(request);
 		if (response.getDocumentResponse().size() == 0) {
 			throw new NotFoundException("No response returned");
 		}
