@@ -1,8 +1,10 @@
 package org.openmrs.module.xdssender.api.handler;
 
+import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -11,13 +13,13 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.util.Set;
 
+@Component("xdssender.AuthenticationHandler")
 public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
 	
 	private final Logger logger = LoggerFactory.getLogger(AuthenticationHandler.class);
 	
-	private String username;
-	
-	private String password;
+	@Autowired
+	private XdsSenderConfig xdsSenderConfig;
 	
 	@Override
 	public Set<QName> getHeaders() {
@@ -30,10 +32,11 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
 		
 		if (outInd.booleanValue()) {
 			try {
-				context.put(BindingProvider.USERNAME_PROPERTY, username);
-				context.put(BindingProvider.PASSWORD_PROPERTY, password);
+				context.put(BindingProvider.USERNAME_PROPERTY, xdsSenderConfig.gettXdsUsername());
+				context.put(BindingProvider.PASSWORD_PROPERTY, xdsSenderConfig.getXdsPassword());
 			}
 			catch (Exception e) {
+				logger.error("Error occured during creating an authentication context", e);
 				return false;
 			}
 		}

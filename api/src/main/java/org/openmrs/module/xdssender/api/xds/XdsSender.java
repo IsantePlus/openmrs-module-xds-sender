@@ -17,10 +17,13 @@ public class XdsSender {
 	@Autowired
 	private XdsSenderConfig config;
 	
+	@Autowired
+	private AuthenticationHandler authenticationHandler;
+	
 	public RegistryResponseType sendProvideAndRegister(ProvideAndRegisterDocumentSetRequestType request) {
 		
 		DocumentRepositoryPortTypeFactory.addHandler((BindingProvider) DocumentRepositoryPortTypeFactory
-		        .getDocumentRepositoryPortSoap12(config.getXdsRepositoryEndpoint()), new AuthenticationHandler());
+		        .getDocumentRepositoryPortSoap12(config.getXdsRepositoryEndpoint()), authenticationHandler);
 		
 		DocumentRepositoryPortType port = DocumentRepositoryPortTypeFactory.getDocumentRepositoryPortSoap12(config
 		        .getXdsRepositoryEndpoint());

@@ -5,7 +5,6 @@ import org.dcm4chee.xds2.infoset.ihe.RetrieveDocumentSetRequestType;
 import org.dcm4chee.xds2.infoset.ihe.RetrieveDocumentSetResponseType;
 import org.dcm4chee.xds2.infoset.util.DocumentRepositoryPortTypeFactory;
 import org.dcm4chee.xds2.infoset.ws.repository.DocumentRepositoryPortType;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.handler.AuthenticationHandler;
 import org.slf4j.Logger;
@@ -21,13 +20,16 @@ public class XdsRetriever {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
+	private AuthenticationHandler authenticationHandler;
+	
+	@Autowired
 	private XdsSenderConfig config;
 	
 	public RetrieveDocumentSetResponseType sendRetrieveCCD(RetrieveDocumentSetRequestType retrieveRequest)
 	        throws XDSException {
 		
 		DocumentRepositoryPortTypeFactory.addHandler((BindingProvider) DocumentRepositoryPortTypeFactory
-		        .getDocumentRepositoryPortSoap12(config.getXdsRepositoryEndpoint()), new AuthenticationHandler());
+		        .getDocumentRepositoryPortSoap12(config.getXdsRepositoryEndpoint()), authenticationHandler);
 		
 		DocumentRepositoryPortType port = DocumentRepositoryPortTypeFactory.getDocumentRepositoryPortSoap12(config
 		        .getXdsRepositoryEndpoint());

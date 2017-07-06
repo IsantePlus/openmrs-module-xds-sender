@@ -9,7 +9,6 @@
  */
 package org.openmrs.module.xdssender;
 
-import ca.uhn.hl7v2.model.v25.segment.LOC;
 import org.openmrs.api.AdministrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,6 +41,10 @@ public class XdsSenderConfig {
 	private static final String ECID_ROOT = "xdssender.ecidRoot";
 	
 	private static final String XDS_REPO_ENDPOINT = "xdssender.repositoryEndpoint";
+	
+	private final static String XDS_REPO_USERNAME = "xdssendder.xdsrepository.username";
+	
+	private final static String XDS_REPO_PASSWORD = "xdssender.xdsrepository.password";
 	
 	@Autowired
 	@Qualifier("adminService")
@@ -82,6 +85,14 @@ public class XdsSenderConfig {
 	
 	public String getEcidRoot() {
 		return getProperty(ECID_ROOT, "");
+	}
+	
+	public String gettXdsUsername() {
+		return getProperty(XDS_REPO_USERNAME, "");
+	}
+	
+	public String getXdsPassword() {
+		return getProperty(XDS_REPO_PASSWORD, "");
 	}
 	
 	public String getXdsRepositoryEndpoint() {
