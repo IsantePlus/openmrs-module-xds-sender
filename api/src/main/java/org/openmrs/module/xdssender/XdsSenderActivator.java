@@ -11,7 +11,7 @@ package org.openmrs.module.xdssender;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Patient;
+import org.openmrs.Encounter;
 import org.openmrs.event.Event;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.xdssender.api.cda.EncounterEventListener;
@@ -30,7 +30,7 @@ public class XdsSenderActivator extends BaseModuleActivator {
 	 */
 	public void started() {
 		log.info("Started Xds Sender");
-		Event.subscribe(Patient.class, null, listener);
+		Event.subscribe(Encounter.class, null, listener);
 	}
 	
 	/**
