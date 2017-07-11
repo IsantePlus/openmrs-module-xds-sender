@@ -12,9 +12,19 @@ package org.openmrs.module.xdssender;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Encounter;
+import org.openmrs.OpenmrsObject;
+import org.openmrs.Patient;
+import org.openmrs.api.context.Context;
 import org.openmrs.event.Event;
+import org.openmrs.event.SubscribableEventListener;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.xdssender.api.cda.EncounterEventListener;
+import org.openmrs.module.xdssender.api.service.XdsExportSerivce;
+import org.openmrs.util.HandlerUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.util.List;
 
 /**
  * This class contains the logic that is run every time this module is either started or shutdown
@@ -23,14 +33,14 @@ public class XdsSenderActivator extends BaseModuleActivator {
 	
 	private Log log = LogFactory.getLog(this.getClass());
 	
+	private EncounterEventListener listener = new EncounterEventListener();
+	
 	/**
 	 * @see #started()
 	 */
 	public void started() {
 		log.info("Started Xds Sender");
-		
-		EncounterEventListener listener = new EncounterEventListener();
-		Event.subscribe(Encounter.class, null, listener);
+		Event.subscribe(Patient.class, null, listener);
 	}
 	
 	/**

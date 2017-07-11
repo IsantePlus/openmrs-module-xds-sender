@@ -69,6 +69,7 @@ import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.xml.stream.XMLInputFactory;
@@ -93,14 +94,29 @@ public class CdaDataUtil {
 	private static final List<String> nextOfKinRelations = Arrays.asList("MTH", "FTH", "GRMTH", "GRFTH", "SIB", "CHILD",
 	    "AUNT", "UNCLE", "PGRMTH", "MGRMTH", "PGRFTH", "MGRFTH", "SON", "DAU", "BRO", "SIS", "DOMPART", "FAMMEMB");
 	
+	// locking object
+	private final static Object s_lockObject = new Object();
+	
+	// Instance
+	private static CdaDataUtil s_instance = null;
+	
 	@Autowired
-	private XdsSenderConfig config;
+	private XdsSenderConfig config = XdsSenderConfig.getInstance();
 	
 	@Autowired
 	private ConceptUtil conceptUtil;
 	
 	@Autowired
-	private CdaMetadataUtil metadataUtil;
+	private CdaMetadataUtil metadataUtil = CdaMetadataUtil.getInstance();
+	
+	public static CdaDataUtil getInstance() {
+		if (s_instance == null)
+			synchronized (s_lockObject) {
+				if (s_instance == null)
+					s_instance = new CdaDataUtil();
+			}
+		return s_instance;
+	}
 	
 	/**
 	 * Parse an II from a string

@@ -12,4 +12,31 @@
 
     <context:component-scan base-package="org.openmrs.module.xdssender"/>
 
+    <bean id="xdssender.service.XdsExportService"
+          class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.xdssender.api.service.impl.XdsExportServiceImpl">
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list>
+                <value>org.openmrs.module.xdssender.api.service.XdsExportSerivce</value>
+                <ref bean="xdssender.service.XdsExportService" />
+            </list>
+        </property>
+    </bean>
+
 </beans>

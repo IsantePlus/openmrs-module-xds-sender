@@ -90,12 +90,12 @@ public class MessageUtil {
 		TS patientDob = cdaDataUtil.createTS(info.getPatient().getBirthdate());
 		patientDob.setDateValuePrecision(TS.DAY);
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_ID,
-		    String.format("%s^^^^&%s&ISO", info.getPatient().getId().toString(), config.getPatientRoot()));
+		    String.format("%s^^^^%s&NI", info.getPatient().getId().toString(), config.getPatientRoot()));
 		InfosetUtil.addOrOverwriteSlot(
 		    oddRegistryObject,
 		    XDSConstants.SLOT_NAME_SOURCE_PATIENT_INFO,
 		    String.format("PID-3|%s",
-		        String.format("%s^^^^&%s&ISO", info.getPatient().getId().toString(), config.getPatientRoot())),
+		        String.format("%s^^^^%s&NI", info.getPatient().getId().toString(), config.getPatientRoot())),
 		    String.format("PID-5|%s^%s^^^", info.getPatient().getFamilyName(), info.getPatient().getGivenName()),
 		    String.format("PID-7|%s", patientDob.getValue()), String.format("PID-8|%s", info.getPatient().getGender()));
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_LANGUAGE_CODE, Context.getLocale()
@@ -198,7 +198,7 @@ public class MessageUtil {
 			authorClass.setClassifiedObject(oddRegistryObject.getId());
 			authorClass.setId(String.format("Classification_%s", UUID.randomUUID().toString()));
 			
-			String authorText = String.format("%s^%s^%s^^^^^^&%s&ISO", pvdr.getId(), pvdr.getPerson().getFamilyName(), pvdr
+			String authorText = String.format("%s^%s^%s^^^^^^%s&NI", pvdr.getId(), pvdr.getPerson().getFamilyName(), pvdr
 			        .getPerson().getGivenName(), config.getProviderRoot());
 			if (authors.contains(authorText))
 				continue;

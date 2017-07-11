@@ -71,7 +71,7 @@ public final class XdsUtil {
 	 * Format identifier for XDS meta-data
 	 */
 	private String formatId(String root, String extension) {
-		return String.format("%s^^^&%s&ISO", extension, root);
+		return String.format("%s^^^%s&NI", extension, root);
 	}
 	
 	/**

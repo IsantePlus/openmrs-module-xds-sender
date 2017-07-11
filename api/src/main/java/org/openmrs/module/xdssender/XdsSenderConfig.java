@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.xdssender;
 
-import ca.uhn.hl7v2.model.v25.segment.LOC;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.api.context.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -43,13 +43,32 @@ public class XdsSenderConfig {
 	
 	private static final String XDS_REPO_ENDPOINT = "xdssender.repositoryEndpoint";
 	
+	private static final String XDS_REPO_USERNAME = "xdssender.repositoryUsername";
+	
+	private static final String XDS_REPO_PASSWORD = "xdssender.repositoryPassword";
+	
+	// locking object
+	private final static Object s_lockObject = new Object();
+	
+	// Instance
+	private static XdsSenderConfig s_instance = null;
+	
+	public static XdsSenderConfig getInstance() {
+		if (s_instance == null)
+			synchronized (s_lockObject) {
+				if (s_instance == null)
+					s_instance = new XdsSenderConfig();
+			}
+		return s_instance;
+	}
+	
 	@Autowired
 	@Qualifier("adminService")
 	private AdministrationService administrationService;
 	
 	public String getIdPattern() {
 		// TODO - change default
-		return getProperty(ID_PATTERN, "%2$s^^^&%1$s&ISO");
+		return getProperty(ID_PATTERN, "%2$s^^^%1$s&NI");
 	}
 	
 	public String getShrRoot() {
@@ -73,7 +92,7 @@ public class XdsSenderConfig {
 	}
 	
 	public String getPatientRoot() {
-		return getProperty(PATIENT_ROOT, "1.2.3.4.5.9");
+		return getProperty(PATIENT_ROOT, "2.16.840.1.113883.4.56");
 	}
 	
 	public String getUserRoot() {
@@ -81,14 +100,22 @@ public class XdsSenderConfig {
 	}
 	
 	public String getEcidRoot() {
-		return getProperty(ECID_ROOT, "");
+		return getProperty(ECID_ROOT, "2.16.840.1.113883.4.56");
 	}
 	
 	public String getXdsRepositoryEndpoint() {
-		return administrationService.getGlobalProperty(XDS_REPO_ENDPOINT);
+		return getProperty(XDS_REPO_ENDPOINT, "localhost:8082/openmrs/ms/xdsrepository");
+	}
+	
+	public String getXdsRepositoryUsername() {
+		return getProperty(XDS_REPO_USERNAME, "xds");
+	}
+	
+	public String getXdsRepositoryPassword() {
+		return getProperty(XDS_REPO_PASSWORD, "xds");
 	}
 	
 	private String getProperty(String name, String defaultVal) {
-		return administrationService.getGlobalProperty(name, defaultVal);
+		return Context.getAdministrationService().getGlobalProperty(name, defaultVal);
 	}
 }

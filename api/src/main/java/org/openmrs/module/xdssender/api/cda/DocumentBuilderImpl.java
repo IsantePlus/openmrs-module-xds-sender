@@ -58,7 +58,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 	
 	private Encounter encounter;
 	
-	private CdaDataUtil cdaDataUtil;
+	private CdaDataUtil cdaDataUtil = CdaDataUtil.getInstance();
 	
 	public DocumentBuilderImpl() {
 	}

@@ -8,6 +8,7 @@ import org.openmrs.Encounter;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.cda.ClinicalDocumentBuilder;
 import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component("xdsSender.XdsExportService")
-public class XdsExportServiceImpl implements XdsExportSerivce {
+public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExportSerivce {
 	
 	@Autowired
 	private ClinicalDocumentBuilder docBuilder;
@@ -72,13 +73,12 @@ public class XdsExportServiceImpl implements XdsExportSerivce {
 		docInfo.setCreationTime(new Date());
 		docInfo.setMimeType("text/xml");
 		docInfo.setPatient(patient);
-		docInfo.setTitle(docModel.getDoc().getTitle().getValue());
 		
 		List<Provider> provs = new ArrayList<Provider>();
 		for (Author aut : docModel.getDoc().getAuthor()) {
 			// Load the author
 			for (II id : aut.getAssignedAuthor().getId())
-				if (id.getRoot().equals(config.getProviderRoot()))
+				if (id.getRoot() != null && id.getRoot().equals(config.getProviderRoot()))
 					provs.add(Context.getProviderService().getProvider(Integer.parseInt(id.getExtension())));
 		}
 		docInfo.setAuthors(provs);

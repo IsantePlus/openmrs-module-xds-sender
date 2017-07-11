@@ -35,6 +35,22 @@
 		<aware_of_module>org.openmrs.module.legacyui</aware_of_module>
 		<aware_of_module>org.openmrs.event</aware_of_module>
 	</aware_of_modules>
+
+
+	<globalProperty>
+		<property>xdssender.repositoryEndpoint</property>
+		<description>Specifies endpoint to XDS repository</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.repositoryUsername</property>
+		<description>Specifies username for authentication to XDS repository</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.repositoryPassword</property>
+		<description>Specifies password for authentication to XDS repository</description>
+	</globalProperty>
 	
 	
 	<!-- AOP
