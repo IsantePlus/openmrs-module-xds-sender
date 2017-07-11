@@ -5,7 +5,8 @@ import org.openmrs.Patient;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.xdssender.api.model.DocumentInfo;
 
-public interface XdsExportSerivce extends OpenmrsService {
+public interface XdsExportService extends OpenmrsService {
 	
 	DocumentInfo exportProvideAndRegister(Encounter encounter, Patient patient);
+	
 }

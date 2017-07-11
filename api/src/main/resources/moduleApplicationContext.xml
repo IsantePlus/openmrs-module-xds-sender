@@ -33,10 +33,12 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list>
-                <value>org.openmrs.module.xdssender.api.service.XdsExportSerivce</value>
+                <value>org.openmrs.module.xdssender.api.service.XdsExportService</value>
                 <ref bean="xdssender.service.XdsExportService" />
             </list>
         </property>
     </bean>
+
+    <context:property-placeholder location="classpath:module.properties"/>
 
 </beans>

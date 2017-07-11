@@ -13,7 +13,7 @@ import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.cda.ClinicalDocumentBuilder;
 import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
 import org.openmrs.module.xdssender.api.model.DocumentInfo;
-import org.openmrs.module.xdssender.api.service.XdsExportSerivce;
+import org.openmrs.module.xdssender.api.service.XdsExportService;
 import org.openmrs.module.xdssender.api.xds.MessageUtil;
 import org.openmrs.module.xdssender.api.xds.XdsSender;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component("xdsSender.XdsExportService")
-public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExportSerivce {
+public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExportService {
 	
 	@Autowired
 	private ClinicalDocumentBuilder docBuilder;

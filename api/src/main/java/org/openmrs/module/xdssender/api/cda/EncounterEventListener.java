@@ -4,7 +4,7 @@ import org.openmrs.Encounter;
 import org.openmrs.api.context.Context;
 import org.openmrs.event.Event;
 import org.openmrs.event.EventListener;
-import org.openmrs.module.xdssender.api.service.XdsExportSerivce;
+import org.openmrs.module.xdssender.api.service.XdsExportService;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
@@ -21,7 +21,7 @@ public class EncounterEventListener implements EventListener {
 			if (Event.Action.CREATED.toString().equals(mapMessage.getString("action"))) {
 				String uuid = ((MapMessage) message).getString("uuid");
 				Encounter encounter = Context.getEncounterService().getEncounterByUuid(uuid);
-				XdsExportSerivce serivce = Context.getService(XdsExportSerivce.class);
+				XdsExportService serivce = Context.getService(XdsExportService.class);
 				serivce.exportProvideAndRegister(encounter, encounter.getPatient());
 			}
 			Context.closeSession();

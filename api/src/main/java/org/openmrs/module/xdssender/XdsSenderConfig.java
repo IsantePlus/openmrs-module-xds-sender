@@ -43,9 +43,9 @@ public class XdsSenderConfig {
 	
 	private static final String XDS_REPO_ENDPOINT = "xdssender.repositoryEndpoint";
 	
-	private static final String XDS_REPO_USERNAME = "xdssender.repositoryUsername";
+	private final static String XDS_REPO_USERNAME = "xdssendder.xdsrepository.username";
 	
-	private static final String XDS_REPO_PASSWORD = "xdssender.repositoryPassword";
+	private final static String XDS_REPO_PASSWORD = "xdssender.xdsrepository.password";
 	
 	// locking object
 	private final static Object s_lockObject = new Object();
@@ -101,6 +101,14 @@ public class XdsSenderConfig {
 	
 	public String getEcidRoot() {
 		return getProperty(ECID_ROOT, "2.16.840.1.113883.4.56");
+	}
+	
+	public String gettXdsUsername() {
+		return getProperty(XDS_REPO_USERNAME, "");
+	}
+	
+	public String getXdsPassword() {
+		return getProperty(XDS_REPO_PASSWORD, "");
 	}
 	
 	public String getXdsRepositoryEndpoint() {
