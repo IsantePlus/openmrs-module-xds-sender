@@ -39,6 +39,4 @@
         </property>
     </bean>
 
-    <context:property-placeholder location="classpath:module.properties"/>
-
 </beans>
