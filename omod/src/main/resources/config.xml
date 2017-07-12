@@ -43,7 +43,7 @@
 	</globalProperty>
 
 	<globalProperty>
-		<property>xdssendder.xdsrepository.username</property>
+		<property>xdssender.xdsrepository.username</property>
 		<description>Specifies username for authentication to XDS repository</description>
 	</globalProperty>
 
