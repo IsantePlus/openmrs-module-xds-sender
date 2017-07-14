@@ -43,7 +43,7 @@ public class XdsSenderConfig {
 	
 	private static final String XDS_REPO_ENDPOINT = "xdssender.repositoryEndpoint";
 	
-	private final static String XDS_REPO_USERNAME = "xdssendder.xdsrepository.username";
+	private final static String XDS_REPO_USERNAME = "xdssender.xdsrepository.username";
 	
 	private final static String XDS_REPO_PASSWORD = "xdssender.xdsrepository.password";
 	
