@@ -5,8 +5,6 @@ import org.dcm4chee.xds2.infoset.ihe.ProvideAndRegisterDocumentSetRequestType;
 import org.dcm4chee.xds2.infoset.rim.AssociationType1;
 import org.dcm4chee.xds2.infoset.rim.ClassificationType;
 import org.dcm4chee.xds2.infoset.rim.ExtrinsicObjectType;
-import org.dcm4chee.xds2.infoset.rim.InternationalStringType;
-import org.dcm4chee.xds2.infoset.rim.LocalizedStringType;
 import org.dcm4chee.xds2.infoset.rim.RegistryObjectListType;
 import org.dcm4chee.xds2.infoset.rim.RegistryPackageType;
 import org.dcm4chee.xds2.infoset.rim.SubmitObjectsRequest;
@@ -84,8 +82,11 @@ public class MessageUtil {
 		patientDob.setDateValuePrecision(TS.DAY);
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_ID,
 		    String.format("%s^^^&%s&ISO", info.getPatient().getId().toString(), config.getPatientRoot()));
-		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_INFO,
-		    String.format("PID-3|%s", String.format("%s^^^&%s&ISO", "pid1", config.getPatientRoot())),
+		InfosetUtil.addOrOverwriteSlot(
+		    oddRegistryObject,
+		    XDSConstants.SLOT_NAME_SOURCE_PATIENT_INFO,
+		    String.format("PID-3|%s",
+		        String.format("%s^^^&%s&ISO", info.getPatient().getId().toString(), config.getPatientRoot())),
 		    String.format("PID-5|%s^%s^^^", info.getPatient().getFamilyName(), info.getPatient().getGivenName()),
 		    String.format("PID-7|%s", patientDob.getValue()), String.format("PID-8|%s", info.getPatient().getGender()));
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_LANGUAGE_CODE, Context.getLocale()
