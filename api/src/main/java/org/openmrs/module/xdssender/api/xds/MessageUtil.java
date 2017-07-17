@@ -55,9 +55,6 @@ public class MessageUtil {
 		// ODD
 		oddRegistryObject.setId("Document01");
 		oddRegistryObject.setMimeType("text/xml");
-		oddRegistryObject.setName(new InternationalStringType());
-		oddRegistryObject.getName().getLocalizedString().add(new LocalizedStringType());
-		oddRegistryObject.getName().getLocalizedString().get(0).setValue(info.getTitle());
 		
 		// Get the earliest time something occurred and the latest
 		Date lastEncounter = new Date(0), firstEncounter = new Date();
@@ -86,12 +83,9 @@ public class MessageUtil {
 		TS patientDob = cdaDataUtil.createTS(info.getPatient().getBirthdate());
 		patientDob.setDateValuePrecision(TS.DAY);
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_ID,
-		    String.format("%s^^^^%s&NI", info.getPatient().getId().toString(), config.getPatientRoot()));
-		InfosetUtil.addOrOverwriteSlot(
-		    oddRegistryObject,
-		    XDSConstants.SLOT_NAME_SOURCE_PATIENT_INFO,
-		    String.format("PID-3|%s",
-		        String.format("%s^^^^%s&NI", info.getPatient().getId().toString(), config.getPatientRoot())),
+		    String.format("%s^^^&%s&ISO", info.getPatient().getId().toString(), config.getPatientRoot()));
+		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_INFO,
+		    String.format("PID-3|%s", String.format("%s^^^&%s&ISO", "pid1", config.getPatientRoot())),
 		    String.format("PID-5|%s^%s^^^", info.getPatient().getFamilyName(), info.getPatient().getGivenName()),
 		    String.format("PID-7|%s", patientDob.getValue()), String.format("PID-8|%s", info.getPatient().getGender()));
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_LANGUAGE_CODE, Context.getLocale()
@@ -101,9 +95,13 @@ public class MessageUtil {
 		
 		// Unique identifier
 		xdsUtil.addExtenalIdentifier(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_uniqueId,
-		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()), "XDSDocumentEntry.uniqueId");
-		xdsUtil.addExtenalIdentifier(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_patientId,
-		    xdsUtil.getPatientIdentifier(info.getPatient()), "XDSDocumentEntry.patientId");
+		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
+		    "XDSDocumentEntry.uniqueId");
+		xdsUtil.addExtenalIdentifier(
+		    oddRegistryObject,
+		    XDSConstants.UUID_XDSDocumentEntry_patientId,
+		    String.format("%s^^^%s&%s&NI", info.getPatient().getId().toString(), config.getEcidRoot(), config.getEcidRoot()),
+		    "XDSDocumentEntry.patientId");
 		
 		// Set classifications
 		xdsUtil.addCodedValueClassification(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_classCode,
@@ -111,14 +109,14 @@ public class MessageUtil {
 		xdsUtil.addCodedValueClassification(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_confidentialityCode,
 		    "1.3.6.1.4.1.21367.2006.7.101", "Connect-a-thon confidentialityCodes", "XDSDocumentEntry.confidentialityCode");
 		xdsUtil.addCodedValueClassification(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_formatCode,
-		    info.getFormatCode(), "1.3.6.1.4.1.19376.1.2.3", "XDSDocumentEntry.formatCode");
+		    info.getFormatCode(), "Connect-a-thon formatCodes", "XDSDocumentEntry.formatCode");
 		xdsUtil.addCodedValueClassification(oddRegistryObject,
-		    XDSConstants.UUID_XDSDocumentEntry_healthCareFacilityTypeCode, "Not Available",
+		    XDSConstants.UUID_XDSDocumentEntry_healthCareFacilityTypeCode, "Outpatient",
 		    "Connect-a-thon healthcareFacilityTypeCodes", "XDSDocumentEntry.healthCareFacilityTypeCode");
 		xdsUtil.addCodedValueClassification(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_practiceSettingCode,
-		    "Not Available", "Connect-a-thon practiceSettingCodes", "UUID_XDSDocumentEntry.practiceSettingCode");
-		xdsUtil.addCodedValueClassification(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_typeCode,
-		    info.getTypeCode(), "LOINC", "XDSDocumentEntry.typeCode");
+		    "General Medicine", "Connect-a-thon practiceSettingCodes", "UUID_XDSDocumentEntry.practiceSettingCode");
+		xdsUtil.addCodedValueClassification(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_typeCode, "34108-1",
+		    "LOINC", "XDSDocumentEntry.typeCode");
 		
 		// Create the submission set
 		TS now = TS.now();
@@ -127,17 +125,21 @@ public class MessageUtil {
 		RegistryPackageType regPackage = new RegistryPackageType();
 		regPackage.setId("SubmissionSet01");
 		InfosetUtil.addOrOverwriteSlot(regPackage, XDSConstants.SLOT_NAME_SUBMISSION_TIME, now.getValue());
-		regPackage.setName(oddRegistryObject.getName());
 		xdsUtil.addCodedValueClassification(regPackage, XDSConstants.UUID_XDSSubmissionSet_contentTypeCode,
 		    info.getClassCode(), "LOINC", "XDSSubmissionSet.contentTypeCode");
 		
 		// Submission set external identifiers
 		xdsUtil.addExtenalIdentifier(regPackage, XDSConstants.UUID_XDSSubmissionSet_uniqueId,
-		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()), "XDSSubmissionSet.uniqueId");
+		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
+		    "XDSSubmissionSet.uniqueId");
 		xdsUtil.addExtenalIdentifier(regPackage, XDSConstants.UUID_XDSSubmissionSet_sourceId,
-		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()), "XDSSubmissionSet.sourceId");
-		xdsUtil.addExtenalIdentifier(regPackage, XDSConstants.UUID_XDSSubmissionSet_patientId,
-		    xdsUtil.getPatientIdentifier(info.getPatient()), "XDSSubmissionSet.patientId");
+		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
+		    "XDSSubmissionSet.sourceId");
+		xdsUtil.addExtenalIdentifier(
+		    regPackage,
+		    XDSConstants.UUID_XDSSubmissionSet_patientId,
+		    String.format("%s^^^%s&%s&NI", info.getPatient().getId().toString(), config.getEcidRoot(), config.getEcidRoot()),
+		    "XDSSubmissionSet.patientId");
 		
 		// Add the eo to the submission
 		registryRequest
@@ -173,7 +175,7 @@ public class MessageUtil {
 		// Add an association
 		AssociationType1 association = new AssociationType1();
 		association.setId("as01");
-		association.setAssociationType("HasMember");
+		association.setAssociationType("urn:oasis:names:tc:ebxml-regrep:AssociationType:HasMember");
 		association.setSourceObject("SubmissionSet01");
 		association.setTargetObject("Document01");
 		InfosetUtil.addOrOverwriteSlot(association, XDSConstants.SLOT_NAME_SUBMISSIONSET_STATUS, "Original");
@@ -194,7 +196,7 @@ public class MessageUtil {
 			authorClass.setClassifiedObject(oddRegistryObject.getId());
 			authorClass.setId(String.format("Classification_%s", UUID.randomUUID().toString()));
 			
-			String authorText = String.format("%s^%s^%s^^^^^^%s&NI", pvdr.getId(), pvdr.getPerson().getFamilyName(), pvdr
+			String authorText = String.format("%s^%s^%s^^^^^^&%s&ISO", pvdr.getId(), pvdr.getPerson().getFamilyName(), pvdr
 			        .getPerson().getGivenName(), config.getProviderRoot());
 			if (authors.contains(authorText))
 				continue;

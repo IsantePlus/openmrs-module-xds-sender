@@ -80,7 +80,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 	 * Get the document format code
 	 */
 	public String getFormatCode() {
-		return "2.16.840.1.113883.10.20.1";
+		return "CDAR2/IHE 1.0";
 	}
 	
 	/**

@@ -27,6 +27,7 @@ public class XdsSender {
 		
 		DocumentRepositoryPortType port = DocumentRepositoryPortTypeFactory.getDocumentRepositoryPortSoap12(config
 		        .getXdsRepositoryEndpoint());
+		
 		((BindingProvider) port).getRequestContext().put(BindingProvider.USERNAME_PROPERTY,
 		    config.getXdsRepositoryUsername());
 		((BindingProvider) port).getRequestContext().put(BindingProvider.PASSWORD_PROPERTY,

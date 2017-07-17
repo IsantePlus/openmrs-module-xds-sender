@@ -68,7 +68,7 @@ public class XdsSenderConfig {
 	
 	public String getIdPattern() {
 		// TODO - change default
-		return getProperty(ID_PATTERN, "%2$s^^^%1$s&NI");
+		return getProperty(ID_PATTERN, "%2$s^^^&%1$s&ISO");
 	}
 	
 	public String getShrRoot() {
@@ -92,7 +92,7 @@ public class XdsSenderConfig {
 	}
 	
 	public String getPatientRoot() {
-		return getProperty(PATIENT_ROOT, "2.16.840.1.113883.4.56");
+		return getProperty(PATIENT_ROOT, "1.2.3");
 	}
 	
 	public String getUserRoot() {
@@ -112,7 +112,7 @@ public class XdsSenderConfig {
 	}
 	
 	public String getXdsRepositoryEndpoint() {
-		return getProperty(XDS_REPO_ENDPOINT, "localhost:8082/openmrs/ms/xdsrepository");
+		return getProperty(XDS_REPO_ENDPOINT, "http://sedish.net:5001/xdsrepository");
 	}
 	
 	public String getXdsRepositoryUsername() {
@@ -120,7 +120,7 @@ public class XdsSenderConfig {
 	}
 	
 	public String getXdsRepositoryPassword() {
-		return getProperty(XDS_REPO_PASSWORD, "xds");
+		return getProperty(XDS_REPO_PASSWORD, "1234");
 	}
 	
 	private String getProperty(String name, String defaultVal) {
