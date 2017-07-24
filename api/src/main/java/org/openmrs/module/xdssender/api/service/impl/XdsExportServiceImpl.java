@@ -64,7 +64,7 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 	
 	private DocumentInfo buildDocInfo(Encounter encounter, Patient patient, DocumentModel docModel) {
 		DocumentInfo docInfo = new DocumentInfo();
-		docInfo.setUniqueId(String.format("2.25.%s", UUID.randomUUID().getMostSignificantBits()));
+		docInfo.setUniqueId(String.format("2.25.%s", UUID.randomUUID().getMostSignificantBits()).replaceAll("-", ""));
 		
 		docInfo.setRelatedEncounter(encounter);
 		

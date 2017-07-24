@@ -1,6 +1,7 @@
 package org.openmrs.module.xdssender.api.cda;
 
 import org.openmrs.Encounter;
+import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.event.Event;
 import org.openmrs.event.EventListener;
@@ -21,8 +22,9 @@ public class EncounterEventListener implements EventListener {
 			if (Event.Action.CREATED.toString().equals(mapMessage.getString("action"))) {
 				String uuid = ((MapMessage) message).getString("uuid");
 				Encounter encounter = Context.getEncounterService().getEncounterByUuid(uuid);
+				Patient patient = Context.getPatientService().getPatient(encounter.getPatient().getPatientId());
 				XdsExportService serivce = Context.getService(XdsExportService.class);
-				serivce.exportProvideAndRegister(encounter, encounter.getPatient());
+				serivce.exportProvideAndRegister(encounter, patient);
 			}
 			Context.closeSession();
 		}

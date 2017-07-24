@@ -82,11 +82,8 @@ public class MessageUtil {
 		patientDob.setDateValuePrecision(TS.DAY);
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_ID,
 		    String.format("%s^^^&%s&ISO", info.getPatient().getId().toString(), config.getPatientRoot()));
-		InfosetUtil.addOrOverwriteSlot(
-		    oddRegistryObject,
-		    XDSConstants.SLOT_NAME_SOURCE_PATIENT_INFO,
-		    String.format("PID-3|%s",
-		        String.format("%s^^^&%s&ISO", info.getPatient().getId().toString(), config.getPatientRoot())),
+		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_INFO,
+		    String.format("PID-3|%s^^^&%s&ISO", info.getPatient().getId().toString(), config.getPatientRoot()),
 		    String.format("PID-5|%s^%s^^^", info.getPatient().getFamilyName(), info.getPatient().getGivenName()),
 		    String.format("PID-7|%s", patientDob.getValue()), String.format("PID-8|%s", info.getPatient().getGender()));
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_LANGUAGE_CODE, Context.getLocale()
@@ -176,7 +173,7 @@ public class MessageUtil {
 		// Add an association
 		AssociationType1 association = new AssociationType1();
 		association.setId("as01");
-		association.setAssociationType("urn:oasis:names:tc:ebxml-regrep:AssociationType:HasMember");
+		association.setAssociationType(XDSConstants.HAS_MEMBER);
 		association.setSourceObject("SubmissionSet01");
 		association.setTargetObject("Document01");
 		InfosetUtil.addOrOverwriteSlot(association, XDSConstants.SLOT_NAME_SUBMISSIONSET_STATUS, "Original");
@@ -195,17 +192,21 @@ public class MessageUtil {
 			ClassificationType authorClass = new ClassificationType();
 			authorClass.setClassificationScheme(XDSConstants.UUID_XDSDocumentEntry_author);
 			authorClass.setClassifiedObject(oddRegistryObject.getId());
+			authorClass.setNodeRepresentation("");
 			authorClass.setId(String.format("Classification_%s", UUID.randomUUID().toString()));
 			
-			String authorText = String.format("%s^%s^%s^^^^^^&%s&ISO", pvdr.getId(), pvdr.getPerson().getFamilyName(), pvdr
-			        .getPerson().getGivenName(), config.getProviderRoot());
+			String authorText = String.format("%s^%s^%s^^^^^^&%s&ISO", pvdr.getIdentifier(), pvdr.getPerson()
+			        .getFamilyName(), pvdr.getPerson().getGivenName(), config.getProviderRoot());
 			if (authors.contains(authorText))
 				continue;
 			else
 				authors.add(authorText);
 			
-			InfosetUtil.addOrOverwriteSlot(authorClass, XDSConstants.SLOT_NAME_AUTHOR_PERSON, authorText);
+			String institutionText = String.format("%s^^^^^&%s&ISO^^^^%s", info.getRelatedEncounter().getLocation()
+			        .getName(), config.getLocationRoot(), info.getRelatedEncounter().getLocation().getId());
 			
+			InfosetUtil.addOrOverwriteSlot(authorClass, XDSConstants.SLOT_NAME_AUTHOR_PERSON, authorText);
+			InfosetUtil.addOrOverwriteSlot(authorClass, "authorInstitution", institutionText);
 			oddRegistryObject.getClassification().add(authorClass);
 		}
 		

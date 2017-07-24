@@ -47,6 +47,10 @@ public class XdsSenderConfig {
 	
 	private final static String XDS_REPO_PASSWORD = "xdssender.xdsrepository.password";
 	
+	public final static String ISANTEPLUS_ROLE_CLINICIAN = "xdssender.isanteplus.provider.role.clinician";
+	
+	public final static String ISANTEPLUS_ROLE_MEDECIN = "xdssender.isanteplus.provider.role.medecin";
+	
 	// locking object
 	private final static Object s_lockObject = new Object();
 	
@@ -84,11 +88,11 @@ public class XdsSenderConfig {
 	}
 	
 	public String getProviderRoot() {
-		return getProperty(PROVIDER_ROOT, "1.2.3.4.5.7");
+		return getProperty(PROVIDER_ROOT, "http://ohie-fr:8080/api/users");
 	}
 	
 	public String getLocationRoot() {
-		return getProperty(LOCATION_ROOT, "1.2.3.4.5.8");
+		return getProperty(LOCATION_ROOT, "http://ohie-fr:8080/api/organisationUnits");
 	}
 	
 	public String getPatientRoot() {

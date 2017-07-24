@@ -36,6 +36,7 @@ import org.openmrs.Provider;
 import org.openmrs.Relationship;
 import org.openmrs.Visit;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.XdsSenderConstants;
 
 import java.util.Calendar;
@@ -156,7 +157,10 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 				// Now add participants
 				for (Entry<EncounterRole, Set<Provider>> encounterProvider : encounter.getProvidersByRoles().entrySet()) {
 					
-					if (encounterProvider.getKey().getName().equals("AUT"))
+					if (encounterProvider.getKey().getName().equals(Context.getAdministrationService().getGlobalProperty(
+							XdsSenderConfig.ISANTEPLUS_ROLE_CLINICIAN))
+					        || encounterProvider.getKey().getName().equals(Context.getAdministrationService().getGlobalProperty(
+							XdsSenderConfig.ISANTEPLUS_ROLE_MEDECIN)))
 						for (Provider pvdr : encounterProvider.getValue()) {
 							Author aut = new Author(ContextControl.OverridingPropagating);
 							aut.setTime(new TS());
