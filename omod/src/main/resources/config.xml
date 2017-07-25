@@ -68,8 +68,18 @@
 		<property>xdssender.openmrs.password</property>
 		<description>Specifies password for authentication in OpenMRS</description>
 	</globalProperty>
-	
-	
+
+	<globalProperty>
+		<property>xdssender.isanteplus.provider.role.clinician</property>
+		<description>Specifies role for add provider to XDS documents</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.isanteplus.provider.role.medecin</property>
+		<description>Specifies role for add provider to XDS documents</description>
+	</globalProperty>
+
+
 	<!-- AOP
 	<advice>
 		<point>org.openmrs.api.FormService</point>
