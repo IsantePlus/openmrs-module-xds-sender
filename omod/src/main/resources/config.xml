@@ -58,6 +58,16 @@
 		<property>xdssender.xdsrepository.password</property>
 		<description>Specifies password for authentication to XDS repository</description>
 	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.openmrs.username</property>
+		<description>Specifies username for authentication in OpenMRS</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.openmrs.password</property>
+		<description>Specifies password for authentication in OpenMRS</description>
+	</globalProperty>
 	
 	
 	<!-- AOP
