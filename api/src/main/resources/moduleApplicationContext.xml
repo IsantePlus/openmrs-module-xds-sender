@@ -38,23 +38,4 @@
             </list>
         </property>
     </bean>
-
-    <bean id="outgoingmessageexceptions.OutgoingMessageExceptionsService"
-          class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager" />
-        </property>
-        <property name="target">
-            <bean class="org.openmrs.module.outgoingmessageexceptions.api.impl.OutgoingMessageExceptionsServiceImpl">
-                <property name="dao" ref="outgoingmessageexceptions.OutgoingMessageExceptionsDao" />
-            </bean>
-        </property>
-        <property name="preInterceptors">
-            <ref bean="serviceInterceptors" />
-        </property>
-        <property name="transactionAttributeSource">
-            <ref bean="transactionAttributeSource" />
-        </property>
-    </bean>
-
 </beans>

@@ -19,12 +19,6 @@
 			org.openmrs.event
 		</require_module>
 	</require_modules>
-
-	<require_modules>
-		<require_module>
-			org.openmrs.module.outgoingmessageexceptions
-		</require_module>
-	</require_modules>
 	
 	<!-- <updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL> -->
 	<!-- /Base Module Properties -->
@@ -40,7 +34,6 @@
 	<aware_of_modules>
 		<aware_of_module>org.openmrs.module.legacyui</aware_of_module>
 		<aware_of_module>org.openmrs.event</aware_of_module>
-		<aware_of_module>org.openmrs.module.outgoingmessageexceptions</aware_of_module>
 	</aware_of_modules>
 
 
@@ -67,6 +60,14 @@
 	<globalProperty>
 		<property>xdssender.openmrs.password</property>
 		<description>Specifies password for authentication in OpenMRS</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.errorHandler.implementation</property>
+		<defaultValue></defaultValue>
+		<description>
+			Which Biometrics engine implementation to should we connect to? Specify a Spring bean name, or leave blank to disable
+		</description>
 	</globalProperty>
 	
 	

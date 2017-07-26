@@ -77,19 +77,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>outgoing-message-exceptions</artifactId>
-            <version>1.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>outgoing-message-exceptions-api</artifactId>
-            <version>1.0.0</version>
-            <scope>provided</scope>
-        </dependency>
         <!-- DCM4CHEE modules (for JAX-b classes and InfoSetUtil) -->
         <dependency>
             <groupId>org.dcm4che</groupId>

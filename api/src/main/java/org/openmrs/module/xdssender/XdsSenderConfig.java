@@ -46,14 +46,16 @@ public class XdsSenderConfig {
 	private final static String XDS_REPO_USERNAME = "xdssender.xdsrepository.username";
 	
 	private final static String XDS_REPO_PASSWORD = "xdssender.xdsrepository.password";
-
+	
 	private final static String OPENMRS_USERNAME = "xdssender.openmrs.username";
-
+	
 	private final static String OPENMRS_PASSWORD = "xdssender.openmrs.password";
 	
 	public final static String ISANTEPLUS_ROLE_CLINICIAN = "xdssender.isanteplus.provider.role.clinician";
 	
 	public final static String ISANTEPLUS_ROLE_MEDECIN = "xdssender.isanteplus.provider.role.medecin";
+	
+	public static final String GP_ERROR_HANDLER_IMPLEMENTATION = "xdssender.errorHandler.implementation";
 	
 	// locking object
 	private final static Object s_lockObject = new Object();
@@ -110,19 +112,19 @@ public class XdsSenderConfig {
 	public String getEcidRoot() {
 		return getProperty(ECID_ROOT, "2.16.840.1.113883.4.56");
 	}
-
+	
 	public String gettXdsUsername() {
 		return getProperty(XDS_REPO_USERNAME, "");
 	}
-
+	
 	public String getXdsPassword() {
 		return getProperty(XDS_REPO_PASSWORD, "");
 	}
-
+	
 	public String getOpenmrsUsername() {
 		return getProperty(OPENMRS_USERNAME, "");
 	}
-
+	
 	public String getOpenmrsPassword() {
 		return getProperty(OPENMRS_PASSWORD, "");
 	}
@@ -137,6 +139,10 @@ public class XdsSenderConfig {
 	
 	public String getXdsRepositoryPassword() {
 		return getProperty(XDS_REPO_PASSWORD, "1234");
+	}
+	
+	public String getErrorHandlerImplementation() {
+		return getProperty(GP_ERROR_HANDLER_IMPLEMENTATION, "");
 	}
 	
 	private String getProperty(String name, String defaultVal) {
