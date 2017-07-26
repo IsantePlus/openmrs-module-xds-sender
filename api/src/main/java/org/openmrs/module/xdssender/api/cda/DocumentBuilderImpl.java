@@ -53,6 +53,8 @@ import java.util.UUID;
  */
 public class DocumentBuilderImpl implements DocumentBuilder {
 	
+	private XdsSenderConfig config = XdsSenderConfig.getInstance();
+	
 	private final Log log = LogFactory.getLog(this.getClass());
 	
 	private Patient recordTarget;
@@ -157,10 +159,9 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 				// Now add participants
 				for (Entry<EncounterRole, Set<Provider>> encounterProvider : encounter.getProvidersByRoles().entrySet()) {
 					
-					if (encounterProvider.getKey().getName().equals(Context.getAdministrationService().getGlobalProperty(
-							XdsSenderConfig.ISANTEPLUS_ROLE_CLINICIAN))
-					        || encounterProvider.getKey().getName().equals(Context.getAdministrationService().getGlobalProperty(
-							XdsSenderConfig.ISANTEPLUS_ROLE_MEDECIN)))
+					if (encounterProvider.getKey().getName().equals(config.getProviderRoleClinician())
+					        || encounterProvider.getKey().getName().equals(config.getProviderRoleMedecin())) {
+						
 						for (Provider pvdr : encounterProvider.getValue()) {
 							Author aut = new Author(ContextControl.OverridingPropagating);
 							aut.setTime(new TS());
@@ -168,7 +169,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 							aut.setAssignedAuthor(cdaDataUtil.createAuthorPerson(pvdr));
 							retVal.getAuthor().add(aut);
 						}
-					else if (encounterProvider.getKey().getName().equals("LA")) // There technically are no "legal" attesters to the document here as it is an auto-generated document
+					} else if (encounterProvider.getKey().getName().equals("LA")) // There technically are no "legal" attesters to the document here as it is an auto-generated document
 						;
 					else {
 						for (Provider pvdr : encounterProvider.getValue()) {

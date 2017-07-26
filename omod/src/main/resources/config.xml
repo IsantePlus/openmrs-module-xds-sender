@@ -66,11 +66,21 @@
 		<property>xdssender.errorHandler.implementation</property>
 		<defaultValue></defaultValue>
 		<description>
-			Which Biometrics engine implementation to should we connect to? Specify a Spring bean name, or leave blank to disable
+			Specify a Spring bean name of error handler service
 		</description>
 	</globalProperty>
-	
-	
+
+	<globalProperty>
+		<property>xdssender.isanteplus.provider.role.clinician</property>
+		<description>Specifies role for add provider to XDS documents</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.isanteplus.provider.role.medecin</property>
+		<description>Specifies role for add provider to XDS documents</description>
+	</globalProperty>
+
+
 	<!-- AOP
 	<advice>
 		<point>org.openmrs.api.FormService</point>

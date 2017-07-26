@@ -32,8 +32,8 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
 		
 		if (outInd.booleanValue()) {
 			try {
-				context.put(BindingProvider.USERNAME_PROPERTY, xdsSenderConfig.gettXdsUsername());
-				context.put(BindingProvider.PASSWORD_PROPERTY, xdsSenderConfig.getXdsPassword());
+				context.put(BindingProvider.USERNAME_PROPERTY, xdsSenderConfig.getXdsRepositoryUsername());
+				context.put(BindingProvider.PASSWORD_PROPERTY, xdsSenderConfig.getXdsRepositoryPassword());
 			}
 			catch (Exception e) {
 				logger.error("Error occured during creating an authentication context", e);

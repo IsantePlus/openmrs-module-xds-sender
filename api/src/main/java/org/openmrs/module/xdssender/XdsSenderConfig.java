@@ -9,10 +9,7 @@
  */
 package org.openmrs.module.xdssender;
 
-import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,9 +48,9 @@ public class XdsSenderConfig {
 	
 	private final static String OPENMRS_PASSWORD = "xdssender.openmrs.password";
 	
-	public final static String ISANTEPLUS_ROLE_CLINICIAN = "xdssender.isanteplus.provider.role.clinician";
+	private final static String ISANTEPLUS_ROLE_CLINICIAN = "xdssender.isanteplus.provider.role.clinician";
 	
-	public final static String ISANTEPLUS_ROLE_MEDECIN = "xdssender.isanteplus.provider.role.medecin";
+	private final static String ISANTEPLUS_ROLE_MEDECIN = "xdssender.isanteplus.provider.role.medecin";
 	
 	public static final String GP_ERROR_HANDLER_IMPLEMENTATION = "xdssender.errorHandler.implementation";
 	
@@ -71,10 +68,6 @@ public class XdsSenderConfig {
 			}
 		return s_instance;
 	}
-	
-	@Autowired
-	@Qualifier("adminService")
-	private AdministrationService administrationService;
 	
 	public String getIdPattern() {
 		// TODO - change default
@@ -112,15 +105,7 @@ public class XdsSenderConfig {
 	public String getEcidRoot() {
 		return getProperty(ECID_ROOT, "2.16.840.1.113883.4.56");
 	}
-	
-	public String gettXdsUsername() {
-		return getProperty(XDS_REPO_USERNAME, "");
-	}
-	
-	public String getXdsPassword() {
-		return getProperty(XDS_REPO_PASSWORD, "");
-	}
-	
+
 	public String getOpenmrsUsername() {
 		return getProperty(OPENMRS_USERNAME, "");
 	}
@@ -141,8 +126,16 @@ public class XdsSenderConfig {
 		return getProperty(XDS_REPO_PASSWORD, "1234");
 	}
 	
+
 	public String getErrorHandlerImplementation() {
 		return getProperty(GP_ERROR_HANDLER_IMPLEMENTATION, "");
+
+	public String getProviderRoleClinician() {
+		return getProperty(ISANTEPLUS_ROLE_CLINICIAN, "Clinician");
+	}
+	
+	public String getProviderRoleMedecin() {
+		return getProperty(ISANTEPLUS_ROLE_MEDECIN, "Medecin");
 	}
 	
 	private String getProperty(String name, String defaultVal) {
