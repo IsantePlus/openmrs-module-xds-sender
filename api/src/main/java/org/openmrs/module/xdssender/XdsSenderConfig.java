@@ -129,6 +129,7 @@ public class XdsSenderConfig {
 
 	public String getErrorHandlerImplementation() {
 		return getProperty(GP_ERROR_HANDLER_IMPLEMENTATION, "");
+	}
 
 	public String getProviderRoleClinician() {
 		return getProperty(ISANTEPLUS_ROLE_CLINICIAN, "Clinician");
