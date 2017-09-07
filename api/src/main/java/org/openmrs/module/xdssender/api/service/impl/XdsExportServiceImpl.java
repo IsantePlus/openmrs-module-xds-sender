@@ -46,7 +46,6 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 			
 			DocumentInfo docInfo = buildDocInfo(encounter, patient, docModel);
 			
-			// TODO: update ECID here?
 			ProvideAndRegisterDocumentSetRequestType request = messageUtil.createProvideAndRegisterDocument(
 			    docModel.getData(), docInfo);
 			RegistryResponseType response = xdsSender.sendProvideAndRegister(request);
@@ -57,7 +56,6 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 			return docInfo;
 		}
 		catch (Exception e) {
-			// TODO:
 			throw new RuntimeException(e);
 		}
 	}
