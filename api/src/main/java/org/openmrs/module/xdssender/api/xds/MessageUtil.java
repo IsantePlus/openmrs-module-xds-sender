@@ -11,6 +11,7 @@ import org.dcm4chee.xds2.infoset.rim.SubmitObjectsRequest;
 import org.dcm4chee.xds2.infoset.util.InfosetUtil;
 import org.marc.everest.datatypes.TS;
 import org.openmrs.Obs;
+import org.openmrs.PatientIdentifier;
 import org.openmrs.Provider;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.xdssender.XdsSenderConfig;
@@ -32,6 +33,8 @@ import java.util.UUID;
 @Component("xdssender.MessageUtil")
 public class MessageUtil {
 	
+	private static final String ECID_NAME = "ECID";
+	
 	@Autowired
 	private CdaDataUtil cdaDataUtil;
 	
@@ -43,6 +46,7 @@ public class MessageUtil {
 	
 	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(byte[] documentContent,
 	        final DocumentInfo info) throws JAXBException, IOException {
+		String patientId = getPatientIdentifier(info);
 		
 		ProvideAndRegisterDocumentSetRequestType retVal = new ProvideAndRegisterDocumentSetRequestType();
 		SubmitObjectsRequest registryRequest = new SubmitObjectsRequest();
@@ -81,9 +85,9 @@ public class MessageUtil {
 		TS patientDob = cdaDataUtil.createTS(info.getPatient().getBirthdate());
 		patientDob.setDateValuePrecision(TS.DAY);
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_ID,
-		    String.format("%s^^^&%s&ISO", info.getPatient().getId().toString(), config.getPatientRoot()));
+		    String.format("%s^^^&%s&ISO", patientId, config.getPatientRoot()));
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_INFO,
-		    String.format("PID-3|%s^^^&%s&ISO", info.getPatient().getId().toString(), config.getPatientRoot()),
+		    String.format("PID-3|%s^^^&%s&ISO", patientId, config.getPatientRoot()),
 		    String.format("PID-5|%s^%s^^^", info.getPatient().getFamilyName(), info.getPatient().getGivenName()),
 		    String.format("PID-7|%s", patientDob.getValue()), String.format("PID-8|%s", info.getPatient().getGender()));
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_LANGUAGE_CODE, Context.getLocale()
@@ -95,10 +99,8 @@ public class MessageUtil {
 		xdsUtil.addExtenalIdentifier(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_uniqueId,
 		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
 		    "XDSDocumentEntry.uniqueId");
-		xdsUtil.addExtenalIdentifier(
-		    oddRegistryObject,
-		    XDSConstants.UUID_XDSDocumentEntry_patientId,
-		    String.format("%s^^^%s&%s&NI", info.getPatient().getId().toString(), config.getEcidRoot(), config.getEcidRoot()),
+		xdsUtil.addExtenalIdentifier(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_patientId,
+		    String.format("%s^^^%s&%s&NI", patientId, config.getEcidRoot(), config.getEcidRoot()),
 		    "XDSDocumentEntry.patientId");
 		
 		// Set classifications
@@ -133,10 +135,8 @@ public class MessageUtil {
 		xdsUtil.addExtenalIdentifier(regPackage, XDSConstants.UUID_XDSSubmissionSet_sourceId,
 		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
 		    "XDSSubmissionSet.sourceId");
-		xdsUtil.addExtenalIdentifier(
-		    regPackage,
-		    XDSConstants.UUID_XDSSubmissionSet_patientId,
-		    String.format("%s^^^%s&%s&NI", info.getPatient().getId().toString(), config.getEcidRoot(), config.getEcidRoot()),
+		xdsUtil.addExtenalIdentifier(regPackage, XDSConstants.UUID_XDSSubmissionSet_patientId,
+		    String.format("%s^^^%s&%s&NI", patientId, config.getEcidRoot(), config.getEcidRoot()),
 		    "XDSSubmissionSet.patientId");
 		
 		// Add the eo to the submission
@@ -216,5 +216,16 @@ public class MessageUtil {
 		retVal.getDocument().add(doc);
 		
 		return retVal;
+	}
+	
+	private String getPatientIdentifier(DocumentInfo info) {
+		String id = info.getPatient().getId().toString();
+		
+		for (PatientIdentifier pid : info.getPatient().getIdentifiers()) {
+			if (pid.getIdentifierType().getName().equals(ECID_NAME)) {
+				id = pid.getIdentifier();
+			}
+		}
+		return id;
 	}
 }
