@@ -46,7 +46,7 @@ public class MessageUtil {
 	
 	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(byte[] documentContent,
 	        final DocumentInfo info) throws JAXBException, IOException {
-		String patientId = getPatientIdentifier(info);
+		String patientId = getPatientIdentifier(info).getIdentifier();
 		
 		ProvideAndRegisterDocumentSetRequestType retVal = new ProvideAndRegisterDocumentSetRequestType();
 		SubmitObjectsRequest registryRequest = new SubmitObjectsRequest();
@@ -218,14 +218,14 @@ public class MessageUtil {
 		return retVal;
 	}
 	
-	private String getPatientIdentifier(DocumentInfo info) {
-		String id = info.getPatient().getId().toString();
+	public PatientIdentifier getPatientIdentifier(DocumentInfo info) {
+		PatientIdentifier result = info.getPatient().getPatientIdentifier();
 		
 		for (PatientIdentifier pid : info.getPatient().getIdentifiers()) {
 			if (pid.getIdentifierType().getName().equals(ECID_NAME)) {
-				id = pid.getIdentifier();
+				result = pid;
 			}
 		}
-		return id;
+		return result;
 	}
 }
