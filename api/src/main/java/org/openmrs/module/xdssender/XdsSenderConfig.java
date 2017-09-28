@@ -48,9 +48,9 @@ public class XdsSenderConfig {
 	
 	private final static String OPENMRS_PASSWORD = "xdssender.openmrs.password";
 	
-	private final static String ISANTEPLUS_ROLE_CLINICIAN = "xdssender.isanteplus.provider.role.clinician";
+	private final static String ISANTEPLUS_ROLE_CLINICIAN = "xdssender.openmrs.provider.role.clinician";
 	
-	private final static String ISANTEPLUS_ROLE_MEDECIN = "xdssender.isanteplus.provider.role.medecin";
+	private final static String ISANTEPLUS_ROLE_MEDECIN = "xdssender.openmrs.provider.role.medecin";
 	
 	public static final String GP_ERROR_HANDLER_IMPLEMENTATION = "xdssender.errorHandler.implementation";
 	
@@ -105,7 +105,7 @@ public class XdsSenderConfig {
 	public String getEcidRoot() {
 		return getProperty(ECID_ROOT, "2.16.840.1.113883.4.56");
 	}
-
+	
 	public String getOpenmrsUsername() {
 		return getProperty(OPENMRS_USERNAME, "");
 	}
@@ -126,11 +126,10 @@ public class XdsSenderConfig {
 		return getProperty(XDS_REPO_PASSWORD, "1234");
 	}
 	
-
 	public String getErrorHandlerImplementation() {
 		return getProperty(GP_ERROR_HANDLER_IMPLEMENTATION, "");
 	}
-
+	
 	public String getProviderRoleClinician() {
 		return getProperty(ISANTEPLUS_ROLE_CLINICIAN, "Clinician");
 	}

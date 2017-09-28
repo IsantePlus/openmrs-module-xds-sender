@@ -71,12 +71,12 @@
 	</globalProperty>
 
 	<globalProperty>
-		<property>xdssender.isanteplus.provider.role.clinician</property>
+		<property>xdssender.openmrs.provider.role.clinician</property>
 		<description>Specifies role for add provider to XDS documents</description>
 	</globalProperty>
 
 	<globalProperty>
-		<property>xdssender.isanteplus.provider.role.medecin</property>
+		<property>xdssender.openmrs.provider.role.medecin</property>
 		<description>Specifies role for add provider to XDS documents</description>
 	</globalProperty>
 
