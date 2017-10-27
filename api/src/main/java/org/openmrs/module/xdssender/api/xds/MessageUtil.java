@@ -65,7 +65,7 @@ public class MessageUtil {
 			for (Obs el : info.getRelatedEncounter().getObs()) {
 				if (el.getObsDatetime().before(firstEncounter))
 					firstEncounter = el.getEncounter().getVisit().getStartDatetime();
-				if (el.getObsDatetime().after(lastEncounter))
+				if (lastEncounter != null && el.getObsDatetime().after(lastEncounter))
 					lastEncounter = el.getEncounter().getVisit().getStopDatetime();
 			}
 		
