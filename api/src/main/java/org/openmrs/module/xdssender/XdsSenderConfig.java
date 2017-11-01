@@ -48,9 +48,9 @@ public class XdsSenderConfig {
 	
 	private final static String OPENMRS_PASSWORD = "xdssender.openmrs.password";
 	
-	private final static String ISANTEPLUS_ROLE_CLINICIAN = "xdssender.openmrs.provider.role.clinician";
+	private final static String XDS_ROLE_CLINICIAN = "xdssender.openmrs.provider.role.clinician";
 	
-	private final static String ISANTEPLUS_ROLE_MEDECIN = "xdssender.openmrs.provider.role.medecin";
+	private final static String XDS_ROLE_DOCTOR = "xdssender.openmrs.provider.role.doctor";
 	
 	public static final String GP_ERROR_HANDLER_IMPLEMENTATION = "xdssender.errorHandler.implementation";
 	
@@ -131,11 +131,11 @@ public class XdsSenderConfig {
 	}
 	
 	public String getProviderRoleClinician() {
-		return getProperty(ISANTEPLUS_ROLE_CLINICIAN, "Clinician");
+		return getProperty(XDS_ROLE_CLINICIAN, "Clinician");
 	}
 	
-	public String getProviderRoleMedecin() {
-		return getProperty(ISANTEPLUS_ROLE_MEDECIN, "Medecin");
+	public String getProviderRoleDoctor() {
+		return getProperty(XDS_ROLE_DOCTOR, "Doctor");
 	}
 	
 	private String getProperty(String name, String defaultVal) {

@@ -76,7 +76,7 @@
 	</globalProperty>
 
 	<globalProperty>
-		<property>xdssender.openmrs.provider.role.medecin</property>
+		<property>xdssender.openmrs.provider.role.doctor</property>
 		<description>Specifies role for add provider to XDS documents</description>
 	</globalProperty>
 
