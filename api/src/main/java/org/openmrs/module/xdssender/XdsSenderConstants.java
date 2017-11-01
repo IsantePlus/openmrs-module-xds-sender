@@ -139,7 +139,7 @@ public final class XdsSenderConstants {
 	public static final String DOC_TEMPLATE_CCD_PLUS = "9.9.9.9.9.9.8";
 	
 	// Section Templates
-	public static final String SCT_TEMPLATE_CCD_ADVNACE_DIRECTIVES = "2.16.840.1.113883.10.20.1.1";
+	public static final String SCT_TEMPLATE_CCD_ADVANCE_DIRECTIVES = "2.16.840.1.113883.10.20.1.1";
 	
 	public static final String SCT_TEMPLATE_CCD_ALERTS = "2.16.840.1.113883.10.20.1.2";
 	
