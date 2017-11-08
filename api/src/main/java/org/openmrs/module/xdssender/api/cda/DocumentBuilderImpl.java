@@ -160,7 +160,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 				for (Entry<EncounterRole, Set<Provider>> encounterProvider : encounter.getProvidersByRoles().entrySet()) {
 					
 					if (encounterProvider.getKey().getName().equals(config.getProviderRoleClinician())
-					        || encounterProvider.getKey().getName().equals(config.getProviderRoleMedecin())) {
+					        || encounterProvider.getKey().getName().equals(config.getProviderRoleDoctor())) {
 						
 						for (Provider pvdr : encounterProvider.getValue()) {
 							Author aut = new Author(ContextControl.OverridingPropagating);

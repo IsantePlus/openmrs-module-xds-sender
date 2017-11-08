@@ -14,7 +14,7 @@ import javax.jms.MapMessage;
 import javax.jms.Message;
 
 public class EncounterEventListener implements EventListener {
-
+	
 	@Autowired
 	private XdsSenderConfig config = XdsSenderConfig.getInstance();
 	
