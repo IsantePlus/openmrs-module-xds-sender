@@ -16,7 +16,6 @@ import org.openmrs.PatientIdentifier;
 import org.openmrs.Provider;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.xdssender.XdsSenderConfig;
-import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.cda.CdaDataUtil;
 import org.openmrs.module.xdssender.api.model.DocumentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +47,7 @@ public class MessageUtil {
 	
 	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(byte[] documentContent,
 	        final DocumentInfo info, Encounter encounter) throws JAXBException, IOException {
-		String patientEcidId = getEcidPatientIdentifier(info).getIdentifier();
-		String patientIsantePlusId = getIsantePusPatientIdentifier(info).getIdentifier();
+		String patientId = getPatientIdentifier(info).getIdentifier();
 		
 		ProvideAndRegisterDocumentSetRequestType retVal = new ProvideAndRegisterDocumentSetRequestType();
 		SubmitObjectsRequest registryRequest = new SubmitObjectsRequest();
@@ -58,8 +56,8 @@ public class MessageUtil {
 		registryRequest.setRegistryObjectList(new RegistryObjectListType());
 		ExtrinsicObjectType oddRegistryObject = new ExtrinsicObjectType();
 		// ODD
-		oddRegistryObject.setId(encounter.getLocation().toString() + ":" + patientIsantePlusId + ":"
-		        + encounter.getForm().getName() + ":" + encounter.getEncounterDatetime());
+		oddRegistryObject.setId(encounter.getLocation().getName() + ":" + patientId + ":" + encounter.getForm().getName()
+		        + ":" + encounter.getEncounterDatetime());
 		oddRegistryObject.setMimeType("text/xml");
 		
 		// Get the earliest time something occurred and the latest
@@ -89,9 +87,9 @@ public class MessageUtil {
 		TS patientDob = cdaDataUtil.createTS(info.getPatient().getBirthdate());
 		patientDob.setDateValuePrecision(TS.DAY);
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_ID,
-		    String.format("%s^^^&%s&ISO", patientEcidId, config.getPatientRoot()));
+		    String.format("%s^^^&%s&ISO", patientId, config.getPatientRoot()));
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_INFO,
-		    String.format("PID-3|%s^^^&%s&ISO", patientEcidId, config.getPatientRoot()),
+		    String.format("PID-3|%s^^^&%s&ISO", patientId, config.getPatientRoot()),
 		    String.format("PID-5|%s^%s^^^", info.getPatient().getFamilyName(), info.getPatient().getGivenName()),
 		    String.format("PID-7|%s", patientDob.getValue()), String.format("PID-8|%s", info.getPatient().getGender()));
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_LANGUAGE_CODE, Context.getLocale()
@@ -104,7 +102,7 @@ public class MessageUtil {
 		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
 		    "XDSDocumentEntry.uniqueId");
 		xdsUtil.addExtenalIdentifier(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_patientId,
-		    String.format("%s^^^%s&%s&NI", patientEcidId, config.getEcidRoot(), config.getEcidRoot()),
+		    String.format("%s^^^%s&%s&NI", patientId, config.getEcidRoot(), config.getEcidRoot()),
 		    "XDSDocumentEntry.patientId");
 		
 		// Set classifications
@@ -140,7 +138,7 @@ public class MessageUtil {
 		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
 		    "XDSSubmissionSet.sourceId");
 		xdsUtil.addExtenalIdentifier(regPackage, XDSConstants.UUID_XDSSubmissionSet_patientId,
-		    String.format("%s^^^%s&%s&NI", patientEcidId, config.getEcidRoot(), config.getEcidRoot()),
+		    String.format("%s^^^%s&%s&NI", patientId, config.getEcidRoot(), config.getEcidRoot()),
 		    "XDSSubmissionSet.patientId");
 		
 		// Add the eo to the submission
@@ -222,22 +220,11 @@ public class MessageUtil {
 		return retVal;
 	}
 	
-	public PatientIdentifier getEcidPatientIdentifier(DocumentInfo info) {
+	public PatientIdentifier getPatientIdentifier(DocumentInfo info) {
 		PatientIdentifier result = info.getPatient().getPatientIdentifier();
 		
 		for (PatientIdentifier pid : info.getPatient().getIdentifiers()) {
 			if (pid.getIdentifierType().getName().equals(ECID_NAME)) {
-				result = pid;
-			}
-		}
-		return result;
-	}
-	
-	public PatientIdentifier getIsantePusPatientIdentifier(DocumentInfo info) {
-		PatientIdentifier result = info.getPatient().getPatientIdentifier();
-		
-		for (PatientIdentifier pid : info.getPatient().getIdentifiers()) {
-			if (pid.getIdentifierType().getUuid().equals(XdsSenderConstants.ISANTEPLUS_IDENTIFIER_UUID)) {
 				result = pid;
 			}
 		}

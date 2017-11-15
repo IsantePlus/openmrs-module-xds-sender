@@ -484,8 +484,6 @@ public final class XdsSenderConstants {
 	
 	public static final String SCT_TEMPLATE_HISTORY_OF_BLOOD_TRANSFUSIONS = "1.3.6.1.4.1.19376.1.5.3.1.1.9.12";
 	
-	public static final String ISANTEPLUS_IDENTIFIER_UUID = "05a29f94-c0ed-11e2-94be-8c13b969e334";
-	
 	private XdsSenderConstants() {
 	}
 }
