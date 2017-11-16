@@ -32,7 +32,7 @@
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
 				<artifactId>legacyui-omod</artifactId>
-				<version>1.2.3</version>
+				<version>${legacyuiVersion}</version>
 				<scope>provided</scope>
 		</dependency>
 	</dependencies>
