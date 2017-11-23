@@ -55,9 +55,12 @@ public class MessageUtil {
 		
 		registryRequest.setRegistryObjectList(new RegistryObjectListType());
 		ExtrinsicObjectType oddRegistryObject = new ExtrinsicObjectType();
+		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		// ODD
-		oddRegistryObject.setId(encounter.getLocation().getName() + ":" + patientId + ":" + encounter.getForm().getName()
-		        + ":" + encounter.getEncounterDatetime());
+		oddRegistryObject.setId(encounter.getLocation().getName().replace(" ", "-") + "/" + patientId + "/"
+		        + encounter.getEncounterType().getName().replace(" ", "-") + "/"
+		        + encounter.getForm().getName().replace(" ", "-") + "/" + format.format(encounter.getEncounterDatetime()));
 		oddRegistryObject.setMimeType("text/xml");
 		
 		// Get the earliest time something occurred and the latest
@@ -177,7 +180,9 @@ public class MessageUtil {
 		association.setId("as01");
 		association.setAssociationType(XDSConstants.HAS_MEMBER);
 		association.setSourceObject("SubmissionSet01");
-		association.setTargetObject("Document01");
+		association.setTargetObject(encounter.getLocation().getName().replace(" ", "-") + "/" + patientId + "/"
+		        + encounter.getEncounterType().getName().replace(" ", "-") + "/"
+		        + encounter.getForm().getName().replace(" ", "-") + "/" + format.format(encounter.getEncounterDatetime()));
 		InfosetUtil.addOrOverwriteSlot(association, XDSConstants.SLOT_NAME_SUBMISSIONSET_STATUS, "Original");
 		registryRequest
 		        .getRegistryObjectList()
