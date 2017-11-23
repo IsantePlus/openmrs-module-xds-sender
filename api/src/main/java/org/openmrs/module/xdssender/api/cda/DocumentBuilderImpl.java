@@ -30,6 +30,7 @@ import org.marc.everest.rmim.uv.cdar2.vocabulary.x_BasicConfidentialityKind;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ServiceEventPerformer;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
+import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.Person;
 import org.openmrs.Provider;
@@ -117,7 +118,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 	/**
 	 * Generate the CDA
 	 */
-	public ClinicalDocument generate(Section... sections) {
+	public ClinicalDocument generate(Location location, Section... sections) {
 		try {
 			ClinicalDocument retVal = new ClinicalDocument();
 			retVal.setTypeId(new II("2.16.840.1.113883.1.3", "POCD_HD000040"));
@@ -138,7 +139,8 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			// Custodian
 			Custodian custodian = new Custodian();
 			custodian.setAssignedCustodian(new AssignedCustodian());
-			custodian.getAssignedCustodian().setRepresentedCustodianOrganization(cdaDataUtil.getCustodianOrganization());
+			custodian.getAssignedCustodian().setRepresentedCustodianOrganization(
+			    cdaDataUtil.getCustodianOrganization(location));
 			retVal.setCustodian(custodian);
 			
 			// Create documentation of

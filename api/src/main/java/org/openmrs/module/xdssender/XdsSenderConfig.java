@@ -38,6 +38,10 @@ public class XdsSenderConfig {
 	
 	private static final String ECID_ROOT = "xdssender.ecidRoot";
 	
+	private static final String CODE_NATIONAL_ROOT = "xdssender.codeNationalRoot";
+	
+	private static final String CODE_ST_ROOT = "xdssender.codeStRoot";
+	
 	private static final String XDS_REPO_ENDPOINT = "xdssender.repositoryEndpoint";
 	
 	private final static String XDS_REPO_USERNAME = "xdssender.xdsrepository.username";
@@ -104,6 +108,14 @@ public class XdsSenderConfig {
 	
 	public String getEcidRoot() {
 		return getProperty(ECID_ROOT, "2.16.840.1.113883.4.56");
+	}
+	
+	public String getCodeNationalRoot() {
+		return getProperty(CODE_NATIONAL_ROOT, "2.25.212283553061960040061731875660599129565");
+	}
+	
+	public String getCodeStRoot() {
+		return getProperty(CODE_ST_ROOT, "2.25.276946543544871160225835991160192746993");
 	}
 	
 	public String getOpenmrsUsername() {

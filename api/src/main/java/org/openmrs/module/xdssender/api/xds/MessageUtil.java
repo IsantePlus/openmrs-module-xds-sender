@@ -11,11 +11,13 @@ import org.dcm4chee.xds2.infoset.rim.SubmitObjectsRequest;
 import org.dcm4chee.xds2.infoset.util.InfosetUtil;
 import org.marc.everest.datatypes.TS;
 import org.openmrs.Encounter;
+import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.Provider;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.xdssender.XdsSenderConfig;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.cda.CdaDataUtil;
 import org.openmrs.module.xdssender.api.model.DocumentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,10 @@ public class MessageUtil {
 	
 	private static final String ECID_NAME = "ECID";
 	
+	private static final String CODE_NATIONAL_NAME = "Code National";
+	
+	private static final String CODE_ST_NAME = "Code ST";
+	
 	@Autowired
 	private CdaDataUtil cdaDataUtil;
 	
@@ -48,6 +54,7 @@ public class MessageUtil {
 	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(byte[] documentContent,
 	        final DocumentInfo info, Encounter encounter) throws JAXBException, IOException {
 		String patientId = getPatientIdentifier(info).getIdentifier();
+		String location = getPatientLocation(info).getName();
 		
 		ProvideAndRegisterDocumentSetRequestType retVal = new ProvideAndRegisterDocumentSetRequestType();
 		SubmitObjectsRequest registryRequest = new SubmitObjectsRequest();
@@ -57,6 +64,7 @@ public class MessageUtil {
 		ExtrinsicObjectType oddRegistryObject = new ExtrinsicObjectType();
 		
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		
 		// ODD
 		oddRegistryObject.setId(encounter.getLocation().getName().replace(" ", "-") + "/" + patientId + "/"
 		        + encounter.getEncounterType().getName().replace(" ", "-") + "/"
@@ -86,15 +94,20 @@ public class MessageUtil {
 		
 		oddRegistryObject.setObjectType("urn:uuid:7edca82f-054d-47f2-a032-9b2a5b5186c1");
 		
+		PatientIdentifier nationalIdentifier = getNationalPatientIdentifier(info);
+		PatientIdentifier siteIdentifier = getSitePatientIdentifier(info);
+		
 		// Add source patient information
 		TS patientDob = cdaDataUtil.createTS(info.getPatient().getBirthdate());
 		patientDob.setDateValuePrecision(TS.DAY);
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_ID,
-		    String.format("%s^^^&%s&ISO", patientId, config.getPatientRoot()));
+		    String.format("%s^^^&%s&ISO", patientId, config.getEcidRoot()));
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_SOURCE_PATIENT_INFO,
-		    String.format("PID-3|%s^^^&%s&ISO", patientId, config.getPatientRoot()),
+		    String.format("PID-3|%s^^^&%s&ISO", nationalIdentifier.getIdentifier(), config.getCodeNationalRoot()),
+		    String.format("PID-3|%s^^^&%s&ISO", siteIdentifier.getIdentifier(), config.getCodeStRoot()),
 		    String.format("PID-5|%s^%s^^^", info.getPatient().getFamilyName(), info.getPatient().getGivenName()),
-		    String.format("PID-7|%s", patientDob.getValue()), String.format("PID-8|%s", info.getPatient().getGender()));
+		    String.format("PID-7|%s", patientDob.getValue()), String.format("PID-8|%s", info.getPatient().getGender()),
+		    String.format("PID-11|%s", location));
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_LANGUAGE_CODE, Context.getLocale()
 		        .toString());
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_CREATION_TIME, new SimpleDateFormat(
@@ -234,5 +247,31 @@ public class MessageUtil {
 			}
 		}
 		return result;
+	}
+	
+	public PatientIdentifier getNationalPatientIdentifier(DocumentInfo info) {
+		PatientIdentifier result = info.getPatient().getPatientIdentifier();
+		
+		for (PatientIdentifier pid : info.getPatient().getIdentifiers()) {
+			if (pid.getIdentifierType().getName().equals(CODE_NATIONAL_NAME)) {
+				result = pid;
+			}
+		}
+		return result;
+	}
+	
+	public PatientIdentifier getSitePatientIdentifier(DocumentInfo info) {
+		PatientIdentifier result = info.getPatient().getPatientIdentifier();
+		
+		for (PatientIdentifier pid : info.getPatient().getIdentifiers()) {
+			if (pid.getIdentifierType().getName().equals(CODE_ST_NAME)) {
+				result = pid;
+			}
+		}
+		return result;
+	}
+	
+	public Location getPatientLocation(DocumentInfo info) {
+		return info.getPatient().getPatientIdentifier().getLocation();
 	}
 }

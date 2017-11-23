@@ -3,6 +3,7 @@ package org.openmrs.module.xdssender.api.cda;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalDocument;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Section;
 import org.openmrs.Encounter;
+import org.openmrs.Location;
 import org.openmrs.Patient;
 
 /**
@@ -45,6 +46,6 @@ public interface DocumentBuilder {
 	/**
 	 * Generate the document
 	 */
-	ClinicalDocument generate(Section... sections);
+	ClinicalDocument generate(Location location, Section... sections);
 	
 }

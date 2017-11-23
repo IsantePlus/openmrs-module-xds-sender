@@ -417,9 +417,9 @@ public class CdaDataUtil {
 	/**
 	 * Get the custodian information
 	 */
-	public CustodianOrganization getCustodianOrganization() {
+	public CustodianOrganization getCustodianOrganization(Location location) {
 		CustodianOrganization retVal = new CustodianOrganization();
-		Location shrLocation = Context.getLocationService().getDefaultLocation();
+		Location shrLocation = location;
 		
 		// Set name
 		if (shrLocation == null) {
