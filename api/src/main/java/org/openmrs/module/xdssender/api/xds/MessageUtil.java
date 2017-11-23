@@ -10,6 +10,7 @@ import org.dcm4chee.xds2.infoset.rim.RegistryPackageType;
 import org.dcm4chee.xds2.infoset.rim.SubmitObjectsRequest;
 import org.dcm4chee.xds2.infoset.util.InfosetUtil;
 import org.marc.everest.datatypes.TS;
+import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.Provider;
@@ -45,7 +46,7 @@ public class MessageUtil {
 	private XdsSenderConfig config;
 	
 	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(byte[] documentContent,
-	        final DocumentInfo info) throws JAXBException, IOException {
+	        final DocumentInfo info, Encounter encounter) throws JAXBException, IOException {
 		String patientId = getPatientIdentifier(info).getIdentifier();
 		
 		ProvideAndRegisterDocumentSetRequestType retVal = new ProvideAndRegisterDocumentSetRequestType();
@@ -54,19 +55,23 @@ public class MessageUtil {
 		
 		registryRequest.setRegistryObjectList(new RegistryObjectListType());
 		ExtrinsicObjectType oddRegistryObject = new ExtrinsicObjectType();
+		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		// ODD
-		oddRegistryObject.setId("Document01");
+		oddRegistryObject.setId(encounter.getLocation().getName().replace(" ", "-") + "/" + patientId + "/"
+		        + encounter.getEncounterType().getName().replace(" ", "-") + "/"
+		        + encounter.getForm().getName().replace(" ", "-") + "/" + format.format(encounter.getEncounterDatetime()));
 		oddRegistryObject.setMimeType("text/xml");
 		
 		// Get the earliest time something occurred and the latest
-		Date lastEncounter = new Date(0), firstEncounter = new Date();
+		Date lastEncounter = encounter.getEncounterDatetime(), firstEncounter = encounter.getEncounterDatetime();
 		
 		if (info.getRelatedEncounter() != null)
 			for (Obs el : info.getRelatedEncounter().getObs()) {
 				if (el.getObsDatetime().before(firstEncounter))
 					firstEncounter = el.getEncounter().getVisit().getStartDatetime();
 				if (lastEncounter != null && el.getObsDatetime().after(lastEncounter))
-					lastEncounter = el.getEncounter().getVisit().getStopDatetime();
+					lastEncounter = el.getEncounter().getEncounterDatetime();
 			}
 		
 		TS firstEncounterTs = cdaDataUtil.createTS(firstEncounter), lastEncounterTs = cdaDataUtil.createTS(lastEncounter), creationTimeTs = TS
@@ -175,7 +180,9 @@ public class MessageUtil {
 		association.setId("as01");
 		association.setAssociationType(XDSConstants.HAS_MEMBER);
 		association.setSourceObject("SubmissionSet01");
-		association.setTargetObject("Document01");
+		association.setTargetObject(encounter.getLocation().getName().replace(" ", "-") + "/" + patientId + "/"
+		        + encounter.getEncounterType().getName().replace(" ", "-") + "/"
+		        + encounter.getForm().getName().replace(" ", "-") + "/" + format.format(encounter.getEncounterDatetime()));
 		InfosetUtil.addOrOverwriteSlot(association, XDSConstants.SLOT_NAME_SUBMISSIONSET_STATUS, "Original");
 		registryRequest
 		        .getRegistryObjectList()

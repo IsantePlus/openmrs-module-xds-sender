@@ -51,7 +51,7 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 			}
 			
 			ProvideAndRegisterDocumentSetRequestType request = messageUtil.createProvideAndRegisterDocument(
-			    docModel.getData(), docInfo);
+			    docModel.getData(), docInfo, encounter);
 			RegistryResponseType response = xdsSender.sendProvideAndRegister(request);
 			
 			if (!response.getStatus().contains("Success"))

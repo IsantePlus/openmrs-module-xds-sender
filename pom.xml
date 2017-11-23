@@ -26,18 +26,27 @@
 		<module>omod</module>
 	</modules>
 
+    <properties>
+        <openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
+		<everestVersion>1.1.0</everestVersion>
+		<dcm4chee-xds2Version>2.0.4</dcm4chee-xds2Version>
+		<javax.servletVersion>2.4</javax.servletVersion>
+		<eventVersion>2.6.0</eventVersion>
+		<legacyuiVersion>1.2.3</legacyuiVersion>
+    </properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>org.marc.everest</groupId>
 				<artifactId>everest-core</artifactId>
-				<version>1.1.0</version>
+				<version>${everestVersion}</version>
 				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.marc.everest</groupId>
 				<artifactId>everest-rmim-uv-cdar2</artifactId>
-				<version>1.1.0</version>
+				<version>${everestVersion}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -58,6 +67,10 @@
 			<id>dcm4che</id>
 			<url>http://dcm4che.org/maven2</url>
 		</repository>
+        <repository>
+            <id>marc-te-main</id>
+            <url>http://te.marc-hi.ca/mvn</url>
+        </repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -70,8 +83,4 @@
 		</pluginRepository>
 	</pluginRepositories>
 
-    <properties>
-        <openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
-		<everestVersion>1.1.0</everestVersion>
-    </properties>
 </project>
