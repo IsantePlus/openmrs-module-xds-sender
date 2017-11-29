@@ -292,7 +292,7 @@ public class CdaDataUtil {
 		
 		// Get the ID
 		retVal.setId(SET.createSET(new II(config.getProviderRoot(), pvdr.getId().toString()), new II(config.getUserRoot(),
-		        Context.getUserService().getUsersByPerson(pvdr.getPerson(), false).get(0).getId().toString())));
+		        pvdr.getIdentifier())));
 		
 		// Set telecom
 		if (pvdr.getPerson() != null) {
@@ -469,10 +469,6 @@ public class CdaDataUtil {
 			if (!patientRole.getId().contains(ii))
 				patientRole.getId().add(ii);
 		}
-		
-		II meId = new II(config.getPatientRoot(), patient.getId().toString());
-		if (!patientRole.getId().contains(meId))
-			patientRole.getId().add(meId);
 		
 		// Address?
 		patientRole.setAddr(createAddressSet(patient));

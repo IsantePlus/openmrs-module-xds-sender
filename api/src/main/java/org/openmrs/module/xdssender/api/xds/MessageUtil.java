@@ -12,6 +12,7 @@ import org.dcm4chee.xds2.infoset.util.InfosetUtil;
 import org.marc.everest.datatypes.TS;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
+import org.openmrs.LocationAttribute;
 import org.openmrs.Obs;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.Provider;
@@ -222,8 +223,16 @@ public class MessageUtil {
 			else
 				authors.add(authorText);
 			
+			String siteCode = null;
+			
+			for (LocationAttribute attribute : info.getRelatedEncounter().getLocation().getAttributes()) {
+				if (attribute.getAttributeType().getUuid().equals(XdsSenderConstants.LOCATION_SITECODE_ATTRIBUTE_UUID)) {
+					siteCode = attribute.getValue().toString();
+				}
+			}
+			
 			String institutionText = String.format("%s^^^^^&%s&ISO^^^^%s", info.getRelatedEncounter().getLocation()
-			        .getName(), config.getLocationRoot(), info.getRelatedEncounter().getLocation().getId());
+			        .getName(), config.getLocationRoot(), siteCode);
 			
 			InfosetUtil.addOrOverwriteSlot(authorClass, XDSConstants.SLOT_NAME_AUTHOR_PERSON, authorText);
 			InfosetUtil.addOrOverwriteSlot(authorClass, "authorInstitution", institutionText);

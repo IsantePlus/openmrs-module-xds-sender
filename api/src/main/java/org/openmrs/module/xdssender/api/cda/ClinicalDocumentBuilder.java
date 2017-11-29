@@ -5,12 +5,12 @@ import org.apache.commons.logging.LogFactory;
 import org.marc.everest.datatypes.generic.CD;
 import org.marc.everest.formatters.xml.its1.XmlIts1Formatter;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalDocument;
-import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Location;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Section;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
+import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
@@ -143,15 +143,14 @@ public class ClinicalDocumentBuilder {
 	   if (allergies.length > 0)
 	   allergySection = allergyBuilder.generate(allergies);*/
 
-		org.openmrs.Location patientLocation=null;
+		Location visitLocation = encounter.getVisit().getLocation();
 
-		for (PatientIdentifier pid : patient.getIdentifiers()) {
-			patientLocation = pid.getLocation();
-		}
+		if (visitLocation == null)
+			visitLocation = Context.getLocationService().getDefaultLocation();
 
 		// Formatter
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-			ClinicalDocument doc = builder.generate(patientLocation, eddSection, flowsheetSection, vitalSignsSection, medicationsSection, probSection,
+			ClinicalDocument doc = builder.generate(visitLocation, eddSection, flowsheetSection, vitalSignsSection, medicationsSection, probSection,
 			    allergySection);
 
 			XmlIts1Formatter formatter = EverestUtil.createFormatter();
