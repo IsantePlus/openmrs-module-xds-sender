@@ -71,6 +71,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -814,6 +815,12 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 			
 		}
 		
+		effectiveTimePeriod.setLow(this.cdaDataUtil.createTS(sourceObs.getObsDatetime()));
+		effectiveTimePeriod.getLow().setDateValuePrecision(TS.DAY);
+		
+		effectiveTimePeriod.setHigh(this.cdaDataUtil.createTS(sourceObs.getObsDatetime()));
+		effectiveTimePeriod.getHigh().setDateValuePrecision(TS.DAY);
+		
 		// We have medication history  
 		if (sourceObs.getConcept().getId().equals(XdsSenderConstants.CONCEPT_ID_MEDICATION_HISTORY)) {
 			retVal.getEffectiveTime().add(effectiveTimePeriod);
@@ -824,8 +831,27 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 		} else
 			retVal.getEffectiveTime().add(effectiveTimeInstant);
 		
+		String obsData = sourceObs.getConcept().getConceptId().toString();
+
+		if (sourceObs.getValueCoded() != null)
+			obsData += "/value-coded: " + sourceObs.getValueCoded().getId().toString();
+		else if (sourceObs.getValueNumeric() != null)
+			obsData += "/value numeric: " + sourceObs.getValueNumeric();
+		else if (sourceObs.getValueDatetime() != null) {
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+			obsData += "/value-datetime: " + format.format(sourceObs.getValueDatetime());
+		} else if (sourceObs.getValueText() != null)
+			obsData += "/value-text: " + sourceObs.getValueText();
+		
 		if (sourceObs.getComment() != null)
 			retVal.setText(new ED(sourceObs.getComment()));
+		
+		try {
+			retVal.setText(obsData);
+		} catch (UnsupportedEncodingException ex) {
+			ex.getMessage();
+		}
+		
 		return retVal;
 	}
 	

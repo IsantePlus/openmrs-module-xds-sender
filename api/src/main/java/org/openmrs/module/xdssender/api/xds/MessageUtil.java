@@ -67,9 +67,9 @@ public class MessageUtil {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		
 		// ODD
-		oddRegistryObject.setId(encounter.getLocation().getName().replace(" ", "-") + "/" + patientId + "/"
-		        + encounter.getEncounterType().getName().replace(" ", "-") + "/"
-		        + encounter.getForm().getName().replace(" ", "-") + "/" + format.format(encounter.getEncounterDatetime()));
+		oddRegistryObject.setId(encounter.getLocation().getUuid() + "/" + patientId + "/"
+		        + encounter.getEncounterType().getUuid() + "/" + encounter.getForm().getUuid() + "/"
+		        + format.format(encounter.getEncounterDatetime()));
 		oddRegistryObject.setMimeType("text/xml");
 		
 		// Get the earliest time something occurred and the latest
@@ -194,9 +194,9 @@ public class MessageUtil {
 		association.setId("as01");
 		association.setAssociationType(XDSConstants.HAS_MEMBER);
 		association.setSourceObject("SubmissionSet01");
-		association.setTargetObject(encounter.getLocation().getName().replace(" ", "-") + "/" + patientId + "/"
-		        + encounter.getEncounterType().getName().replace(" ", "-") + "/"
-		        + encounter.getForm().getName().replace(" ", "-") + "/" + format.format(encounter.getEncounterDatetime()));
+		association.setTargetObject(encounter.getLocation().getUuid() + "/" + patientId + "/"
+		        + encounter.getEncounterType().getUuid() + "/" + encounter.getForm().getUuid() + "/"
+		        + format.format(encounter.getEncounterDatetime()));
 		InfosetUtil.addOrOverwriteSlot(association, XDSConstants.SLOT_NAME_SUBMISSIONSET_STATUS, "Original");
 		registryRequest
 		        .getRegistryObjectList()
@@ -234,9 +234,9 @@ public class MessageUtil {
 			String institutionText = String.format("%s^^^^^&%s&ISO^^^^%s", info.getRelatedEncounter().getLocation()
 			        .getName(), config.getLocationRoot(), siteCode);
 			
-			InfosetUtil.addOrOverwriteSlot(authorClass, XDSConstants.SLOT_NAME_AUTHOR_PERSON, authorText);
+			/*InfosetUtil.addOrOverwriteSlot(authorClass, XDSConstants.SLOT_NAME_AUTHOR_PERSON, authorText);
 			InfosetUtil.addOrOverwriteSlot(authorClass, "authorInstitution", institutionText);
-			oddRegistryObject.getClassification().add(authorClass);
+			oddRegistryObject.getClassification().add(authorClass);*/
 		}
 		
 		ProvideAndRegisterDocumentSetRequestType.Document doc = new ProvideAndRegisterDocumentSetRequestType.Document();
