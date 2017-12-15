@@ -234,9 +234,9 @@ public class MessageUtil {
 			String institutionText = String.format("%s^^^^^&%s&ISO^^^^%s", info.getRelatedEncounter().getLocation()
 			        .getName(), config.getLocationRoot(), siteCode);
 			
-			/*InfosetUtil.addOrOverwriteSlot(authorClass, XDSConstants.SLOT_NAME_AUTHOR_PERSON, authorText);
+			InfosetUtil.addOrOverwriteSlot(authorClass, XDSConstants.SLOT_NAME_AUTHOR_PERSON, authorText);
 			InfosetUtil.addOrOverwriteSlot(authorClass, "authorInstitution", institutionText);
-			oddRegistryObject.getClassification().add(authorClass);*/
+			oddRegistryObject.getClassification().add(authorClass);
 		}
 		
 		ProvideAndRegisterDocumentSetRequestType.Document doc = new ProvideAndRegisterDocumentSetRequestType.Document();
