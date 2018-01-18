@@ -172,7 +172,8 @@ public class CdaDataUtil {
 		AssignedEntity retVal = new AssignedEntity();
 		
 		// Get the ID
-		retVal.setId(SET.createSET(new II(config.getProviderRoot(), pvdr.getId().toString())));
+		retVal.setId(SET.createSET(new II(config.getProviderRoot(), pvdr.getId().toString()), new II(config.getUserRoot(),
+		        pvdr.getUuid())));
 		
 		// Telecoms
 		retVal.setTelecom(createTelecomSet(pvdr.getPerson()));
@@ -292,7 +293,7 @@ public class CdaDataUtil {
 		
 		// Get the ID
 		retVal.setId(SET.createSET(new II(config.getProviderRoot(), pvdr.getId().toString()), new II(config.getUserRoot(),
-		        pvdr.getIdentifier())));
+		        pvdr.getUuid())));
 		
 		// Set telecom
 		if (pvdr.getPerson() != null) {
@@ -324,7 +325,7 @@ public class CdaDataUtil {
 		    XdsSenderConstants.ATTRIBUTE_NAME_EXTERNAL_ID);
 		if (externalId != null)
 			retVal.getId().add(parseIIFromString(externalId.getValue().toString()));
-		retVal.getId().add(new II(config.getLocationRoot(), location.getId().toString()));
+		retVal.getId().add(new II(config.getLocationRoot(), location.getUuid()));
 		
 		// Name , etc. ?
 		if (location.getName() != null)
@@ -347,7 +348,7 @@ public class CdaDataUtil {
 			if (externalId != null)
 				retVal.getAsOrganizationPartOf().getId().add(parseIIFromString(externalId.getValue().toString()));
 			retVal.getAsOrganizationPartOf().getId()
-			        .add(new II(config.getLocationRoot(), location.getParentLocation().getId().toString()));
+			        .add(new II(config.getLocationRoot(), location.getParentLocation().getUuid()));
 			
 			if (location.getParentLocation().getRetired())
 				retVal.getAsOrganizationPartOf().setStatusCode(RoleStatus.Terminated);
@@ -440,9 +441,9 @@ public class CdaDataUtil {
 			    XdsSenderConstants.ATTRIBUTE_NAME_EXTERNAL_ID);
 			if (idAttribute != null)
 				retVal.setId(SET.createSET(parseIIFromString(idAttribute.getValue().toString()),
-				    new II(config.getLocationRoot(), shrLocation.getId().toString())));
+				    new II(config.getLocationRoot(), shrLocation.getUuid())));
 			else
-				retVal.setId(SET.createSET(new II(config.getLocationRoot(), shrLocation.getId().toString())));
+				retVal.setId(SET.createSET(new II(config.getLocationRoot(), shrLocation.getUuid())));
 			
 			retVal.setAddr(createAddressSet(shrLocation));
 			// TODO
