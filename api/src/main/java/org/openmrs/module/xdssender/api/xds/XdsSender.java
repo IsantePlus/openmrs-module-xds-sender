@@ -6,6 +6,7 @@ import org.dcm4chee.xds2.infoset.util.DocumentRepositoryPortTypeFactory;
 import org.dcm4chee.xds2.infoset.ws.repository.DocumentRepositoryPortType;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.handler.AuthenticationHandler;
+import org.openmrs.module.xdssender.api.handler.XdsDocumentMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,9 @@ public class XdsSender {
 	@Autowired
 	private AuthenticationHandler authenticationHandler;
 	
+	@Autowired
+	private XdsDocumentMessageHandler xdsDocumentMessageHandler;
+	
 	public RegistryResponseType sendProvideAndRegister(ProvideAndRegisterDocumentSetRequestType request) {
 		
 		DocumentRepositoryPortTypeFactory.addHandler((BindingProvider) DocumentRepositoryPortTypeFactory
@@ -27,6 +31,8 @@ public class XdsSender {
 		
 		DocumentRepositoryPortType port = DocumentRepositoryPortTypeFactory.getDocumentRepositoryPortSoap12(config
 		        .getXdsRepositoryEndpoint());
+		
+		DocumentRepositoryPortTypeFactory.addHandler((BindingProvider) port, xdsDocumentMessageHandler);
 		
 		((BindingProvider) port).getRequestContext().put(BindingProvider.USERNAME_PROPERTY,
 		    config.getXdsRepositoryUsername());
