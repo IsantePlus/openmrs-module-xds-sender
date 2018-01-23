@@ -832,11 +832,11 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 			retVal.getEffectiveTime().add(effectiveTimeInstant);
 		
 		String obsData = sourceObs.getConcept().getConceptId().toString();
-
+		
 		if (sourceObs.getValueCoded() != null)
 			obsData += "/value-coded: " + sourceObs.getValueCoded().getId().toString();
 		else if (sourceObs.getValueNumeric() != null)
-			obsData += "/value numeric: " + sourceObs.getValueNumeric();
+			obsData += "/value-numeric: " + sourceObs.getValueNumeric();
 		else if (sourceObs.getValueDatetime() != null) {
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 			obsData += "/value-datetime: " + format.format(sourceObs.getValueDatetime());

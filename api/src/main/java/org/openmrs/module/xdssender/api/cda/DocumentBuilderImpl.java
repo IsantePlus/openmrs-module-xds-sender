@@ -122,6 +122,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 		try {
 			ClinicalDocument retVal = new ClinicalDocument();
 			retVal.setTypeId(new II("2.16.840.1.113883.1.3", "POCD_HD000040"));
+			retVal.setCode(this.getTypeCode());
 			retVal.setRealmCode(SET.createSET(new CS<BindingRealm>(BindingRealm.UniversalRealmOrContextUsedInEveryInstance)));
 			retVal.setTemplateId(LIST.createLIST(new II(XdsSenderConstants.DOC_TEMPLATE_MEDICAL_DOCUMENTS)));
 			// Identifier is the SHR root of the odd document ODD ID + Current Time (making the UUID of the ODD)
