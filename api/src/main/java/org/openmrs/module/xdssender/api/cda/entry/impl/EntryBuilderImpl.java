@@ -106,7 +106,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 	// log
 	protected final Log log = LogFactory.getLog(this.getClass());
 	
-	protected static final String REGEX_IVL_PQ = "^\\{?([\\d.]*)?\\s(\\w*)?\\s?\\.*\\s?([\\d.]*)?\\s?([\\w]*?)?\\}?$";
+	protected static final String REGEX_IVL_PQ = "^\\{?([\\d.]*)?\\s?(\\w*)?\\s?\\.*\\s?([\\d.]*)?\\s?([\\w]*?)?\\}?$";
 	
 	/**
 	 * Get the identifier list
