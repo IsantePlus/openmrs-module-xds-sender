@@ -70,7 +70,12 @@ public class ClinicalDocumentBuilder {
 			//relevantObs = Context.getObsService().getObservationsByPerson(builder.getRecordTarget());
 		
 		for (Obs obs : relevantObs) {
-			medicationObs.add(obs);
+			//we want to have all obs groups at the end of the list
+			if (obs.hasGroupMembers()) {
+				medicationObs.add(obs);
+			} else {
+				medicationObs.add(0, obs);	//this probably is some group member
+			}
 		}
 		
 		Section eddSection = null, flowsheetSection = null, vitalSignsSection = null, medicationsSection = null, probSection = null, allergySection = null;
