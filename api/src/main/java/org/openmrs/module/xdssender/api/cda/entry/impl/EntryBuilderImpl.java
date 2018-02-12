@@ -1,5 +1,6 @@
 package org.openmrs.module.xdssender.api.cda.entry.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.marc.everest.datatypes.BL;
@@ -105,7 +106,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 	// log
 	protected final Log log = LogFactory.getLog(this.getClass());
 	
-	protected static final String REGEX_IVL_PQ = "^\\{?([\\d.]*)?\\s(\\w*)?\\s?\\.*\\s?([\\d.]*)?\\s?([\\w]*?)?\\}?$";
+	protected static final String REGEX_IVL_PQ = "^\\{?([\\d.]*)?\\s?(\\w*)?\\s?[\\/\\.]*\\s?([\\d.]*)?\\s?([\\w]*?)?\\}?\\s?\\w*$";
 	
 	/**
 	 * Get the identifier list
@@ -117,10 +118,11 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 			Obs sourceObs = (Obs) source;
 			if (sourceObs.getAccessionNumber() != null && !sourceObs.getAccessionNumber().isEmpty()) {
 				II ii = this.cdaDataUtil.parseIIFromString(sourceObs.getAccessionNumber());
-				if (ii.getRoot() != null && !ii.getRoot().isEmpty())
+				if (StringUtils.isNotBlank(ii.getRoot())) {
 					retVal.add(ii);
+				}
 			}
-			retVal.add(new II(this.config.getObsRoot(), sourceObs.getId().toString()));
+			retVal.add(new II(this.config.getObsRoot(), sourceObs.getUuid()));
 		}
 		
 		return retVal;
@@ -809,8 +811,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 						reasonAct.setId(SET.createSET(this.cdaDataUtil.parseIIFromString(component.getValueText())));
 						reasonRelation.setClinicalStatement(reasonAct);
 						retVal.getEntryRelationship().add(reasonRelation);
-					} else
-						throw new RuntimeException("Don't understand how to represent medication component observation");
+					}
 			}
 			
 		}
@@ -840,11 +841,18 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 		else if (sourceObs.getValueDatetime() != null) {
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 			obsData += "/value-datetime: " + format.format(sourceObs.getValueDatetime());
-		} else if (sourceObs.getValueText() != null)
+		} else if (sourceObs.getValueText() != null) {
 			obsData += "/value-text: " + sourceObs.getValueText();
+		} else if (sourceObs.hasGroupMembers()) {
+			obsData += "/group-members:";
+			for (Obs member : sourceObs.getGroupMembers()) {
+				obsData += " " + member.getUuid();
+			}
+		}
 		
-		if (sourceObs.getComment() != null)
-			retVal.setText(new ED(sourceObs.getComment()));
+		if (sourceObs.getComment() != null) {
+			obsData += "/" + sourceObs.getComment();
+		}
 		
 		try {
 			retVal.setText(obsData);
