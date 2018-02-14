@@ -22,15 +22,20 @@ public class EncounterEventListener implements EventListener {
 	public void onMessage(Message message) {
 		try {
 			MapMessage mapMessage = (MapMessage) message;
+			String messageAction = mapMessage.getString("action");
+			
 			Context.openSession();
 			Context.authenticate(config.getOpenmrsUsername(), config.getOpenmrsPassword());
-			if (Event.Action.CREATED.toString().equals(mapMessage.getString("action"))) {
+			
+			if (Event.Action.CREATED.toString().equals(messageAction)
+			        || Event.Action.UPDATED.toString().equals(messageAction)) {
 				String uuid = ((MapMessage) message).getString("uuid");
 				Encounter encounter = Context.getEncounterService().getEncounterByUuid(uuid);
 				Patient patient = Context.getPatientService().getPatient(encounter.getPatient().getPatientId());
 				XdsExportService serivce = Context.getService(XdsExportService.class);
 				serivce.exportProvideAndRegister(encounter, patient);
 			}
+			
 			Context.closeSession();
 		}
 		catch (JMSException e) {
