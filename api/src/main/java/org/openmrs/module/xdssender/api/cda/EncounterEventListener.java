@@ -12,11 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
+import org.springframework.stereotype.Component;
 
+@Component
 public class EncounterEventListener implements EventListener {
 	
 	@Autowired
-	private XdsSenderConfig config = XdsSenderConfig.getInstance();
+	private XdsSenderConfig config;
 	
 	@Override
 	public void onMessage(Message message) {

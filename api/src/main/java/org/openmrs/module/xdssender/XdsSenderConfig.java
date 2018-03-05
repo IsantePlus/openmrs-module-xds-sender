@@ -58,19 +58,8 @@ public class XdsSenderConfig {
 	
 	public static final String GP_ERROR_HANDLER_IMPLEMENTATION = "xdssender.errorHandler.implementation";
 	
-	// locking object
-	private final static Object s_lockObject = new Object();
-	
-	// Instance
-	private static XdsSenderConfig s_instance = null;
-	
 	public static XdsSenderConfig getInstance() {
-		if (s_instance == null)
-			synchronized (s_lockObject) {
-				if (s_instance == null)
-					s_instance = new XdsSenderConfig();
-			}
-		return s_instance;
+		return Context.getRegisteredComponent("xdssender.XdsSenderConfig", XdsSenderConfig.class);
 	}
 	
 	public String getIdPattern() {

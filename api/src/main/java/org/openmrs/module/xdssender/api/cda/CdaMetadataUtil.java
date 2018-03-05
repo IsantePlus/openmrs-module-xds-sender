@@ -34,21 +34,6 @@ public class CdaMetadataUtil {
 	
 	private Log log = LogFactory.getLog(getClass());
 	
-	// locking object
-	private final static Object s_lockObject = new Object();
-	
-	// Instance
-	private static CdaMetadataUtil s_instance = null;
-	
-	public static CdaMetadataUtil getInstance() {
-		if (s_instance == null)
-			synchronized (s_lockObject) {
-				if (s_instance == null)
-					s_instance = new CdaMetadataUtil();
-			}
-		return s_instance;
-	}
-	
 	@Autowired
 	private ConceptUtil conceptUtil;
 	

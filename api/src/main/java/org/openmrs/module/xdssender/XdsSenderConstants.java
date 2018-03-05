@@ -483,7 +483,7 @@ public final class XdsSenderConstants {
 	public static final String SCT_TEMPLATE_FUNCTIONAL_STATUS = "1.3.6.1.4.1.19376.1.5.3.1.3.17";
 	
 	public static final String SCT_TEMPLATE_HISTORY_OF_BLOOD_TRANSFUSIONS = "1.3.6.1.4.1.19376.1.5.3.1.1.9.12";
-
+	
 	public static final String LOCATION_SITECODE_ATTRIBUTE_UUID = "6242bf19-207e-4076-9d28-9290525b8ed9";
 	
 	private XdsSenderConstants() {
