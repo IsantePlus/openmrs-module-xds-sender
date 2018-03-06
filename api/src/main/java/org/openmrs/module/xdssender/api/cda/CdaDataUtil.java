@@ -94,28 +94,17 @@ public class CdaDataUtil {
 	private static final List<String> nextOfKinRelations = Arrays.asList("MTH", "FTH", "GRMTH", "GRFTH", "SIB", "CHILD",
 	    "AUNT", "UNCLE", "PGRMTH", "MGRMTH", "PGRFTH", "MGRFTH", "SON", "DAU", "BRO", "SIS", "DOMPART", "FAMMEMB");
 	
-	// locking object
-	private final static Object s_lockObject = new Object();
-	
-	// Instance
-	private static CdaDataUtil s_instance = null;
-	
 	@Autowired
-	private XdsSenderConfig config = XdsSenderConfig.getInstance();
+	private XdsSenderConfig config;
 	
 	@Autowired
 	private ConceptUtil conceptUtil;
 	
 	@Autowired
-	private CdaMetadataUtil metadataUtil = CdaMetadataUtil.getInstance();
+	private CdaMetadataUtil metadataUtil;
 	
 	public static CdaDataUtil getInstance() {
-		if (s_instance == null)
-			synchronized (s_lockObject) {
-				if (s_instance == null)
-					s_instance = new CdaDataUtil();
-			}
-		return s_instance;
+		return Context.getRegisteredComponent("xdssender.CdaDataUtil", CdaDataUtil.class);
 	}
 	
 	/**

@@ -16,7 +16,7 @@ import javax.xml.ws.BindingProvider;
 public class XdsSender {
 	
 	@Autowired
-	private XdsSenderConfig config = XdsSenderConfig.getInstance();
+	private XdsSenderConfig config;
 	
 	@Autowired
 	private AuthenticationHandler authenticationHandler;

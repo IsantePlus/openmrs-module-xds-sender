@@ -36,7 +36,7 @@ public class XdsSenderController {
 	protected final Log log = LogFactory.getLog(getClass());
 	
 	@Autowired
-	UserService userService;
+	private UserService userService;
 	
 	/** Success form view name */
 	private final String VIEW = "/module/${rootArtifactid}/${rootArtifactid}";
