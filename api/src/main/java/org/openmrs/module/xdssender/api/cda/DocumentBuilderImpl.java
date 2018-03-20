@@ -130,7 +130,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			idDate.setDateValuePrecision(TS.SECONDNOTIMEZONE);
 			
 			// Set core properties
-			retVal.setId(UUID.randomUUID());
+			setDocumentId(retVal);
 			retVal.setEffectiveTime(TS.now());
 			
 			// Set to Normal, anything above a normal will not be included in the extract
@@ -248,4 +248,11 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 		}
 	}
 	
+	private void setDocumentId(ClinicalDocument document) {
+		if (encounter != null && encounter.getVisit() != null) {
+			document.setId("visit/encounter", encounter.getVisit().getUuid() + "/" + encounter.getUuid());
+		} else {
+			document.setId(UUID.randomUUID());
+		}
+	}
 }
