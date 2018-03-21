@@ -8,6 +8,7 @@ import org.dcm4chee.xds2.infoset.rim.ExtrinsicObjectType;
 import org.dcm4chee.xds2.infoset.rim.RegistryObjectListType;
 import org.dcm4chee.xds2.infoset.rim.RegistryPackageType;
 import org.dcm4chee.xds2.infoset.rim.SubmitObjectsRequest;
+import org.dcm4chee.xds2.infoset.rim.VersionInfoType;
 import org.dcm4chee.xds2.infoset.util.InfosetUtil;
 import org.marc.everest.datatypes.TS;
 import org.openmrs.Encounter;
@@ -17,6 +18,8 @@ import org.openmrs.Obs;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.Provider;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.Module;
+import org.openmrs.module.ModuleFactory;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.cda.CdaDataUtil;
@@ -71,6 +74,15 @@ public class MessageUtil {
 		        + encounter.getEncounterType().getUuid() + "/" + encounter.getForm().getUuid() + "/"
 		        + format.format(encounter.getEncounterDatetime()));
 		oddRegistryObject.setMimeType("text/xml");
+		
+		//software version
+		Module module = ModuleFactory.getModuleById(config.getModuleUsedToDetermineSoftwareVersion());
+		if (module != null) {
+			VersionInfoType softwareVersion = new VersionInfoType();
+			softwareVersion.setVersionName(module.getVersion());
+			softwareVersion.setComment("Software Version");
+			oddRegistryObject.setContentVersionInfo(softwareVersion);
+		}
 		
 		// Get the earliest time something occurred and the latest
 		Date lastEncounter = encounter.getEncounterDatetime(), firstEncounter = encounter.getEncounterDatetime();
