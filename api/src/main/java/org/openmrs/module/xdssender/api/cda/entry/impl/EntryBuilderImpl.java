@@ -106,7 +106,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 	// log
 	protected final Log log = LogFactory.getLog(this.getClass());
 	
-	protected static final String REGEX_IVL_PQ = "^\\{?([\\d.]*)?\\s?(\\w*)?\\s?[\\/\\.]*\\s?([\\d.]*)?\\s?([\\w]*?)?\\}?\\s?\\w*$";
+	protected static final String REGEX_IVL_PQ = "^\\{?([\\d.]*)?\\s?(\\w*)?\\s?[\\/\\.]*\\s?([\\d.]*)?\\s?([\\w]*?)?[\\/\\.]*\\s?([\\d.]*)?\\s?(\\w*)?\\}?\\s?\\w*$";
 	
 	/**
 	 * Get the identifier list
@@ -415,6 +415,11 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 				PQ group2 = new PQ(new BigDecimal(match.group(3)), match.group(4));
 				// Range
 				retVal = new IVL<PQ>(group1, group2);
+				if (match.groupCount() > 5 && StringUtils.isNotBlank(match.group(5))) {
+					PQ group3 = new PQ(new BigDecimal(match.group(5)), match.group(6));
+					retVal = new IVL<PQ>(group1, group2);
+					retVal.setOriginalText(new ED(group1 + "/" + group2 + "/" + group3));
+				}
 			} else if (valueText.contains("{"))
 				retVal = new IVL<PQ>(group1, null);
 			else
