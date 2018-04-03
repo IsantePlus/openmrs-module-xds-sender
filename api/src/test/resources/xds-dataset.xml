@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+    <!-- Metadata -->
+
+    <location location_id="2" name="Bayonnais" creator="1" date_created="2005-01-06 00:00:00"/>
+
+    <patient_identifier_type patient_identifier_type_id="1" name="OpenMRS Identification Number"
+                             retired="0" required="0" creator="1" date_created="2005-01-06 00:00:00"
+                             uuid="05a29f94-c0ed-11e2-94be-8c13b969e334"/>
+
+    <!-- Patient -->
+    <person person_id="10" gender="M" birthdate="1987-02-11 10:15:00" dead="0"
+            creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
+    <patient patient_id="10" creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
+
+    <person_address person_address_id="4" person_id="10" country="Haiti" city_village="Anse Rouge"
+                    address1="Anba Morne Porte" address2="Trou coucou" address3="1ère L'Arbre"
+                    creator="1" date_created="2005-01-06 00:00:00" voided="0" state_province="Artibonite"
+                    preferred="0"/>
+
+    <person_name person_name_id="4" preferred="1" person_id="10" given_name="Joe"
+                 middle_name="Terry" family_name="Doe" creator="1"
+                 date_created="2005-01-06 00:00:00" voided="0"/>
+
+    <patient_identifier patient_identifier_id="20" patient_id="10" identifier="1004X"
+                        identifier_type="1" creator="1" date_created="2005-01-06 00:00:00" voided="0"
+                        preferred="1" location_id="2"/>
+</dataset>
