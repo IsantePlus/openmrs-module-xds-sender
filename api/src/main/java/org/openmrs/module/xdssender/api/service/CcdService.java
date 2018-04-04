@@ -1,6 +1,5 @@
 package org.openmrs.module.xdssender.api.service;
 
-import javassist.NotFoundException;
 import org.dcm4chee.xds2.common.exception.XDSException;
 import org.openmrs.Patient;
 import org.openmrs.module.xdssender.api.domain.Ccd;
@@ -11,5 +10,5 @@ public interface CcdService {
 	
 	Ccd getLocallyStoredCcd(Patient patient);
 	
-	Ccd downloadAndSaveCcd(Patient patient) throws NotFoundException, XDSException, IOException;
+	Ccd downloadAndSaveCcd(Patient patient) throws XDSException, IOException;
 }
