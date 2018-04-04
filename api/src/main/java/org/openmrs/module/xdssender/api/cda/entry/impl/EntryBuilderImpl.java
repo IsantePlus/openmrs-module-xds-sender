@@ -861,7 +861,8 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 		
 		try {
 			retVal.setText(obsData);
-		} catch (UnsupportedEncodingException ex) {
+		}
+		catch (UnsupportedEncodingException ex) {
 			ex.getMessage();
 		}
 		
