@@ -23,7 +23,7 @@ public class CcdDaoImpl implements CcdDao {
 			return ccd;
 		} else {
 			existing.setDocument(ccd.getDocument());
-			sessionFactory.getCurrentSession().save(existing);
+			sessionFactory.getCurrentSession().update(existing);
 			return existing;
 		}
 	}

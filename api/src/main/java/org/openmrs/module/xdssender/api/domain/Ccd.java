@@ -21,7 +21,7 @@ import java.util.Date;
 public class Ccd extends BaseOpenmrsData {
 	
 	@Id
-	@Column(name = "national_synchronization_failure_id")
+	@Column(name = "xdssender_ccd_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
