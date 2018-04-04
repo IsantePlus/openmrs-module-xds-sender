@@ -29,7 +29,7 @@
            </column>
            <column name="document" type="clob" />
        </createTable>
-       <addForeignKeyConstraint constraintName="xdssender_ccd_patient_fk" baseTableName="xdssender_item"
+       <addForeignKeyConstraint constraintName="xdssender_ccd_patient_fk" baseTableName="xdssender_ccd"
                                 baseColumnNames="patient" referencedTableName="patient"
                                 referencedColumnNames="patient_id" />
    </changeSet>
