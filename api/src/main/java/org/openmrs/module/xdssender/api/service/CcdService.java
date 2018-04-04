@@ -11,4 +11,6 @@ public interface CcdService {
 	Ccd getLocallyStoredCcd(Patient patient);
 	
 	Ccd downloadAndSaveCcd(Patient patient) throws XDSException, IOException;
+	
+	void downloadCcdAsPDF(Patient patient);
 }
