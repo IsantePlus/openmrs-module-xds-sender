@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 @Service(value = "ccdService")
 public class CcdServiceImpl implements CcdService {
@@ -45,7 +46,7 @@ public class CcdServiceImpl implements CcdService {
 	}
 	
 	@Override
-	public void downloadCcdAsPDF(Patient patient) {
+	public void downloadCcdAsPDF(OutputStream stream, Patient patient) {
 		LOGGER.info("CCD PDF is being downloaded.");
 	}
 }

@@ -5,6 +5,7 @@ import org.openmrs.Patient;
 import org.openmrs.module.xdssender.api.domain.Ccd;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 public interface CcdService {
 	
@@ -12,5 +13,5 @@ public interface CcdService {
 	
 	Ccd downloadAndSaveCcd(Patient patient) throws XDSException, IOException;
 	
-	void downloadCcdAsPDF(Patient patient);
+	void downloadCcdAsPDF(OutputStream stream, Patient patient);
 }
