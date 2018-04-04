@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-@Service
+@Service(value = "ccdService")
 public class CcdServiceImpl implements CcdService {
 	
 	@Autowired
