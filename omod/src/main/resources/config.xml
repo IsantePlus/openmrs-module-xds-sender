@@ -80,6 +80,12 @@
 		<description>Specifies role for add provider to XDS documents</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>xdssender.openmrs.moduleUsedToDetermineSoftwareVersion</property>
+		<defaultValue>isanteplusreports</defaultValue>
+		<description>Specifies the module name which will be used to determine the software version.</description>
+	</globalProperty>
+
 
 	<!-- AOP
 	<advice>

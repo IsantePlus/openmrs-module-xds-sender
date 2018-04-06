@@ -56,6 +56,8 @@ public class XdsSenderConfig {
 	
 	private final static String XDS_ROLE_DOCTOR = "xdssender.openmrs.provider.role.doctor";
 	
+	private final static String XDS_MODULE_USED_TO_DETERMINE_SOFTWARE_VERSION = "xdssender.openmrs.moduleUsedToDetermineSoftwareVersion";
+	
 	public static final String GP_ERROR_HANDLER_IMPLEMENTATION = "xdssender.errorHandler.implementation";
 	
 	public static XdsSenderConfig getInstance() {
@@ -137,6 +139,10 @@ public class XdsSenderConfig {
 	
 	public String getProviderRoleDoctor() {
 		return getProperty(XDS_ROLE_DOCTOR, "Doctor");
+	}
+	
+	public String getModuleUsedToDetermineSoftwareVersion() {
+		return getProperty(XDS_MODULE_USED_TO_DETERMINE_SOFTWARE_VERSION, "isanteplusreports");
 	}
 	
 	private String getProperty(String name, String defaultVal) {
