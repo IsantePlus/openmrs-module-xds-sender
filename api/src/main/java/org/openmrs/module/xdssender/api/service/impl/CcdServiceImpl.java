@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.OutputStream;
 
-@Service(value = "ccdService")
+@Service(value = "xdsSender.CcdService")
 public class CcdServiceImpl implements CcdService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(CcdServiceImpl.class);
