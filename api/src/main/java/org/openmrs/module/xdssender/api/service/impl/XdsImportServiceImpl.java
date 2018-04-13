@@ -8,6 +8,7 @@ import org.openmrs.module.xdssender.api.domain.Ccd;
 import org.openmrs.module.xdssender.api.model.DocumentInfo;
 import org.openmrs.module.xdssender.api.service.XdsImportService;
 import org.openmrs.module.xdssender.api.xds.XdsRetriever;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
@@ -17,7 +18,8 @@ import java.nio.charset.StandardCharsets;
 @Component("xdsSender.XdsImportService")
 public class XdsImportServiceImpl implements XdsImportService {
 	
-	private final XdsRetriever xdsRetriever = new XdsRetriever();
+	@Autowired
+	private XdsRetriever xdsRetriever;
 	
 	@Override
 	public Ccd retrieveCCD(DocumentInfo documentInfo) throws XDSException, IOException {
