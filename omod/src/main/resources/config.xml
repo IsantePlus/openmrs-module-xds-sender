@@ -86,6 +86,21 @@
 		<description>Specifies the module name which will be used to determine the software version.</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.ccd.errorHandler.implementation</property>
+		<defaultValue>outgoingmessageexceptions.CcdErrorHandlingService</defaultValue>
+		<description>
+			Specify a Spring bean name of CCD error handler service
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.xdsB.errorHandler.implementation</property>
+		<defaultValue>outgoingmessageexceptions.XdsBErrorHandlingService</defaultValue>
+		<description>
+			Specify a Spring bean name of XDS.b error handler service
+		</description>
+	</globalProperty>
 
 	<!-- AOP
 	<advice>
