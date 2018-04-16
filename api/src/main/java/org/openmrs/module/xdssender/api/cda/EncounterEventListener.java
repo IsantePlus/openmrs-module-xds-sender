@@ -44,5 +44,4 @@ public class EncounterEventListener implements EventListener {
 			System.out.println("Some error occurred" + e.getErrorCode());
 		}
 	}
-	
 }
