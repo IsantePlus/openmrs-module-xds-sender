@@ -32,12 +32,8 @@
 			<artifactId>everest-formatters-xml-dt-r1</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.dcm4che</groupId>
-			<artifactId>dcm4chee-xds2-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
+			<groupId>org.openmrs</groupId>
+			<artifactId>event-api</artifactId>
 		</dependency>
 
 		<!-- DCM4CHEE modules (for JAX-b classes and InfoSetUtil) -->
@@ -46,9 +42,20 @@
 			<artifactId>dcm4chee-xds2-infoset</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.openmrs</groupId>
-			<artifactId>event-api</artifactId>
+			<groupId>org.dcm4che</groupId>
+			<artifactId>dcm4chee-xds2-common</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.jboss.spec.javax.servlet</groupId>
+					<artifactId>jboss-servlet-api_3.0_spec</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+		</dependency>
+
 	</dependencies>
 
 </project>

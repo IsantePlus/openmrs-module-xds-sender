@@ -17,6 +17,7 @@
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>xds-sender-api</artifactId>
+			<version>${parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openmrs.web</groupId>
@@ -46,6 +47,13 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 			</plugin>
 		</plugins>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
 	</build>
 
 </project>

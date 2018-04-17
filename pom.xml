@@ -18,8 +18,7 @@
 
 	<scm>
 		<connection>scm:git:git@github.com:IsantePlus/openmrs-module-xds-sender.git</connection>
-		<developerConnection>scm:git:git@github.com:IsantePlus/openmrs-module-xds-sender.git
-		</developerConnection>
+		<developerConnection>scm:git:git@github.com:IsantePlus/openmrs-module-xds-sender.git</developerConnection>
 		<url>https://github.com/IsantePlus/openmrs-module-xds-sender/</url>
 	</scm>
 
@@ -33,9 +32,9 @@
 		<everestVersion>1.1.0</everestVersion>
 		<dcm4chee-xds2Version>2.0.4</dcm4chee-xds2Version>
 		<javax.servletVersion>2.4</javax.servletVersion>
-		<eventVersion>2.6.0</eventVersion>
+		<eventVersion>2.5</eventVersion>
 		<legacyuiVersion>1.2.3</legacyuiVersion>
-		<javaCompilerVersion>1.8</javaCompilerVersion>
+		<javaCompilerVersion>1.7</javaCompilerVersion>
 	</properties>
 
 	<dependencyManagement>
@@ -64,22 +63,11 @@
 				<groupId>org.dcm4che</groupId>
 				<artifactId>dcm4chee-xds2-common</artifactId>
 				<version>${dcm4chee-xds2Version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.jboss.spec.javax.servlet</groupId>
-						<artifactId>jboss-servlet-api_3.0_spec</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.dcm4che</groupId>
 				<artifactId>dcm4chee-xds2-infoset</artifactId>
 				<version>${dcm4chee-xds2Version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.openmrs.module</groupId>
-				<artifactId>xds-sender-api</artifactId>
-				<version>${version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openmrs.module</groupId>
@@ -92,6 +80,13 @@
 				<artifactId>openmrs-web</artifactId>
 				<version>${openmrsPlatformVersion}</version>
 				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.openmrs.web</groupId>
+				<artifactId>openmrs-web</artifactId>
+				<version>${openmrsPlatformVersion}</version>
+				<scope>provided</scope>
+				<classifier>tests</classifier>
 			</dependency>
 			<dependency>
 				<groupId>org.openmrs</groupId>

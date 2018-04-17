@@ -15,7 +15,7 @@
 	<activator>org.openmrs.module.xdssender.XdsSenderActivator</activator>
 
 	<require_modules>
-		<require_module>
+		<require_module version="${eventVersion}">
 			org.openmrs.event
 		</require_module>
 	</require_modules>
