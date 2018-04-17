@@ -62,11 +62,9 @@ public class XdsSenderConfig {
 	
 	private final static String XDS_MODULE_USED_TO_DETERMINE_SOFTWARE_VERSION = "xdssender.openmrs.moduleUsedToDetermineSoftwareVersion";
 	
-	private final static String CCD_ERROR_HANDLER_IMPLEMENTATION =
-			"xdssender.ccd.errorHandler.implementation";
+	private final static String CCD_ERROR_HANDLER_IMPLEMENTATION = "xdssender.ccd.errorHandler.implementation";
 	
-	private final static String XDS_B_ERROR_HANDLER_IMPLEMENTATION =
-			"xdssender.xdsB.errorHandler.implementation";
+	private final static String XDS_B_ERROR_HANDLER_IMPLEMENTATION = "xdssender.xdsB.errorHandler.implementation";
 	
 	public static final String GP_ERROR_HANDLER_IMPLEMENTATION = "xdssender.errorHandler.implementation";
 	
@@ -178,8 +176,7 @@ public class XdsSenderConfig {
 	}
 	
 	private boolean isPropertySet(String globalProperty) {
-		return StringUtils.isNotBlank(
-				Context.getAdministrationService().getGlobalProperty(globalProperty));
+		return StringUtils.isNotBlank(Context.getAdministrationService().getGlobalProperty(globalProperty));
 	}
 	
 	private <T> T getComponentByGlobalProperty(String propertyName, Class<T> type) {
