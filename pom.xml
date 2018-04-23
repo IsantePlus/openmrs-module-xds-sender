@@ -82,13 +82,6 @@
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.openmrs.web</groupId>
-				<artifactId>openmrs-web</artifactId>
-				<version>${openmrsPlatformVersion}</version>
-				<scope>provided</scope>
-				<classifier>tests</classifier>
-			</dependency>
-			<dependency>
 				<groupId>org.openmrs</groupId>
 				<artifactId>event-api</artifactId>
 				<version>${eventVersion}</version>
