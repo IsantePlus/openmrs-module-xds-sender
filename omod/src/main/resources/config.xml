@@ -87,7 +87,7 @@
 	</globalProperty>
 
 	<globalProperty>
-		<property>@MODULE_ID@.ccd.errorHandler.implementation</property>
+		<property>xdssender.ccd.errorHandler.implementation</property>
 		<defaultValue>outgoingmessageexceptions.CcdErrorHandlingService</defaultValue>
 		<description>
 			Specify a Spring bean name of CCD error handler service
@@ -95,7 +95,7 @@
 	</globalProperty>
 
 	<globalProperty>
-		<property>@MODULE_ID@.xdsB.errorHandler.implementation</property>
+		<property>xdssender.xdsB.errorHandler.implementation</property>
 		<defaultValue>outgoingmessageexceptions.XdsBErrorHandlingService</defaultValue>
 		<description>
 			Specify a Spring bean name of XDS.b error handler service

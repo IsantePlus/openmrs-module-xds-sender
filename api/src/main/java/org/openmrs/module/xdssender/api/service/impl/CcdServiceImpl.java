@@ -1,5 +1,7 @@
 package org.openmrs.module.xdssender.api.service.impl;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import org.dcm4chee.xds2.common.exception.XDSException;
 import org.openmrs.Patient;
 import org.openmrs.module.xdssender.api.domain.Ccd;
@@ -11,9 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.io.OutputStream;
 
 @Service(value = "xdsSender.CcdService")
 public class CcdServiceImpl implements CcdService {
