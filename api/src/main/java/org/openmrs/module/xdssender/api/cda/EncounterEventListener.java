@@ -7,12 +7,12 @@ import org.openmrs.event.Event;
 import org.openmrs.event.EventListener;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.service.XdsExportService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Component("xdssender.EncounterEventListener")
 public class EncounterEventListener implements EventListener {
