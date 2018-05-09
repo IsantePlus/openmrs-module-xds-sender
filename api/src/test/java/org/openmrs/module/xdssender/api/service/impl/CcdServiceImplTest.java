@@ -11,10 +11,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.Patient;
 import org.openmrs.module.xdssender.api.domain.Ccd;
 import org.openmrs.module.xdssender.api.domain.dao.CcdDao;
-import org.openmrs.module.xdssender.api.model.DocumentInfo;
 import org.openmrs.module.xdssender.api.service.XdsImportService;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -42,24 +44,26 @@ public class CcdServiceImplTest {
 	private Patient patient;
 	
 	@Captor
-	private ArgumentCaptor<DocumentInfo> documentInfoCaptor;
+	private ArgumentCaptor<Patient> patientArgumentCaptor;
 	
 	@Test
-	public void shouldSaveAndReturnDownloadedCcd() throws XDSException, IOException {
+	public void shouldSaveAndReturnDownloadedCcd() throws XDSException, IOException, NoSuchAlgorithmException,
+	        KeyStoreException, KeyManagementException {
 		when(ccdDao.saveOrUpdate(any(Ccd.class))).thenReturn(ccd);
-		when(xdsImportService.retrieveCCD(any(DocumentInfo.class))).thenReturn(ccd);
+		when(xdsImportService.retrieveCCD(any(Patient.class))).thenReturn(ccd);
 		
 		Ccd result = ccdService.downloadAndSaveCcd(patient);
 		
 		assertEquals(ccd, result);
-		verify(xdsImportService).retrieveCCD(documentInfoCaptor.capture());
-		assertEquals(patient, documentInfoCaptor.getValue().getPatient());
+		verify(xdsImportService).retrieveCCD(patientArgumentCaptor.capture());
+		assertEquals(patient, patientArgumentCaptor.getValue());
 		verify(ccdDao).saveOrUpdate(ccd);
 	}
 	
 	@Test
-	public void shouldReturnNullOnCcdNotFoundDuringDownload() throws XDSException, IOException {
-		when(xdsImportService.retrieveCCD(any(DocumentInfo.class))).thenReturn(null);
+	public void shouldReturnNullOnCcdNotFoundDuringDownload() throws XDSException, IOException, NoSuchAlgorithmException,
+	        KeyStoreException, KeyManagementException {
+		when(xdsImportService.retrieveCCD(any(Patient.class))).thenReturn(null);
 		
 		Ccd result = ccdService.downloadAndSaveCcd(patient);
 		

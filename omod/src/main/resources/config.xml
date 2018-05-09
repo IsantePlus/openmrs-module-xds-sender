@@ -86,6 +86,22 @@
 		<description>Specifies the module name which will be used to determine the software version.</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>xdssender.exportCcdEndpoint</property>
+		<defaultValue>https://sedish.net:8082/openmrs/ws/rest/exportccd/ccd</defaultValue>
+		<description>Specifies the export ccd module endpoint address (OpenSHR)</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.oshr.username</property>
+		<description>Specifies the OpenSHR username</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.oshr.password</property>
+		<description>Specifies the OpenSHR password</description>
+	</globalProperty>
+
 
 	<!-- AOP
 	<advice>
