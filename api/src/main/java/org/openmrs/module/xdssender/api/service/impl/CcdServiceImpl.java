@@ -4,7 +4,6 @@ import org.dcm4chee.xds2.common.exception.XDSException;
 import org.openmrs.Patient;
 import org.openmrs.module.xdssender.api.domain.Ccd;
 import org.openmrs.module.xdssender.api.domain.dao.CcdDao;
-import org.openmrs.module.xdssender.api.model.DocumentInfo;
 import org.openmrs.module.xdssender.api.service.CcdService;
 import org.openmrs.module.xdssender.api.service.XdsImportService;
 import org.slf4j.Logger;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 @Service(value = "xdsSender.CcdService")
@@ -32,11 +30,9 @@ public class CcdServiceImpl implements CcdService {
 	}
 	
 	@Override
-	public Ccd downloadAndSaveCcd(Patient patient) throws XDSException, IOException {
-		DocumentInfo info = new DocumentInfo();
-		info.setPatient(patient);
+	public Ccd downloadAndSaveCcd(Patient patient) throws XDSException {
 		
-		Ccd ccd = xdsImportService.retrieveCCD(info);
+		Ccd ccd = xdsImportService.retrieveCCD(patient);
 		
 		if (ccd != null) {
 			ccd = ccdDao.saveOrUpdate(ccd);

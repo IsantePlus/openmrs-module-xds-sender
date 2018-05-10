@@ -33,6 +33,8 @@
 		<javax.servletVersion>2.4</javax.servletVersion>
 		<eventVersion>2.6.0</eventVersion>
 		<legacyuiVersion>1.2.3</legacyuiVersion>
+		<apacheHttpCoreVersion>4.4.9</apacheHttpCoreVersion>
+		<apacheHttpClientVersion>4.5</apacheHttpClientVersion>
     </properties>
 
 	<dependencyManagement>
@@ -47,6 +49,22 @@
 				<groupId>org.marc.everest</groupId>
 				<artifactId>everest-rmim-uv-cdar2</artifactId>
 				<version>${everestVersion}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openmrs.web</groupId>
+				<artifactId>openmrs-web</artifactId>
+				<scope>provided</scope>
+				<version>${openmrsPlatformVersion}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<version>${apacheHttpCoreVersion}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>${apacheHttpClientVersion}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

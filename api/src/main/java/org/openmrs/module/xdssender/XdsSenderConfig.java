@@ -9,6 +9,8 @@
  */
 package org.openmrs.module.xdssender;
 
+import org.apache.commons.lang.StringUtils;
+import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.springframework.stereotype.Component;
 
@@ -58,7 +60,15 @@ public class XdsSenderConfig {
 	
 	private final static String XDS_MODULE_USED_TO_DETERMINE_SOFTWARE_VERSION = "xdssender.openmrs.moduleUsedToDetermineSoftwareVersion";
 	
-	public static final String GP_ERROR_HANDLER_IMPLEMENTATION = "xdssender.errorHandler.implementation";
+	private static final String GP_ERROR_HANDLER_IMPLEMENTATION = "xdssender.errorHandler.implementation";
+	
+	private static final String XDSSENDER_EXPORT_CCD_ENDPOINT = "xdssender.exportCcdEndpoint";
+	
+	private static final String XDSSENDER_OSHR_USERNAME = "xdssender.oshr.username";
+	
+	private static final String XDSSENDER_OSHR_PASSWORD = "xdssender.oshr.password";
+	
+	private static final String XDSSENDER_EXPORT_CCD_IGNORE_CERTS = "xdssender.exportCcd.ignoreCerts";
 	
 	public static XdsSenderConfig getInstance() {
 		return Context.getRegisteredComponent("xdssender.XdsSenderConfig", XdsSenderConfig.class);
@@ -145,7 +155,31 @@ public class XdsSenderConfig {
 		return getProperty(XDS_MODULE_USED_TO_DETERMINE_SOFTWARE_VERSION, "isanteplusreports");
 	}
 	
+	public String getExportCcdEndpoint() {
+		return getProperty(XDSSENDER_EXPORT_CCD_ENDPOINT);
+	}
+	
+	public String getOshrUsername() {
+		return getProperty(XDSSENDER_OSHR_USERNAME);
+	}
+	
+	public String getOshrPassword() {
+		return getProperty(XDSSENDER_OSHR_PASSWORD);
+	}
+	
+	public Boolean getExportCcdIgnoreCerts() {
+		return Boolean.parseBoolean(getProperty(XDSSENDER_EXPORT_CCD_IGNORE_CERTS));
+	}
+	
 	private String getProperty(String name, String defaultVal) {
 		return Context.getAdministrationService().getGlobalProperty(name, defaultVal);
+	}
+	
+	private String getProperty(String propertyName) {
+		String propertyValue = Context.getAdministrationService().getGlobalProperty(propertyName);
+		if (StringUtils.isBlank(propertyValue)) {
+			throw new APIException(String.format("Property value for '%s' is not set", propertyName));
+		}
+		return propertyValue;
 	}
 }
