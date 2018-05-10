@@ -30,7 +30,12 @@ public class XdsRetriever {
 	public CloseableHttpResponse sendRetrieveCCD(String patientEcid) throws XDSException, IOException,
 	        NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
 		
-		CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(createSSLFactoryIgnoringCert()).build();
+		CloseableHttpClient httpclient;
+		if (config.getExportCcdIgnoreCerts()) {
+			httpclient = HttpClients.custom().setSSLSocketFactory(createSSLFactoryIgnoringCert()).build();
+		} else {
+			httpclient = HttpClients.createDefault();
+		}
 		HttpGet httpGet = new HttpGet(config.getExportCcdEndpoint() + "/" + patientEcid);
 		interceptAuthorization(httpGet);
 		return httpclient.execute(httpGet);

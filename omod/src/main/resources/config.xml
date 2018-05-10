@@ -102,6 +102,11 @@
 		<description>Specifies the OpenSHR password</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>xdssender.exportCcd.ignoreCerts</property>
+		<defaultValue>false</defaultValue>
+		<description>Determines if ccd downloading from OpenSHR should ignore certificates</description>
+	</globalProperty>
 
 	<!-- AOP
 	<advice>

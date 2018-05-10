@@ -5,11 +5,7 @@ import org.openmrs.Patient;
 import org.openmrs.module.xdssender.api.domain.Ccd;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.io.OutputStream;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 
 public interface CcdService {
 	
@@ -17,9 +13,8 @@ public interface CcdService {
 	Ccd getLocallyStoredCcd(Patient patient);
 	
 	@Transactional
-	Ccd downloadAndSaveCcd(Patient patient) throws XDSException, IOException, KeyStoreException, NoSuchAlgorithmException,
-	        KeyManagementException;
+	Ccd downloadAndSaveCcd(Patient patient) throws XDSException;
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	void downloadCcdAsPDF(OutputStream stream, Patient patient);
 }

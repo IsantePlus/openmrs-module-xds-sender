@@ -11,11 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.OutputStream;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 
 @Service(value = "xdsSender.CcdService")
 public class CcdServiceImpl implements CcdService {
@@ -34,8 +30,7 @@ public class CcdServiceImpl implements CcdService {
 	}
 	
 	@Override
-	public Ccd downloadAndSaveCcd(Patient patient) throws XDSException, IOException, KeyStoreException,
-	        NoSuchAlgorithmException, KeyManagementException {
+	public Ccd downloadAndSaveCcd(Patient patient) throws XDSException {
 		
 		Ccd ccd = xdsImportService.retrieveCCD(patient);
 		

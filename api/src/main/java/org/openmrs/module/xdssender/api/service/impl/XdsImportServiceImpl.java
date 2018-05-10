@@ -1,5 +1,6 @@
 package org.openmrs.module.xdssender.api.service.impl;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.HttpResponseException;
@@ -15,9 +16,7 @@ import org.openmrs.module.xdssender.api.xds.XdsRetriever;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -41,18 +40,30 @@ public class XdsImportServiceImpl implements XdsImportService {
 	private PatientService patientService;
 	
 	@Override
-	public Ccd retrieveCCD(Patient patient) throws XDSException, IOException, KeyStoreException, NoSuchAlgorithmException,
-	        KeyManagementException {
+	public Ccd retrieveCCD(Patient patient) throws XDSException {
+		Ccd ccd;
 		
 		String patientEcid = extractPatientEcid(patient);
-		
-		CloseableHttpResponse response = xdsRetriever.sendRetrieveCCD(patientEcid);
-		validateResponse(response);
-		
-		Ccd ccd = new Ccd();
-		
-		ccd.setDocument(parseContent(response).toString());
-		ccd.setPatient(patient);
+		try {
+			CloseableHttpResponse response = xdsRetriever.sendRetrieveCCD(patientEcid);
+			validateResponse(response);
+			
+			ccd = new Ccd();
+			ccd.setDocument(IOUtils.toString(response.getEntity().getContent()));
+			ccd.setPatient(patient);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (KeyStoreException e) {
+			throw new RuntimeException(e);
+		}
+		catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
+		catch (KeyManagementException e) {
+			throw new RuntimeException(e);
+		}
 		
 		return ccd;
 	}
@@ -61,17 +72,6 @@ public class XdsImportServiceImpl implements XdsImportService {
 		if (response.getStatusLine().getStatusCode() != SUCCESS_CODE) {
 			throw new HttpResponseException(response.getStatusLine().getStatusCode(), "Unable to import a CCD document");
 		}
-	}
-	
-	private String parseContent(CloseableHttpResponse response) throws IOException {
-		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-		
-		StringBuffer result = new StringBuffer();
-		String line;
-		while ((line = rd.readLine()) != null) {
-			result.append(line);
-		}
-		return result.toString();
 	}
 	
 	private String extractPatientEcid(Patient patient) {
