@@ -1,6 +1,5 @@
 package org.openmrs.module.xdssender.api.service.impl;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.dcm4chee.xds2.infoset.ihe.ProvideAndRegisterDocumentSetRequestType;
 import org.dcm4chee.xds2.infoset.rim.RegistryResponseType;
 import org.marc.everest.datatypes.II;
@@ -13,13 +12,10 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.cda.ClinicalDocumentBuilder;
 import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
-import org.openmrs.module.xdssender.api.errorhandling.ErrorHandlingService;
 import org.openmrs.module.xdssender.api.model.DocumentInfo;
 import org.openmrs.module.xdssender.api.service.XdsExportService;
 import org.openmrs.module.xdssender.api.xds.MessageUtil;
 import org.openmrs.module.xdssender.api.xds.XdsSender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,8 +26,6 @@ import java.util.UUID;
 
 @Component("xdsSender.XdsExportService")
 public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExportService {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(XdsExportServiceImpl.class);
 	
 	@Autowired
 	private ClinicalDocumentBuilder docBuilder;
@@ -64,19 +58,10 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 				throw new Exception("Could not execute provide and register");
 			
 			return docInfo;
-		} catch (Exception e) {
-			ErrorHandlingService errorHandler = config.getXdsBErrorHandlingService();
-			if (errorHandler != null) {
-				LOGGER.error("XDS export exception occurred", e);
-				errorHandler.handle(e.getMessage(),
-						"xdsSender.XdsExportService.exportProvideAndRegister", true,
-						ExceptionUtils.getFullStackTrace(e));
-			} else {
-				throw new RuntimeException("XDS export exception occurred "
-						+ "with not configured XDS.b error handler", e);
-			}
 		}
-		return null;
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private DocumentInfo buildDocInfo(Encounter encounter, Patient patient, DocumentModel docModel) {
@@ -91,7 +76,7 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 		docInfo.setMimeType("text/xml");
 		docInfo.setPatient(patient);
 		
-		List<Provider> provs = new ArrayList<>();
+		List<Provider> provs = new ArrayList<Provider>();
 		for (Author aut : docModel.getDoc().getAuthor()) {
 			// Load the author
 			for (II id : aut.getAssignedAuthor().getId())
