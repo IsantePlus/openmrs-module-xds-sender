@@ -30,7 +30,6 @@ import org.springframework.stereotype.Component;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,8 +54,8 @@ public class MessageUtil {
 	@Autowired
 	private XdsSenderConfig config;
 	
-	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(byte[] documentContent,
-	        final DocumentInfo info, Encounter encounter) throws JAXBException, IOException {
+	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(final DocumentInfo info,
+	        Encounter encounter, List<byte[]> docModelsContent) throws JAXBException {
 		String patientId = getPatientIdentifier(info).getIdentifier();
 		String location = getPatientLocation(info).getName();
 		
@@ -250,11 +249,13 @@ public class MessageUtil {
 			InfosetUtil.addOrOverwriteSlot(authorClass, "authorInstitution", institutionText);
 			oddRegistryObject.getClassification().add(authorClass);
 		}
-		
-		ProvideAndRegisterDocumentSetRequestType.Document doc = new ProvideAndRegisterDocumentSetRequestType.Document();
-		doc.setId(oddRegistryObject.getId());
-		doc.setValue(documentContent);
-		retVal.getDocument().add(doc);
+
+        for (byte[] docContent: docModelsContent) {
+            ProvideAndRegisterDocumentSetRequestType.Document doc = new ProvideAndRegisterDocumentSetRequestType.Document();
+            doc.setId(oddRegistryObject.getId());
+            doc.setValue(docContent);
+            retVal.getDocument().add(doc);
+        }
 		
 		return retVal;
 	}

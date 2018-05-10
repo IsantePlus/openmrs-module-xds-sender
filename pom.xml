@@ -37,6 +37,18 @@
 
 	<dependencyManagement>
 		<dependencies>
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>labintegration-api</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.openmrs.web</groupId>
+                <artifactId>openmrs-web</artifactId>
+                <version>${openmrsPlatformVersion}</version>
+                <scope>provided</scope>
+            </dependency>
 			<dependency>
 				<groupId>org.marc.everest</groupId>
 				<artifactId>everest-core</artifactId>
