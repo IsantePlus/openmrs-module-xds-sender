@@ -35,6 +35,18 @@
 			<groupId>org.openmrs</groupId>
 			<artifactId>event-api</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.openmrs.web</groupId>
+			<artifactId>openmrs-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
 
 		<!-- DCM4CHEE modules (for JAX-b classes and InfoSetUtil) -->
 		<dependency>

@@ -16,7 +16,6 @@ import org.openmrs.module.xdssender.api.service.XdsExportService;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
-import org.openmrs.module.xdssender.api.service.impl.XdsExportServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +25,9 @@ import org.springframework.stereotype.Component;
 public class EncounterEventListener implements EventListener {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(EncounterEventListener.class);
-	
+
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	
+
 	@Autowired
 	private XdsSenderConfig config;
 	

@@ -34,6 +34,8 @@
 		<javax.servletVersion>2.4</javax.servletVersion>
 		<eventVersion>2.5</eventVersion>
 		<legacyuiVersion>1.2.3</legacyuiVersion>
+		<apacheHttpCoreVersion>4.4.9</apacheHttpCoreVersion>
+		<apacheHttpClientVersion>4.5</apacheHttpClientVersion>
 		<javaCompilerVersion>1.7</javaCompilerVersion>
 	</properties>
 
@@ -43,31 +45,49 @@
 				<groupId>org.marc.everest</groupId>
 				<artifactId>everest-core</artifactId>
 				<version>${everestVersion}</version>
+				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.marc.everest</groupId>
 				<artifactId>everest-rmim-uv-cdar2</artifactId>
 				<version>${everestVersion}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<version>${apacheHttpCoreVersion}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>${apacheHttpClientVersion}</version>
+				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.marc.everest</groupId>
 				<artifactId>everest-formatters-xml-its1</artifactId>
 				<version>${everestVersion}</version>
+				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.marc.everest</groupId>
 				<artifactId>everest-formatters-xml-dt-r1</artifactId>
 				<version>${everestVersion}</version>
+				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.dcm4che</groupId>
 				<artifactId>dcm4chee-xds2-common</artifactId>
 				<version>${dcm4chee-xds2Version}</version>
+				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.dcm4che</groupId>
 				<artifactId>dcm4chee-xds2-infoset</artifactId>
 				<version>${dcm4chee-xds2Version}</version>
+				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.openmrs.module</groupId>

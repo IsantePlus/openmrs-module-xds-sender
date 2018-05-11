@@ -87,6 +87,28 @@
 	</globalProperty>
 
 	<globalProperty>
+		<property>xdssender.exportCcdEndpoint</property>
+		<defaultValue>https://sedish.net:8082/openmrs/ws/rest/exportccd/ccd</defaultValue>
+		<description>Specifies the export ccd module endpoint address (OpenSHR)</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.oshr.username</property>
+		<description>Specifies the OpenSHR username</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.oshr.password</property>
+		<description>Specifies the OpenSHR password</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.exportCcd.ignoreCerts</property>
+		<defaultValue>false</defaultValue>
+		<description>Determines if ccd downloading from OpenSHR should ignore certificates</description>
+	</globalProperty>
+
+	<globalProperty>
 		<property>xdssender.ccd.errorHandler.implementation</property>
 		<defaultValue>outgoingmessageexceptions.CcdErrorHandlingService</defaultValue>
 		<description>

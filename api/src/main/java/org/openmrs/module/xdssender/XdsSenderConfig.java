@@ -62,12 +62,18 @@ public class XdsSenderConfig {
 	
 	private final static String XDS_MODULE_USED_TO_DETERMINE_SOFTWARE_VERSION = "xdssender.openmrs.moduleUsedToDetermineSoftwareVersion";
 	
+	private static final String XDSSENDER_EXPORT_CCD_ENDPOINT = "xdssender.exportCcdEndpoint";
+
+	private static final String XDSSENDER_OSHR_USERNAME = "xdssender.oshr.username";
+
+	private static final String XDSSENDER_OSHR_PASSWORD = "xdssender.oshr.password";
+
+	private static final String XDSSENDER_EXPORT_CCD_IGNORE_CERTS = "xdssender.exportCcd.ignoreCerts";
+
 	private final static String CCD_ERROR_HANDLER_IMPLEMENTATION = "xdssender.ccd.errorHandler.implementation";
-	
+
 	private final static String XDS_B_ERROR_HANDLER_IMPLEMENTATION = "xdssender.xdsB.errorHandler.implementation";
-	
-	public static final String GP_ERROR_HANDLER_IMPLEMENTATION = "xdssender.errorHandler.implementation";
-	
+
 	public static XdsSenderConfig getInstance() {
 		return Context.getRegisteredComponent("xdssender.XdsSenderConfig", XdsSenderConfig.class);
 	}
@@ -137,10 +143,6 @@ public class XdsSenderConfig {
 		return getProperty(XDS_REPO_PASSWORD, "1234");
 	}
 	
-	public String getErrorHandlerImplementation() {
-		return getProperty(GP_ERROR_HANDLER_IMPLEMENTATION, "");
-	}
-	
 	public String getProviderRoleClinician() {
 		return getProperty(XDS_ROLE_CLINICIAN, "Clinician");
 	}
@@ -153,6 +155,22 @@ public class XdsSenderConfig {
 		return getProperty(XDS_MODULE_USED_TO_DETERMINE_SOFTWARE_VERSION, "isanteplusreports");
 	}
 	
+	public String getExportCcdEndpoint() {
+		return getProperty(XDSSENDER_EXPORT_CCD_ENDPOINT);
+	}
+
+	public String getOshrUsername() {
+		return getProperty(XDSSENDER_OSHR_USERNAME);
+	}
+
+	public String getOshrPassword() {
+		return getProperty(XDSSENDER_OSHR_PASSWORD);
+	}
+
+	public Boolean getExportCcdIgnoreCerts() {
+		return Boolean.parseBoolean(getProperty(XDSSENDER_EXPORT_CCD_IGNORE_CERTS));
+	}
+
 	public CcdErrorHandlingService getCcdErrorHandlingService() {
 		String propertyName = CCD_ERROR_HANDLER_IMPLEMENTATION;
 		CcdErrorHandlingService handler = null;
@@ -161,7 +179,7 @@ public class XdsSenderConfig {
 		}
 		return handler;
 	}
-	
+
 	public XdsBErrorHandlingService getXdsBErrorHandlingService() {
 		String propertyName = XDS_B_ERROR_HANDLER_IMPLEMENTATION;
 		XdsBErrorHandlingService handler = null;
@@ -170,15 +188,23 @@ public class XdsSenderConfig {
 		}
 		return handler;
 	}
-	
+
 	private String getProperty(String name, String defaultVal) {
 		return Context.getAdministrationService().getGlobalProperty(name, defaultVal);
 	}
-	
+
+	private String getProperty(String propertyName) {
+		String propertyValue = Context.getAdministrationService().getGlobalProperty(propertyName);
+		if (StringUtils.isBlank(propertyValue)) {
+			throw new APIException(String.format("Property value for '%s' is not set", propertyName));
+		}
+		return propertyValue;
+	}
+
 	private boolean isPropertySet(String globalProperty) {
 		return StringUtils.isNotBlank(Context.getAdministrationService().getGlobalProperty(globalProperty));
 	}
-	
+
 	private <T> T getComponentByGlobalProperty(String propertyName, Class<T> type) {
 		String propertyValue = Context.getAdministrationService().getGlobalProperty(propertyName);
 		if (StringUtils.isBlank(propertyValue)) {
