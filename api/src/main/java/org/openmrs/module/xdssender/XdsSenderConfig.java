@@ -12,6 +12,7 @@ package org.openmrs.module.xdssender;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.xdssender.api.scheduler.PullNotificationsTask;
 import org.springframework.stereotype.Component;
 
 /**
@@ -69,6 +70,8 @@ public class XdsSenderConfig {
 	private static final String XDSSENDER_OSHR_PASSWORD = "xdssender.oshr.password";
 	
 	private static final String XDSSENDER_EXPORT_CCD_IGNORE_CERTS = "xdssender.exportCcd.ignoreCerts";
+	
+	private static final String PULL_NOTIFICATIONS_TASK_INTERVAL = "xdssender.pullNotificationsTaskInterval";
 	
 	public static XdsSenderConfig getInstance() {
 		return Context.getRegisteredComponent("xdssender.XdsSenderConfig", XdsSenderConfig.class);
@@ -169,6 +172,10 @@ public class XdsSenderConfig {
 	
 	public Boolean getExportCcdIgnoreCerts() {
 		return Boolean.parseBoolean(getProperty(XDSSENDER_EXPORT_CCD_IGNORE_CERTS));
+	}
+	
+	public Long getPullNotificationsTaskInterval() {
+		return Long.parseLong(getProperty(PULL_NOTIFICATIONS_TASK_INTERVAL, PullNotificationsTask.DEFAULT_INTERVAL_SECONDS));
 	}
 	
 	private String getProperty(String name, String defaultVal) {
