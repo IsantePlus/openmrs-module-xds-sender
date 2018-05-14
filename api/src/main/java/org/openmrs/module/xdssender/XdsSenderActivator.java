@@ -16,7 +16,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.event.Event;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.xdssender.api.cda.EncounterEventListener;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.openmrs.module.xdssender.api.scheduler.impl.XdsSenderSchedulerServiceImpl;
 
 /**
  * This class contains the logic that is run every time this module is either started or shutdown
@@ -36,6 +36,7 @@ public class XdsSenderActivator extends BaseModuleActivator {
 	public void started() {
 		log.info("Started Xds Sender");
 		Event.subscribe(Encounter.class, null, getEncounterEventListener());
+		Context.getRegisteredComponents(XdsSenderSchedulerServiceImpl.class).get(0).runXdsSenderScheduler();
 	}
 	
 	/**
