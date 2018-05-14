@@ -7,6 +7,9 @@ public class RetrieveAndSaveCcdParameters implements Serializable {
 
 	private String patientUuid;
 
+	public RetrieveAndSaveCcdParameters() {
+	}
+
 	public RetrieveAndSaveCcdParameters(String patientUuid) {
 		this.patientUuid = patientUuid;
 	}

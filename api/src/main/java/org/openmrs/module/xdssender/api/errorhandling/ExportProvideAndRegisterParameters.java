@@ -8,7 +8,10 @@ public class ExportProvideAndRegisterParameters implements Serializable {
 	private String patientUuid;
 	
 	private String encounterUuid;
-	
+
+	public ExportProvideAndRegisterParameters() {
+	}
+
 	public ExportProvideAndRegisterParameters(String patientUuid, String encounterUuid) {
 		this.patientUuid = patientUuid;
 		this.encounterUuid = encounterUuid;
