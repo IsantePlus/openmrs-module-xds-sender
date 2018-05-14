@@ -11,6 +11,7 @@ import org.openmrs.event.EventListener;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.errorhandling.ErrorHandlingService;
 import org.openmrs.module.xdssender.api.errorhandling.ExportProvideAndRegisterParameters;
+import org.openmrs.module.xdssender.api.errorhandling.XdsBErrorHandlingService;
 import org.openmrs.module.xdssender.api.service.XdsExportService;
 
 import javax.jms.JMSException;
@@ -25,8 +26,6 @@ import org.springframework.stereotype.Component;
 public class EncounterEventListener implements EventListener {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(EncounterEventListener.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	@Autowired
 	private XdsSenderConfig config;
@@ -54,7 +53,7 @@ public class EncounterEventListener implements EventListener {
 						LOGGER.error("XDS export exception occurred", e);
 						errorHandler.handle(
 								prepareParameters(encounter, patient),
-								"xdsSender.XdsExportService.exportProvideAndRegister",
+								XdsBErrorHandlingService.EXPORT_PROVIDE_AND_REGISTER_DESTINATION,
 								true,
 								ExceptionUtils.getFullStackTrace(e));
 					} else {
@@ -75,7 +74,7 @@ public class EncounterEventListener implements EventListener {
 		ExportProvideAndRegisterParameters parameters =
 				new ExportProvideAndRegisterParameters(patient.getUuid(), encounter.getUuid());
 		try {
-			return OBJECT_MAPPER.writeValueAsString(parameters);
+			return new ObjectMapper().writeValueAsString(parameters);
 		} catch (IOException e) {
 			throw new RuntimeException("Cannot prepare parameters for OutgoingMessageException", e);
 		}
