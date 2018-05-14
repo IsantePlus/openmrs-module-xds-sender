@@ -43,22 +43,28 @@ public class EncounterEventListener implements EventListener {
 			        || Event.Action.UPDATED.toString().equals(messageAction)) {
 				String uuid = ((MapMessage) message).getString("uuid");
 				Encounter encounter = Context.getEncounterService().getEncounterByUuid(uuid);
-				Patient patient = Context.getPatientService().getPatient(encounter.getPatient().getPatientId());
-				XdsExportService service = Context.getService(XdsExportService.class);
-				try {
-					service.exportProvideAndRegister(encounter, patient);
-				} catch (Exception e) {
-					ErrorHandlingService errorHandler = config.getXdsBErrorHandlingService();
-					if (errorHandler != null) {
-						LOGGER.error("XDS export exception occurred", e);
-						errorHandler.handle(
-								prepareParameters(encounter, patient),
-								XdsBErrorHandlingService.EXPORT_PROVIDE_AND_REGISTER_DESTINATION,
-								true,
-								ExceptionUtils.getFullStackTrace(e));
-					} else {
-						throw new RuntimeException("XDS export exception occurred "
-								+ "with not configured XDS.b error handler", e);
+				if (encounter.getForm() == null) {
+					LOGGER.warn("Skipped sending Encounter %s (formId is NULL "
+							+ "-> probably it's the creating encounter)");
+				} else {
+					Patient patient = Context.getPatientService()
+							.getPatient(encounter.getPatient().getPatientId());
+					XdsExportService service = Context.getService(XdsExportService.class);
+					try {
+						service.exportProvideAndRegister(encounter, patient);
+					} catch (Exception e) {
+						ErrorHandlingService errorHandler = config.getXdsBErrorHandlingService();
+						if (errorHandler != null) {
+							LOGGER.error("XDS export exception occurred", e);
+							errorHandler.handle(
+									prepareParameters(encounter, patient),
+									XdsBErrorHandlingService.EXPORT_PROVIDE_AND_REGISTER_DESTINATION,
+									true,
+									ExceptionUtils.getFullStackTrace(e));
+						} else {
+							throw new RuntimeException("XDS export exception occurred "
+									+ "with not configured XDS.b error handler", e);
+						}
 					}
 				}
 			}
