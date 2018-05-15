@@ -1,12 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.openmrs.maven.parents</groupId>
-        <artifactId>maven-parent-openmrs-module</artifactId>
-        <version>1.1.1</version>
-    </parent>
+	<parent>
+		<groupId>org.openmrs.maven.parents</groupId>
+		<artifactId>maven-parent-openmrs-module</artifactId>
+		<version>1.1.1</version>
+	</parent>
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>xds-sender</artifactId>
@@ -26,16 +27,17 @@
 		<module>omod</module>
 	</modules>
 
-    <properties>
-        <openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
+	<properties>
+		<openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
 		<everestVersion>1.1.0</everestVersion>
 		<dcm4chee-xds2Version>2.0.4</dcm4chee-xds2Version>
 		<javax.servletVersion>2.4</javax.servletVersion>
-		<eventVersion>2.6.0</eventVersion>
+		<eventVersion>2.5</eventVersion>
 		<legacyuiVersion>1.2.3</legacyuiVersion>
 		<apacheHttpCoreVersion>4.4.9</apacheHttpCoreVersion>
 		<apacheHttpClientVersion>4.5</apacheHttpClientVersion>
-    </properties>
+		<javaCompilerVersion>1.7</javaCompilerVersion>
+	</properties>
 
 	<dependencyManagement>
 		<dependencies>
@@ -49,25 +51,90 @@
 				<groupId>org.marc.everest</groupId>
 				<artifactId>everest-rmim-uv-cdar2</artifactId>
 				<version>${everestVersion}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.openmrs.web</groupId>
-				<artifactId>openmrs-web</artifactId>
-				<scope>provided</scope>
-				<version>${openmrsPlatformVersion}</version>
+				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpcore</artifactId>
 				<version>${apacheHttpCoreVersion}</version>
+				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
 				<version>${apacheHttpClientVersion}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.marc.everest</groupId>
+				<artifactId>everest-formatters-xml-its1</artifactId>
+				<version>${everestVersion}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.marc.everest</groupId>
+				<artifactId>everest-formatters-xml-dt-r1</artifactId>
+				<version>${everestVersion}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.dcm4che</groupId>
+				<artifactId>dcm4chee-xds2-common</artifactId>
+				<version>${dcm4chee-xds2Version}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.dcm4che</groupId>
+				<artifactId>dcm4chee-xds2-infoset</artifactId>
+				<version>${dcm4chee-xds2Version}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>legacyui-omod</artifactId>
+				<version>${legacyuiVersion}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.openmrs.web</groupId>
+				<artifactId>openmrs-web</artifactId>
+				<version>${openmrsPlatformVersion}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.openmrs</groupId>
+				<artifactId>event-api</artifactId>
+				<version>${eventVersion}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>servlet-api</artifactId>
+				<version>${javax.servletVersion}</version>
+				<scope>provided</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.googlecode.maven-java-formatter-plugin</groupId>
+					<artifactId>maven-java-formatter-plugin</artifactId>
+					<inherited>false</inherited>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<target>${javaCompilerVersion}</target>
+						<source>${javaCompilerVersion}</source>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 
 	<repositories>
 		<repository>
@@ -85,10 +152,10 @@
 			<id>dcm4che</id>
 			<url>http://dcm4che.org/maven2</url>
 		</repository>
-        <repository>
-            <id>marc-te-main</id>
-            <url>http://te.marc-hi.ca/mvn</url>
-        </repository>
+		<repository>
+			<id>marc-te-main</id>
+			<url>http://te.marc-hi.ca/mvn</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
