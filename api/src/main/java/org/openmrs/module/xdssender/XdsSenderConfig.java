@@ -14,6 +14,7 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.xdssender.api.errorhandling.CcdErrorHandlingService;
 import org.openmrs.module.xdssender.api.errorhandling.XdsBErrorHandlingService;
+import org.openmrs.module.xdssender.api.scheduler.PullNotificationsTask;
 import org.springframework.stereotype.Component;
 
 /**
@@ -61,7 +62,7 @@ public class XdsSenderConfig {
 	private final static String XDS_ROLE_DOCTOR = "xdssender.openmrs.provider.role.doctor";
 	
 	private final static String XDS_MODULE_USED_TO_DETERMINE_SOFTWARE_VERSION = "xdssender.openmrs.moduleUsedToDetermineSoftwareVersion";
-	
+
 	private static final String XDSSENDER_EXPORT_CCD_ENDPOINT = "xdssender.exportCcdEndpoint";
 
 	private static final String XDSSENDER_OSHR_USERNAME = "xdssender.oshr.username";
@@ -73,6 +74,8 @@ public class XdsSenderConfig {
 	private final static String CCD_ERROR_HANDLER_IMPLEMENTATION = "xdssender.ccd.errorHandler.implementation";
 
 	private final static String XDS_B_ERROR_HANDLER_IMPLEMENTATION = "xdssender.xdsB.errorHandler.implementation";
+
+	private static final String PULL_NOTIFICATIONS_TASK_INTERVAL = "xdssender.pullNotificationsTaskInterval";
 
 	public static XdsSenderConfig getInstance() {
 		return Context.getRegisteredComponent("xdssender.XdsSenderConfig", XdsSenderConfig.class);
@@ -142,7 +145,7 @@ public class XdsSenderConfig {
 	public String getXdsRepositoryPassword() {
 		return getProperty(XDS_REPO_PASSWORD, "1234");
 	}
-	
+
 	public String getProviderRoleClinician() {
 		return getProperty(XDS_ROLE_CLINICIAN, "Clinician");
 	}
@@ -158,15 +161,15 @@ public class XdsSenderConfig {
 	public String getExportCcdEndpoint() {
 		return getProperty(XDSSENDER_EXPORT_CCD_ENDPOINT);
 	}
-
+	
 	public String getOshrUsername() {
 		return getProperty(XDSSENDER_OSHR_USERNAME);
 	}
-
+	
 	public String getOshrPassword() {
 		return getProperty(XDSSENDER_OSHR_PASSWORD);
 	}
-
+	
 	public Boolean getExportCcdIgnoreCerts() {
 		return Boolean.parseBoolean(getProperty(XDSSENDER_EXPORT_CCD_IGNORE_CERTS));
 	}
@@ -189,10 +192,14 @@ public class XdsSenderConfig {
 		return handler;
 	}
 
+	public Long getPullNotificationsTaskInterval() {
+		return Long.parseLong(getProperty(PULL_NOTIFICATIONS_TASK_INTERVAL, PullNotificationsTask.DEFAULT_INTERVAL_SECONDS));
+	}
+
 	private String getProperty(String name, String defaultVal) {
 		return Context.getAdministrationService().getGlobalProperty(name, defaultVal);
 	}
-
+	
 	private String getProperty(String propertyName) {
 		String propertyValue = Context.getAdministrationService().getGlobalProperty(propertyName);
 		if (StringUtils.isBlank(propertyValue)) {
@@ -206,10 +213,6 @@ public class XdsSenderConfig {
 	}
 
 	private <T> T getComponentByGlobalProperty(String propertyName, Class<T> type) {
-		String propertyValue = Context.getAdministrationService().getGlobalProperty(propertyName);
-		if (StringUtils.isBlank(propertyValue)) {
-			throw new APIException("Property value for '" + propertyName + "' is not set");
-		}
-		return Context.getRegisteredComponent(propertyValue, type);
+		return Context.getRegisteredComponent(getProperty(propertyName), type);
 	}
 }

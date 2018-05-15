@@ -124,6 +124,27 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>xdssender.pullNotificationsTaskInterval</property>
+		<defaultValue>3600</defaultValue>
+		<description>Interval time (in seconds) to execute pulling notifications from Pull Point task</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.notificationsPullPoint.username</property>
+		<description>Username to authorize int the Notifications Pull Point</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.notificationsPullPoint.password</property>
+		<description>Password to authorize int the Notifications Pull Point</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.notificationsPullPoint.endpoint</property>
+		<description>Endpoint used to fetch Notifications from the Pull Point</description>
+	</globalProperty>
+
 	<!-- AOP
 	<advice>
 		<point>org.openmrs.api.FormService</point>
