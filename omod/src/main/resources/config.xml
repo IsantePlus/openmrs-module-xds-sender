@@ -63,14 +63,6 @@
 	</globalProperty>
 
 	<globalProperty>
-		<property>xdssender.errorHandler.implementation</property>
-		<defaultValue></defaultValue>
-		<description>
-			Specify a Spring bean name of error handler service
-		</description>
-	</globalProperty>
-
-	<globalProperty>
 		<property>xdssender.openmrs.provider.role.clinician</property>
 		<description>Specifies role for add provider to XDS documents</description>
 	</globalProperty>
