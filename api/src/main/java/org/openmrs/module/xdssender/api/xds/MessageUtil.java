@@ -69,6 +69,9 @@ public class MessageUtil {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		
 		// ODD
+		if (encounter.getForm() == null) {
+			throw new RuntimeException("Cannot send encounter without formId");
+		}
 		oddRegistryObject.setId(encounter.getLocation().getUuid() + "/" + patientId + "/"
 		        + encounter.getEncounterType().getUuid() + "/" + encounter.getForm().getUuid() + "/"
 		        + format.format(encounter.getEncounterDatetime()));

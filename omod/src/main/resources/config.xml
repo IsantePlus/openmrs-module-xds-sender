@@ -15,7 +15,7 @@
 	<activator>org.openmrs.module.xdssender.XdsSenderActivator</activator>
 
 	<require_modules>
-		<require_module>
+		<require_module version="${eventVersion}">
 			org.openmrs.event
 		</require_module>
 		<require_module>
@@ -66,14 +66,6 @@
 	</globalProperty>
 
 	<globalProperty>
-		<property>xdssender.errorHandler.implementation</property>
-		<defaultValue></defaultValue>
-		<description>
-			Specify a Spring bean name of error handler service
-		</description>
-	</globalProperty>
-
-	<globalProperty>
 		<property>xdssender.openmrs.provider.role.clinician</property>
 		<description>Specifies role for add provider to XDS documents</description>
 	</globalProperty>
@@ -89,6 +81,64 @@
 		<description>Specifies the module name which will be used to determine the software version.</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>xdssender.exportCcdEndpoint</property>
+		<defaultValue>https://sedish.net:8082/openmrs/ws/rest/exportccd/ccd</defaultValue>
+		<description>Specifies the export ccd module endpoint address (OpenSHR)</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.oshr.username</property>
+		<description>Specifies the OpenSHR username</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.oshr.password</property>
+		<description>Specifies the OpenSHR password</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.exportCcd.ignoreCerts</property>
+		<defaultValue>false</defaultValue>
+		<description>Determines if ccd downloading from OpenSHR should ignore certificates</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.ccd.errorHandler.implementation</property>
+		<defaultValue>outgoingmessageexceptions.CcdErrorHandlingService</defaultValue>
+		<description>
+			Specify a Spring bean name of CCD error handler service
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.xdsB.errorHandler.implementation</property>
+		<defaultValue>outgoingmessageexceptions.XdsBErrorHandlingService</defaultValue>
+		<description>
+			Specify a Spring bean name of XDS.b error handler service
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.pullNotificationsTaskInterval</property>
+		<defaultValue>3600</defaultValue>
+		<description>Interval time (in seconds) to execute pulling notifications from Pull Point task</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.notificationsPullPoint.username</property>
+		<description>Username to authorize int the Notifications Pull Point</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.notificationsPullPoint.password</property>
+		<description>Password to authorize int the Notifications Pull Point</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.notificationsPullPoint.endpoint</property>
+		<description>Endpoint used to fetch Notifications from the Pull Point</description>
+	</globalProperty>
 
 	<!-- AOP
 	<advice>
