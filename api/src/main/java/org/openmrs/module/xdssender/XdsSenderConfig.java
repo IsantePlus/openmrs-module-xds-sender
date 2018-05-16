@@ -12,6 +12,8 @@ package org.openmrs.module.xdssender;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.xdssender.api.errorhandling.CcdErrorHandlingService;
+import org.openmrs.module.xdssender.api.errorhandling.XdsBErrorHandlingService;
 import org.openmrs.module.xdssender.api.scheduler.PullNotificationsTask;
 import org.springframework.stereotype.Component;
 
@@ -60,25 +62,27 @@ public class XdsSenderConfig {
 	private final static String XDS_ROLE_DOCTOR = "xdssender.openmrs.provider.role.doctor";
 	
 	private final static String XDS_MODULE_USED_TO_DETERMINE_SOFTWARE_VERSION = "xdssender.openmrs.moduleUsedToDetermineSoftwareVersion";
-	
-	private static final String GP_ERROR_HANDLER_IMPLEMENTATION = "xdssender.errorHandler.implementation";
-	
+
 	private static final String XDSSENDER_EXPORT_CCD_ENDPOINT = "xdssender.exportCcdEndpoint";
-	
+
 	private static final String XDSSENDER_OSHR_USERNAME = "xdssender.oshr.username";
-	
+
 	private static final String XDSSENDER_OSHR_PASSWORD = "xdssender.oshr.password";
-	
+
 	private static final String XDSSENDER_EXPORT_CCD_IGNORE_CERTS = "xdssender.exportCcd.ignoreCerts";
-	
+
+	private final static String CCD_ERROR_HANDLER_IMPLEMENTATION = "xdssender.ccd.errorHandler.implementation";
+
+	private final static String XDS_B_ERROR_HANDLER_IMPLEMENTATION = "xdssender.xdsB.errorHandler.implementation";
+
 	private static final String PULL_NOTIFICATIONS_TASK_INTERVAL = "xdssender.pullNotificationsTaskInterval";
-	
+
 	private static final String NOTIFICATIONS_PULL_POINT_ENDPOINT = "xdssender.notificationsPullPoint.endpoint";
-	
+
 	private static final String NOTIFICATIONS_PULL_POINT_USERNAME = "xdssender.notificationsPullPoint.username";
-	
+
 	private static final String NOTIFICATIONS_PULL_POINT_PASSWORD = "xdssender.notificationsPullPoint.password";
-	
+
 	public static XdsSenderConfig getInstance() {
 		return Context.getRegisteredComponent("xdssender.XdsSenderConfig", XdsSenderConfig.class);
 	}
@@ -147,11 +151,7 @@ public class XdsSenderConfig {
 	public String getXdsRepositoryPassword() {
 		return getProperty(XDS_REPO_PASSWORD, "1234");
 	}
-	
-	public String getErrorHandlerImplementation() {
-		return getProperty(GP_ERROR_HANDLER_IMPLEMENTATION, "");
-	}
-	
+
 	public String getProviderRoleClinician() {
 		return getProperty(XDS_ROLE_CLINICIAN, "Clinician");
 	}
@@ -179,23 +179,39 @@ public class XdsSenderConfig {
 	public Boolean getExportCcdIgnoreCerts() {
 		return Boolean.parseBoolean(getProperty(XDSSENDER_EXPORT_CCD_IGNORE_CERTS));
 	}
-	
+
+	public CcdErrorHandlingService getCcdErrorHandlingService() {
+		String propertyName = CCD_ERROR_HANDLER_IMPLEMENTATION;
+		CcdErrorHandlingService handler = null;
+		if (isPropertySet(propertyName)) {
+			handler = getComponentByGlobalProperty(propertyName, CcdErrorHandlingService.class);
+		}
+		return handler;
+	}
+
+	public XdsBErrorHandlingService getXdsBErrorHandlingService() {
+		String propertyName = XDS_B_ERROR_HANDLER_IMPLEMENTATION;
+		XdsBErrorHandlingService handler = null;
+		if (isPropertySet(propertyName)) {
+			handler = getComponentByGlobalProperty(propertyName, XdsBErrorHandlingService.class);
+		}
+		return handler;
+	}
+
 	public Long getPullNotificationsTaskInterval() {
 		return Long.parseLong(getProperty(PULL_NOTIFICATIONS_TASK_INTERVAL, PullNotificationsTask.DEFAULT_INTERVAL_SECONDS));
 	}
-	
 	public String getNotificationsPullPointEndpoint() {
 		return getProperty(NOTIFICATIONS_PULL_POINT_ENDPOINT);
 	}
-	
+
 	public String getNotificationsPullPointUsername() {
 		return getProperty(NOTIFICATIONS_PULL_POINT_USERNAME);
 	}
-	
+
 	public String getNotificationsPullPointPassword() {
 		return getProperty(NOTIFICATIONS_PULL_POINT_PASSWORD);
 	}
-	
 	private String getProperty(String name, String defaultVal) {
 		return Context.getAdministrationService().getGlobalProperty(name, defaultVal);
 	}
@@ -206,5 +222,13 @@ public class XdsSenderConfig {
 			throw new APIException(String.format("Property value for '%s' is not set", propertyName));
 		}
 		return propertyValue;
+	}
+
+	private boolean isPropertySet(String globalProperty) {
+		return StringUtils.isNotBlank(Context.getAdministrationService().getGlobalProperty(globalProperty));
+	}
+
+	private <T> T getComponentByGlobalProperty(String propertyName, Class<T> type) {
+		return Context.getRegisteredComponent(getProperty(propertyName), type);
 	}
 }

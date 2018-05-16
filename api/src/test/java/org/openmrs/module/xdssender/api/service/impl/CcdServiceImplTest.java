@@ -47,8 +47,7 @@ public class CcdServiceImplTest {
 	private ArgumentCaptor<Patient> patientArgumentCaptor;
 	
 	@Test
-	public void shouldSaveAndReturnDownloadedCcd() throws XDSException, IOException, NoSuchAlgorithmException,
-	        KeyStoreException, KeyManagementException {
+	public void shouldSaveAndReturnDownloadedCcd() throws XDSException {
 		when(ccdDao.saveOrUpdate(any(Ccd.class))).thenReturn(ccd);
 		when(xdsImportService.retrieveCCD(any(Patient.class))).thenReturn(ccd);
 		
@@ -61,8 +60,7 @@ public class CcdServiceImplTest {
 	}
 	
 	@Test
-	public void shouldReturnNullOnCcdNotFoundDuringDownload() throws XDSException, IOException, NoSuchAlgorithmException,
-	        KeyStoreException, KeyManagementException {
+	public void shouldReturnNullOnCcdNotFoundDuringDownload() throws XDSException {
 		when(xdsImportService.retrieveCCD(any(Patient.class))).thenReturn(null);
 		
 		Ccd result = ccdService.downloadAndSaveCcd(patient);
