@@ -73,6 +73,12 @@ public class XdsSenderConfig {
 	
 	private static final String PULL_NOTIFICATIONS_TASK_INTERVAL = "xdssender.pullNotificationsTaskInterval";
 	
+	private static final String NOTIFICATIONS_PULL_POINT_ENDPOINT = "xdssender.notificationsPullPoint.endpoint";
+	
+	private static final String NOTIFICATIONS_PULL_POINT_USERNAME = "xdssender.notificationsPullPoint.username";
+	
+	private static final String NOTIFICATIONS_PULL_POINT_PASSWORD = "xdssender.notificationsPullPoint.password";
+	
 	public static XdsSenderConfig getInstance() {
 		return Context.getRegisteredComponent("xdssender.XdsSenderConfig", XdsSenderConfig.class);
 	}
@@ -176,6 +182,18 @@ public class XdsSenderConfig {
 	
 	public Long getPullNotificationsTaskInterval() {
 		return Long.parseLong(getProperty(PULL_NOTIFICATIONS_TASK_INTERVAL, PullNotificationsTask.DEFAULT_INTERVAL_SECONDS));
+	}
+	
+	public String getNotificationsPullPointEndpoint() {
+		return getProperty(NOTIFICATIONS_PULL_POINT_ENDPOINT);
+	}
+	
+	public String getNotificationsPullPointUsername() {
+		return getProperty(NOTIFICATIONS_PULL_POINT_USERNAME);
+	}
+	
+	public String getNotificationsPullPointPassword() {
+		return getProperty(NOTIFICATIONS_PULL_POINT_PASSWORD);
 	}
 	
 	private String getProperty(String name, String defaultVal) {

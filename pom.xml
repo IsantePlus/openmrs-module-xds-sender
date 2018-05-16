@@ -66,6 +66,11 @@
 				<artifactId>httpclient</artifactId>
 				<version>${apacheHttpClientVersion}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.springframework.ws</groupId>
+				<artifactId>spring-ws-core</artifactId>
+				<version>2.4.2.RELEASE</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

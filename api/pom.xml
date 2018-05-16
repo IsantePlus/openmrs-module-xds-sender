@@ -12,6 +12,31 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.13.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <bindingDirectory>src/main/resources/xjb</bindingDirectory>
+                    <schemaLanguage>WSDL</schemaLanguage>
+                    <generatePackage>org.openmrs.module.xdssender.notificationspullpoint</generatePackage>
+                    <schemas>
+                        <schema>
+                            <url>${basedir}/src/main/resources/wsdl/bw-2.wsdl</url>
+                        </schema>
+                        <schema>
+                            <url>${basedir}/src/main/resources/wsdl/brw-2.wsdl</url>
+                        </schema>
+                    </schemas>
+                </configuration>
+            </plugin>
         </plugins>
 
         <testResources>
@@ -73,6 +98,10 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.ws</groupId>
+            <artifactId>spring-ws-core</artifactId>
+        </dependency>
         <!-- DCM4CHEE modules (for JAX-b classes and InfoSetUtil) -->
         <dependency>
             <groupId>org.dcm4che</groupId>
