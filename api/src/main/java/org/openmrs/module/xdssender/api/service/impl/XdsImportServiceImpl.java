@@ -3,8 +3,8 @@ package org.openmrs.module.xdssender.api.service.impl;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.dcm4chee.xds2.common.exception.XDSException;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
@@ -45,7 +45,7 @@ public class XdsImportServiceImpl implements XdsImportService {
 		
 		String patientEcid = extractPatientEcid(patient);
 		try {
-			CloseableHttpResponse response = xdsRetriever.sendRetrieveCCD(patientEcid);
+			HttpResponse response = xdsRetriever.sendRetrieveCCD(patientEcid);
 			validateResponse(response);
 			
 			ccd = new Ccd();
@@ -68,7 +68,7 @@ public class XdsImportServiceImpl implements XdsImportService {
 		return ccd;
 	}
 	
-	private void validateResponse(CloseableHttpResponse response) throws HttpResponseException {
+	private void validateResponse(HttpResponse response) throws HttpResponseException {
 		if (response.getStatusLine().getStatusCode() != SUCCESS_CODE) {
 			throw new HttpResponseException(response.getStatusLine().getStatusCode(), "Unable to import a CCD document");
 		}
