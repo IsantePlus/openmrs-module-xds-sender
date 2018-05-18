@@ -45,6 +45,7 @@ public class XdsSenderActivator extends BaseModuleActivator {
 	@Override
 	public void stopped() {
 		log.info("Shutdown Xds Sender");
+		Event.unsubscribe(Encounter.class, null, getEncounterEventListener());
 	}
 	
 }
