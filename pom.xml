@@ -34,8 +34,8 @@
 		<javax.servletVersion>2.4</javax.servletVersion>
 		<eventVersion>2.5</eventVersion>
 		<legacyuiVersion>1.2.3</legacyuiVersion>
-		<apacheHttpCoreVersion>4.4.9</apacheHttpCoreVersion>
-		<apacheHttpClientVersion>4.5</apacheHttpClientVersion>
+		<apacheHttpCoreVersion>4.2</apacheHttpCoreVersion>
+		<apacheHttpClientVersion>4.2</apacheHttpClientVersion>
 		<javaCompilerVersion>1.7</javaCompilerVersion>
 	</properties>
 
