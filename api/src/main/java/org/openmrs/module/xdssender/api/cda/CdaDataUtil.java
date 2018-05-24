@@ -56,6 +56,7 @@ import org.openmrs.ConceptNumeric;
 import org.openmrs.ImplementationId;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
+import org.openmrs.LocationAttributeType;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
@@ -314,7 +315,7 @@ public class CdaDataUtil {
 		    XdsSenderConstants.ATTRIBUTE_NAME_EXTERNAL_ID);
 		if (externalId != null)
 			retVal.getId().add(parseIIFromString(externalId.getValue().toString()));
-		retVal.getId().add(new II(config.getLocationRoot(), location.getUuid()));
+		retVal.getId().add(new II(config.getLocationRoot(), getLocationSiteCode(location)));
 		
 		// Name , etc. ?
 		if (location.getName() != null)
@@ -337,7 +338,7 @@ public class CdaDataUtil {
 			if (externalId != null)
 				retVal.getAsOrganizationPartOf().getId().add(parseIIFromString(externalId.getValue().toString()));
 			retVal.getAsOrganizationPartOf().getId()
-			        .add(new II(config.getLocationRoot(), location.getParentLocation().getUuid()));
+			        .add(new II(config.getLocationRoot(), getLocationSiteCode(location.getParentLocation())));
 			
 			if (location.getParentLocation().getRetired())
 				retVal.getAsOrganizationPartOf().setStatusCode(RoleStatus.Terminated);
@@ -346,6 +347,16 @@ public class CdaDataUtil {
 		}
 		
 		return retVal;
+	}
+	
+	private String getLocationSiteCode(Location location) {
+		String siteCode = "";
+		for (LocationAttribute attribute : location.getAttributes()) {
+			if (attribute.getAttributeType().getUuid().equals(XdsSenderConstants.LOCATION_SITECODE_ATTRIBUTE_UUID)) {
+				siteCode = attribute.getValue().toString();
+			}
+		}
+		return siteCode;
 	}
 	
 	/**
@@ -430,9 +441,9 @@ public class CdaDataUtil {
 			    XdsSenderConstants.ATTRIBUTE_NAME_EXTERNAL_ID);
 			if (idAttribute != null)
 				retVal.setId(SET.createSET(parseIIFromString(idAttribute.getValue().toString()),
-				    new II(config.getLocationRoot(), shrLocation.getUuid())));
+				    new II(config.getLocationRoot(), getLocationSiteCode(shrLocation))));
 			else
-				retVal.setId(SET.createSET(new II(config.getLocationRoot(), shrLocation.getUuid())));
+				retVal.setId(SET.createSET(new II(config.getLocationRoot(), getLocationSiteCode(shrLocation))));
 			
 			retVal.setAddr(createAddressSet(shrLocation));
 			// TODO
