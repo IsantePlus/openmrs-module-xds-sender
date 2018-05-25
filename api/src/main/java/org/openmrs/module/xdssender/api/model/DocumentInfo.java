@@ -1,11 +1,17 @@
 package org.openmrs.module.xdssender.api.model;
 
+import org.marc.everest.datatypes.II;
+import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Author;
 import org.openmrs.Encounter;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Represents basic information about a document related to a patient
@@ -49,6 +55,27 @@ public class DocumentInfo {
 	
 	// Type code
 	private String typeCode;
+
+	public DocumentInfo(Encounter encounter, Patient patient, DocumentModel docModel, String mimeType,
+						 String providerRoot) {
+		uniqueId = String.format("2.25.%s", UUID.randomUUID().getMostSignificantBits()).replaceAll("-", "");
+
+		relatedEncounter = encounter;
+		classCode = docModel.getTypeCode();
+		formatCode = docModel.getFormatCode();
+		creationTime = new Date();
+		this.mimeType = mimeType;
+		this.patient = patient;
+
+		List<Provider> provs = new ArrayList<Provider>();
+		for (Author aut : docModel.getAuthors()) {
+			// Load the author
+			for (II id : aut.getAssignedAuthor().getId())
+				if (id.getRoot() != null && id.getRoot().equals(providerRoot))
+					provs.add(Context.getProviderService().getProvider(Integer.parseInt(id.getExtension())));
+		}
+		authorXon = provs;
+	}
 	
 	/**
 	 * Gets the creation time

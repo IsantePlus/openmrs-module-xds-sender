@@ -3,6 +3,7 @@ package org.openmrs.module.xdssender.api.cda.model;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Author;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalDocument;
 
 import javax.xml.transform.Source;
@@ -12,9 +13,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class DocumentModel {
 	
@@ -34,12 +36,15 @@ public final class DocumentModel {
 	 * Can only be created by static method
 	 */
 	private DocumentModel() {
-		
 	}
 	
 	public ClinicalDocument getDoc() {
 		return doc;
 	}
+
+    public List<Author> getAuthors() {
+        return doc != null ? doc.getAuthor() : new ArrayList<Author>();
+    }
 	
 	public String getFormatCode() {
 		return formatCode;
@@ -86,6 +91,13 @@ public final class DocumentModel {
 			IOUtils.closeQuietly(in);
 		}
 	}
+
+    public static DocumentModel createInstance(byte[] documentData, String msg) {
+            DocumentModel retVal = new DocumentModel();
+            retVal.html = msg;
+            retVal.data = documentData;
+            return retVal;
+    }
 	
 	public void applyFormatting() {
 		html = html.substring(html.indexOf("<body>") + "<body>".length());
