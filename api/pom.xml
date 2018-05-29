@@ -1,6 +1,6 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xmlns="http://maven.apache.org/POM/4.0.0"
-		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+		 xmlns="http://maven.apache.org/POM/4.0.0"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -65,9 +65,42 @@
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
+			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-ws-core</artifactId>
+		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.13.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<bindingDirectory>src/main/resources/xjb</bindingDirectory>
+					<schemaLanguage>WSDL</schemaLanguage>
+					<generatePackage>org.openmrs.module.xdssender.notificationspullpoint</generatePackage>
+					<schemas>
+						<schema>
+							<url>http://docs.oasis-open.org/wsn/bw-2.wsdl</url>
+						</schema>
+						<schema>
+							<url>http://docs.oasis-open.org/wsn/brw-2.wsdl</url>
+						</schema>
+					</schemas>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>

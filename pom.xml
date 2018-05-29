@@ -31,12 +31,13 @@
 		<openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
 		<everestVersion>1.1.0</everestVersion>
 		<dcm4chee-xds2Version>2.0.4</dcm4chee-xds2Version>
-		<javax.servletVersion>2.4</javax.servletVersion>
+		<javax.servletVersion>3.1.0</javax.servletVersion>
 		<eventVersion>2.5</eventVersion>
 		<legacyuiVersion>1.2.3</legacyuiVersion>
 		<apacheHttpCoreVersion>4.2</apacheHttpCoreVersion>
 		<apacheHttpClientVersion>4.2</apacheHttpClientVersion>
 		<javaCompilerVersion>1.7</javaCompilerVersion>
+		<springWsVersion>2.4.2.RELEASE</springWsVersion>
 	</properties>
 
 	<dependencyManagement>
@@ -107,9 +108,66 @@
 				<version>${eventVersion}</version>
 				<scope>provided</scope>
 			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.ws</groupId>
+				<artifactId>spring-ws-core</artifactId>
+				<version>${springWsVersion}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-expression</artifactId>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-aop</artifactId>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc</artifactId>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-oxm</artifactId>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<scope>provided</scope>
+			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
-				<artifactId>servlet-api</artifactId>
+				<artifactId>javax.servlet-api</artifactId>
 				<version>${javax.servletVersion}</version>
 				<scope>provided</scope>
 			</dependency>

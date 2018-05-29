@@ -1,0 +1,54 @@
+<jxb:bindings
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+    version="2.1">
+
+    <jxb:bindings schemaLocation="http://docs.oasis-open.org/wsn/b-2.xsd">
+        <jxb:bindings node="//xs:complexType[@name='QueryExpressionType']">
+            <jxb:class name="QueryExpressionTypeB2"/>
+        </jxb:bindings>
+    </jxb:bindings>
+
+    <jxb:bindings schemaLocation="http://docs.oasis-open.org/wsn/t-1.xsd">
+        <jxb:bindings node="//xs:complexType[@name='QueryExpressionType']">
+            <jxb:class name="QueryExpressionTypeT1"/>
+        </jxb:bindings>
+    </jxb:bindings>
+
+    <jxb:bindings schemaLocation="http://docs.oasis-open.org/wsn/br-2.xsd">
+        <jxb:bindings multiple="true" node="//xs:element[@name='ConsumerReference']">
+            <jxb:class name="ConsumerReferenceBR2"/>
+        </jxb:bindings>
+    </jxb:bindings>
+
+    <jxb:bindings schemaLocation="http://docs.oasis-open.org/wsn/b-2.xsd">
+        <jxb:bindings multiple="true" node="//xs:element[@name='ConsumerReference']">
+            <jxb:class name="ConsumerReferenceB2"/>
+        </jxb:bindings>
+    </jxb:bindings>
+
+    <jxb:bindings schemaLocation="http://docs.oasis-open.org/wsn/br-2.xsd">
+        <jxb:bindings node="//xs:element[@name='CreationTime']">
+            <jxb:class name="CreationTimeBR2"/>
+        </jxb:bindings>
+    </jxb:bindings>
+
+    <jxb:bindings schemaLocation="http://docs.oasis-open.org/wsn/b-2.xsd">
+        <jxb:bindings node="//xs:element[@name='CreationTime']">
+            <jxb:class name="CreationTimeB2"/>
+        </jxb:bindings>
+    </jxb:bindings>
+
+    <jxb:bindings schemaLocation="http://docs.oasis-open.org/wsn/br-2.xsd">
+        <jxb:bindings multiple="true" node="//xs:element[@name='Topic']">
+            <jxb:class name="TopicBR2"/>
+        </jxb:bindings>
+    </jxb:bindings>
+
+    <jxb:bindings schemaLocation="http://docs.oasis-open.org/wsn/b-2.xsd">
+        <jxb:bindings multiple="true" node="//xs:element[@name='Topic']">
+            <jxb:class name="TopicB2"/>
+        </jxb:bindings>
+    </jxb:bindings>
+
+</jxb:bindings>
