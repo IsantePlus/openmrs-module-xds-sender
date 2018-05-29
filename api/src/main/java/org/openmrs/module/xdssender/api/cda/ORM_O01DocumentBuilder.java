@@ -14,28 +14,28 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 public class ORM_O01DocumentBuilder {
-	
-	private final Log log = LogFactory.getLog(this.getClass());
 
-	private static final String ORM_O01 = "ORM_O01";
+    private final Log log = LogFactory.getLog(this.getClass());
+
+    private static final String ORM_O01 = "ORM_O01";
 
     @Autowired
     private OrderGeneratorManager orderGeneratorManager;
-	
-	public DocumentModel buildDocument(Encounter encounter) {
+
+    public DocumentModel buildDocument(Encounter encounter) {
         try {
             String message = orderGeneratorManager.generateORMO01Message(encounter, OrderDestination.SCC);
-		    byte[] data = message.getBytes(StandardCharsets.UTF_8);
+            byte[] data = message.getBytes(StandardCharsets.UTF_8);
 
             return DocumentModel.createInstance(data, message);
         } catch (MessageCreationException ex) {
             log.error("Error generating orders:", ex);
         }
 
-		return null;
-	}
+        return null;
+    }
 
-	public static String getDocId(String clinicalDocId) {
-	    return ORM_O01 + "-" + clinicalDocId;
+    public static String getDocId(String clinicalDocId) {
+        return ORM_O01 + "-" + clinicalDocId;
     }
 }

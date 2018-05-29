@@ -21,30 +21,30 @@ import org.springframework.stereotype.Component;
 
 @Component("xdsSender.XdsExportService")
 public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExportService {
-	
-	private final Log log = LogFactory.getLog(this.getClass());
-	
-	@Autowired
-	private ClinicalDocumentBuilder docBuilder;
-	
-	@Autowired
-	private ORM_O01DocumentBuilder ormDocBuilder;
-	
-	@Autowired
-	private MessageUtil messageUtil;
-	
-	@Autowired
-	private XdsSenderConfig config;
-	
-	@Autowired
-	private XdsSender xdsSender;
-	
-	@Override
-	public DocumentInfo exportProvideAndRegister(Encounter encounter, Patient patient) {
-		try {
-			DocumentModel clinicalDocModel = docBuilder.buildDocument(patient, encounter);
-			DocumentInfo clinicalDocInfo = new DocumentInfo(encounter, patient, clinicalDocModel,
-					"text/xsl", config.getProviderRoot());
+
+    private final Log log = LogFactory.getLog(this.getClass());
+
+    @Autowired
+    private ClinicalDocumentBuilder clinicalDocBuilder;
+
+    @Autowired
+    private ORM_O01DocumentBuilder ormDocBuilder;
+
+    @Autowired
+    private MessageUtil messageUtil;
+
+    @Autowired
+    private XdsSenderConfig config;
+
+    @Autowired
+    private XdsSender xdsSender;
+
+    @Override
+    public DocumentInfo exportProvideAndRegister(Encounter encounter, Patient patient) {
+        try {
+            DocumentModel clinicalDocModel = clinicalDocBuilder.buildDocument(patient, encounter);
+            DocumentInfo clinicalDocInfo = new DocumentInfo(encounter, patient, clinicalDocModel,
+                    "text/xsl", config.getProviderRoot());
             DocumentData clinicalDoc = new DocumentData(clinicalDocInfo, clinicalDocModel.getData());
 
             DocumentData msgDoc = null;
@@ -55,21 +55,20 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
                 msgDoc = new DocumentData(msgDocInfo, msgDocModel.getData());
             }
 
-			if (!messageUtil.getPatientIdentifier(clinicalDocInfo).getIdentifierType().getName().equals("ECID")) {
-				throw new Exception("Patient doesn't have ECID Identifier.");
-			}
+            if (!messageUtil.getPatientIdentifier(clinicalDocInfo).getIdentifierType().getName().equals("ECID")) {
+                throw new Exception("Patient doesn't have ECID Identifier.");
+            }
 
-			ProvideAndRegisterDocumentSetRequestType request = messageUtil.createProvideAndRegisterDocument(clinicalDoc,
+            ProvideAndRegisterDocumentSetRequestType request = messageUtil.createProvideAndRegisterDocument(clinicalDoc,
                     msgDoc, encounter);
-			RegistryResponseType response = xdsSender.sendProvideAndRegister(request);
+            RegistryResponseType response = xdsSender.sendProvideAndRegister(request);
 
-			if (!response.getStatus().contains("Success"))
-				throw new Exception("Could not execute provide and register");
+            if (!response.getStatus().contains("Success"))
+                throw new Exception("Could not execute provide and register");
 
-			return clinicalDocInfo;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+            return clinicalDocInfo;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
