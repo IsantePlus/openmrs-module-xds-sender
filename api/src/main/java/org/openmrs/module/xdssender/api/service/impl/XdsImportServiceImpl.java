@@ -25,7 +25,6 @@ import java.io.IOException;
 public class XdsImportServiceImpl implements XdsImportService {
 	
 	private static final Log LOGGER = LogFactory.getLog(XdsImportServiceImpl.class);
-	
 
 	private static final String ECID_NAME = "ECID";
 	
@@ -34,7 +33,7 @@ public class XdsImportServiceImpl implements XdsImportService {
 	
 	@Autowired
 	private XdsRetriever xdsRetriever;
-	
+
 	@Override
 	public Ccd retrieveCCD(Patient patient) throws XDSException {
 		Ccd ccd = null;
