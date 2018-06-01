@@ -14,11 +14,18 @@ public class CcdHttpResult {
 
     public CcdHttpResult(HttpResponse response) {
         this.response = response;
-        this.exception = null;
+
+        int code = response.getStatusLine().getStatusCode();
+        if (!is2xxSuccessful(code)) {
+            exception = new Exception(String.format("CCD import failure. Http response: "
+                    + "code %d, message \n %s", code, response));
+        } else {
+            exception = null;
+        }
     }
 
     public boolean inError() {
-        return response == null;
+        return response == null || exception != null;
     }
 
     public Exception getException() {
@@ -27,5 +34,9 @@ public class CcdHttpResult {
 
     public HttpResponse getResponse() {
         return response;
+    }
+
+    private boolean is2xxSuccessful(int code) {
+        return code >= 200 && code < 300;
     }
 }
