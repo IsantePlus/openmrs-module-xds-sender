@@ -1,6 +1,5 @@
 package org.openmrs.module.xdssender.api.cda;
 
-import java.io.IOException;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.Encounter;
@@ -12,15 +11,17 @@ import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.errorhandling.ErrorHandlingService;
 import org.openmrs.module.xdssender.api.errorhandling.ExportProvideAndRegisterParameters;
 import org.openmrs.module.xdssender.api.errorhandling.XdsBErrorHandlingService;
+import org.openmrs.module.xdssender.api.patient.PatientEcidUpdater;
 import org.openmrs.module.xdssender.api.service.XdsExportService;
-
-import javax.jms.JMSException;
-import javax.jms.MapMessage;
-import javax.jms.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.Message;
+import java.io.IOException;
 
 @Component("xdssender.EncounterEventListener")
 public class EncounterEventListener implements EventListener {
@@ -29,7 +30,10 @@ public class EncounterEventListener implements EventListener {
 
 	@Autowired
 	private XdsSenderConfig config;
-	
+
+	@Autowired
+	private PatientEcidUpdater ecidUpdater;
+
 	@Override
 	public void onMessage(Message message) {
 		try {
@@ -49,7 +53,11 @@ public class EncounterEventListener implements EventListener {
 				} else {
 					Patient patient = Context.getPatientService()
 							.getPatient(encounter.getPatient().getPatientId());
+
+					ecidUpdater.fetchEcidIfRequired(patient);
+
 					XdsExportService service = Context.getService(XdsExportService.class);
+
 					try {
 						service.exportProvideAndRegister(encounter, patient);
 					} catch (Exception e) {
