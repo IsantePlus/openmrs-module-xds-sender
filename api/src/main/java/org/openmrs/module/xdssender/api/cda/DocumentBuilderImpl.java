@@ -162,26 +162,19 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 				// Now add participants
 				for (Entry<EncounterRole, Set<Provider>> encounterProvider : encounter.getProvidersByRoles().entrySet()) {
 					
-					if (encounterProvider.getKey().getName().equals(config.getProviderRoleClinician())
-					        || encounterProvider.getKey().getName().equals(config.getProviderRoleDoctor())) {
-						
-						for (Provider pvdr : encounterProvider.getValue()) {
-							Author aut = new Author(ContextControl.OverridingPropagating);
-							aut.setTime(new TS());
-							aut.getTime().setNullFlavor(NullFlavor.NoInformation);
-							aut.setAssignedAuthor(cdaDataUtil.createAuthorPerson(pvdr));
-							retVal.getAuthor().add(aut);
-						}
-					} else if (encounterProvider.getKey().getName().equals("LA")) // There technically are no "legal" attesters to the document here as it is an auto-generated document
-						;
-					else {
-						for (Provider pvdr : encounterProvider.getValue()) {
-							Performer1 performer = new Performer1(x_ServiceEventPerformer.PRF,
-							        cdaDataUtil.createAssignedEntity(pvdr));
-							performer.setFunctionCode((CE<ParticipationFunction>) cdaDataUtil.parseCodeFromString(
-							    encounterProvider.getKey().getDescription(), CE.class));
-							event.getPerformer().add(performer);
-						}
+					for (Provider pvdr : encounterProvider.getValue()) {
+						Author aut = new Author(ContextControl.OverridingPropagating);
+						aut.setTime(new TS());
+						aut.getTime().setNullFlavor(NullFlavor.NoInformation);
+						aut.setAssignedAuthor(cdaDataUtil.createAuthorPerson(pvdr));
+						retVal.getAuthor().add(aut);
+					}
+					for (Provider pvdr : encounterProvider.getValue()) {
+						Performer1 performer = new Performer1(x_ServiceEventPerformer.PRF,
+								cdaDataUtil.createAssignedEntity(pvdr));
+						performer.setFunctionCode((CE<ParticipationFunction>) cdaDataUtil.parseCodeFromString(
+							encounterProvider.getKey().getDescription(), CE.class));
+						event.getPerformer().add(performer);
 					}
 				}
 			} else {
