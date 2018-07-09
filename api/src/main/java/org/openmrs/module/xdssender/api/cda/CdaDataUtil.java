@@ -56,7 +56,6 @@ import org.openmrs.ConceptNumeric;
 import org.openmrs.ImplementationId;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
-import org.openmrs.LocationAttributeType;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
@@ -70,7 +69,6 @@ import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.xml.stream.XMLInputFactory;
@@ -163,7 +161,7 @@ public class CdaDataUtil {
 		
 		// Get the ID
 		retVal.setId(SET.createSET(new II(config.getProviderRoot(), pvdr.getId().toString()), new II(config.getUserRoot(),
-		        pvdr.getUuid())));
+		        pvdr.getIdentifier())));
 		
 		// Telecoms
 		retVal.setTelecom(createTelecomSet(pvdr.getPerson()));
@@ -177,7 +175,7 @@ public class CdaDataUtil {
 		PersonAttribute orgAttribute = pvdr.getPerson().getAttribute(XdsSenderConstants.ATTRIBUTE_NAME_ORGANIZATION);
 		if (orgAttribute != null)
 			retVal.setRepresentedOrganization(createOrganization((Location) orgAttribute.getHydratedObject()));
-		
+
 		return retVal;
 		
 	}
@@ -283,7 +281,7 @@ public class CdaDataUtil {
 		
 		// Get the ID
 		retVal.setId(SET.createSET(new II(config.getProviderRoot(), pvdr.getId().toString()), new II(config.getUserRoot(),
-		        pvdr.getUuid())));
+		        pvdr.getIdentifier())));
 		
 		// Set telecom
 		if (pvdr.getPerson() != null) {

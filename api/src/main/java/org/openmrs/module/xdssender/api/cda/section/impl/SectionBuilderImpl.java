@@ -2,13 +2,8 @@ package org.openmrs.module.xdssender.api.cda.section.impl;
 
 import org.marc.everest.datatypes.SD;
 import org.marc.everest.datatypes.doc.StructDocElementNode;
-import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.AssignedAuthor;
-import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Author;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalStatement;
-import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Component4;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Entry;
-import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.EntryRelationship;
-import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Organizer;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Section;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntry;
 import org.openmrs.module.xdssender.api.cda.CdaDataUtil;
@@ -16,7 +11,6 @@ import org.openmrs.module.xdssender.api.cda.CdaTextUtil;
 import org.openmrs.module.xdssender.api.cda.section.SectionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -76,34 +70,10 @@ public abstract class SectionBuilderImpl implements SectionBuilder {
 		// Generate the text
 		retVal.setText(this.generateLevel3Text(retVal));
 		
-		// Minify authors
-		for (Entry ent : entries)
-			this.minifyAuthors(ent.getClinicalStatement(), retVal.getAuthor());
-		
 		return retVal;
 	}
 	
-	/**
-	 * Minify authors
-	 */
-	private void minifyAuthors(ClinicalStatement clinicalStatement, ArrayList<Author> author) {
-		
-		for (Author aut : clinicalStatement.getAuthor()) {
-			if (!this.cdaDataUtil.containsAuthor(author, aut))
-				author.add(aut);
-			aut.setAssignedAuthor(new AssignedAuthor(aut.getAssignedAuthor().getId()));
-			
-		}
-		
-		for (EntryRelationship er : clinicalStatement.getEntryRelationship())
-			this.minifyAuthors(er.getClinicalStatement(), author);
-		
-		if (clinicalStatement instanceof Organizer)
-			for (Component4 comp4 : ((Organizer) clinicalStatement).getComponent())
-				this.minifyAuthors(comp4.getClinicalStatement(), author);
-		
-	}
-	
+
 	protected CdaTextUtil getCdaTextUtil() {
 		return cdaTextUtil;
 	}

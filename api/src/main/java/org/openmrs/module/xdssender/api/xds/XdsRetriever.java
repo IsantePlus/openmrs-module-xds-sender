@@ -6,7 +6,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 import org.openmrs.module.xdssender.XdsSenderConfig;
@@ -16,14 +18,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 @Component("xdssender.XdsRetriever")
@@ -57,25 +57,13 @@ public class XdsRetriever {
 	}
 	
 	private SSLSocketFactory createSSLFactoryIgnoringCert() throws NoSuchAlgorithmException, KeyStoreException,
-	        KeyManagementException {
-
-		SSLContext sslContext = SSLContext.getInstance("SSL");
-
-		sslContext.init(null, new TrustManager[] { new X509TrustManager() {
-			public X509Certificate[] getAcceptedIssuers() {
-				return null;
+			KeyManagementException, UnrecoverableKeyException {
+		return new SSLSocketFactory(new TrustStrategy() {
+			@Override
+			public boolean isTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+				return true;
 			}
-
-			public void checkClientTrusted(X509Certificate[] certs,
-										   String authType) {
-			}
-
-			public void checkServerTrusted(X509Certificate[] certs,
-										   String authType) {
-			}
-		} }, new SecureRandom());
-
-		return new SSLSocketFactory(sslContext);
+		}, new AllowAllHostnameVerifier());
 	}
 	
 	private void interceptAuthorization(HttpGet httpGet) {
