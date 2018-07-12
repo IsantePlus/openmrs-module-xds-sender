@@ -28,6 +28,8 @@ public final class DocumentModel {
 
     private String typeCode;
 
+    private String typeCodeScheme;
+
     private byte[] data;
 
     private static Log log = LogFactory.getLog(DocumentModel.class);
@@ -54,15 +56,20 @@ public final class DocumentModel {
         return typeCode;
     }
 
+    public String getTypeCodeScheme() {
+        return typeCodeScheme;
+    }
+
     public byte[] getData() {
         return data;
     }
 
     public static DocumentModel createInstance(byte[] documentData) {
-        return createInstance(documentData, null, null, null);
+        return createInstance(documentData, null, null, null, (ClinicalDocument)null);
     }
 
-    public static DocumentModel createInstance(byte[] documentData, String typeCode, String formatCode, ClinicalDocument doc) {
+    public static DocumentModel createInstance(byte[] documentData, String typeCode, String typeCodeScheme,
+                                               String formatCode, ClinicalDocument doc) {
         InputStream in = null;
         try {
             in = new ByteArrayInputStream(documentData);
@@ -78,6 +85,7 @@ public final class DocumentModel {
             retVal.applyFormatting();
             log.error(retVal.html);
             retVal.typeCode = typeCode;
+            retVal.typeCodeScheme = typeCodeScheme;
             retVal.formatCode = formatCode;
             retVal.doc = doc;
             retVal.data = documentData;
@@ -90,9 +98,13 @@ public final class DocumentModel {
         }
     }
 
-    public static DocumentModel createInstance(byte[] documentData, String msg) {
+    public static DocumentModel createInstance(byte[] documentData, String typeCode, String typeCodeScheme,
+                                               String formatCode, String msg) {
         DocumentModel retVal = new DocumentModel();
         retVal.html = msg;
+        retVal.typeCode = typeCode;
+        retVal.typeCodeScheme = typeCodeScheme;
+        retVal.formatCode = formatCode;
         retVal.data = documentData;
         return retVal;
     }

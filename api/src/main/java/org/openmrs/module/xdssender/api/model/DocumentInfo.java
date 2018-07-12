@@ -51,6 +51,9 @@ public class DocumentInfo {
     // Class code
     private String classCode;
 
+    // Class code scheme
+    private String classCodeScheme;
+
     // Creation time
     private Date creationTime;
 
@@ -63,6 +66,7 @@ public class DocumentInfo {
 
         relatedEncounter = encounter;
         classCode = docModel.getTypeCode();
+        classCodeScheme = docModel.getTypeCodeScheme();
         formatCode = docModel.getFormatCode();
         creationTime = new Date();
         this.mimeType = mimeType;
@@ -236,6 +240,20 @@ public class DocumentInfo {
      */
     public void setClassCode(String classCode) {
         this.classCode = classCode;
+    }
+
+    /**
+     * @return the classCodeScheme
+     */
+    public String getClassCodeScheme() {
+        return classCodeScheme;
+    }
+
+    /**
+     * @param classCodeScheme the classCodeScheme to set
+     */
+    public void setClassCodeScheme(String classCodeScheme) {
+        this.classCodeScheme = classCodeScheme;
     }
 
     public String getTypeCode() {

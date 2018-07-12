@@ -2,14 +2,12 @@ package org.openmrs.module.xdssender.api.cda;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.marc.everest.datatypes.generic.CD;
 import org.marc.everest.formatters.xml.its1.XmlIts1Formatter;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalDocument;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Section;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.xdssender.XdsSenderConstants;
@@ -108,7 +106,8 @@ public class ClinicalDocumentBuilder {
 			XmlIts1Formatter formatter = EverestUtil.createFormatter();
 			formatter.graph(baos, doc);
 
-			return DocumentModel.createInstance(baos.toByteArray(), builder.getTypeCode(), builder.getFormatCode(), doc);
+			return DocumentModel.createInstance(baos.toByteArray(), builder.getTypeCode(),
+                XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, builder.getFormatCode(), doc);
 		} catch (Exception e) {
 			log.error("Error generating document:", e);
 			throw new RuntimeException(e);
