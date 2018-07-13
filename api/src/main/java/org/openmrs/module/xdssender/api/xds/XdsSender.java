@@ -14,30 +14,30 @@ import javax.xml.ws.BindingProvider;
 
 @Component("xdssender.XdsSender")
 public class XdsSender {
-	
-	@Autowired
-	private XdsSenderConfig config;
-	
-	@Autowired
-	private AuthenticationHandler authenticationHandler;
-	
-	@Autowired
-	private XdsDocumentMessageHandler xdsDocumentMessageHandler;
-	
-	public RegistryResponseType sendProvideAndRegister(ProvideAndRegisterDocumentSetRequestType request) {
-		
-		DocumentRepositoryPortTypeFactory.addHandler((BindingProvider) DocumentRepositoryPortTypeFactory
-		        .getDocumentRepositoryPortSoap12(config.getXdsRepositoryEndpoint()), authenticationHandler);
-		
-		DocumentRepositoryPortType port = DocumentRepositoryPortTypeFactory.getDocumentRepositoryPortSoap12(config
-		        .getXdsRepositoryEndpoint());
-		
-		DocumentRepositoryPortTypeFactory.addHandler((BindingProvider) port, xdsDocumentMessageHandler);
-		
-		((BindingProvider) port).getRequestContext().put(BindingProvider.USERNAME_PROPERTY,
-		    config.getXdsRepositoryUsername());
-		((BindingProvider) port).getRequestContext().put(BindingProvider.PASSWORD_PROPERTY,
-		    config.getXdsRepositoryPassword());
-		return port.documentRepositoryProvideAndRegisterDocumentSetB(request);
-	}
+
+    @Autowired
+    private XdsSenderConfig config;
+
+    @Autowired
+    private AuthenticationHandler authenticationHandler;
+
+    @Autowired
+    private XdsDocumentMessageHandler xdsDocumentMessageHandler;
+
+    public RegistryResponseType sendProvideAndRegister(ProvideAndRegisterDocumentSetRequestType request) {
+
+        DocumentRepositoryPortTypeFactory.addHandler((BindingProvider) DocumentRepositoryPortTypeFactory
+                .getDocumentRepositoryPortSoap12(config.getXdsRepositoryEndpoint()), authenticationHandler);
+
+        DocumentRepositoryPortType port = DocumentRepositoryPortTypeFactory.getDocumentRepositoryPortSoap12(config
+                .getXdsRepositoryEndpoint());
+
+        DocumentRepositoryPortTypeFactory.addHandler((BindingProvider) port, xdsDocumentMessageHandler);
+
+        ((BindingProvider) port).getRequestContext().put(BindingProvider.USERNAME_PROPERTY,
+                config.getXdsRepositoryUsername());
+        ((BindingProvider) port).getRequestContext().put(BindingProvider.PASSWORD_PROPERTY,
+                config.getXdsRepositoryPassword());
+        return port.documentRepositoryProvideAndRegisterDocumentSetB(request);
+    }
 }

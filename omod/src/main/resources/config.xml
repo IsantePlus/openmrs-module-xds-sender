@@ -1,213 +1,216 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <module configVersion="1.2">
-	
-	<!-- Base Module Properties -->
-	<id>${project.parent.artifactId}</id>
-	<name>${project.parent.name}</name>
-	<version>${project.parent.version}</version>
-	<package>org.openmrs.module.xdssender</package>
-	<author>SolDevelo</author>
-	<description>
-			${project.parent.description}
-	</description>
 
-	<activator>org.openmrs.module.xdssender.XdsSenderActivator</activator>
+    <!-- Base Module Properties -->
+    <id>${project.parent.artifactId}</id>
+    <name>${project.parent.name}</name>
+    <version>${project.parent.version}</version>
+    <package>org.openmrs.module.xdssender</package>
+    <author>SolDevelo</author>
+    <description>
+        ${project.parent.description}
+    </description>
 
-	<require_modules>
-		<require_module version="${eventVersion}">
-			org.openmrs.event
-		</require_module>
-	</require_modules>
-	
-	<!-- <updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL> -->
-	<!-- /Base Module Properties -->
-	
-	<require_version>2.0.5</require_version>
-	
-	<!-- Extensions -->
-	<extension>
-		<point>org.openmrs.admin.list</point>
-		<class>org.openmrs.module.xdssender.extension.html.AdminList</class>
-	</extension>
+    <activator>org.openmrs.module.xdssender.XdsSenderActivator</activator>
 
-	<aware_of_modules>
-		<aware_of_module>org.openmrs.module.legacyui</aware_of_module>
-		<aware_of_module>org.openmrs.event</aware_of_module>
-	</aware_of_modules>
+    <require_modules>
+        <require_module version="${eventVersion}">
+            org.openmrs.event
+        </require_module>
+        <require_module>
+            org.openmrs.module.labintegration
+        </require_module>
+    </require_modules>
 
+    <!-- <updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL> -->
+    <!-- /Base Module Properties -->
 
-	<globalProperty>
-		<property>xdssender.repositoryEndpoint</property>
-		<description>Specifies endpoint to XDS repository</description>
-	</globalProperty>
+    <require_version>2.0.5</require_version>
 
-	<globalProperty>
-		<property>xdssender.xdsrepository.username</property>
-		<description>Specifies username for authentication to XDS repository</description>
-	</globalProperty>
+    <!-- Extensions -->
+    <extension>
+        <point>org.openmrs.admin.list</point>
+        <class>org.openmrs.module.xdssender.extension.html.AdminList</class>
+    </extension>
 
-	<globalProperty>
-		<property>xdssender.xdsrepository.password</property>
-		<description>Specifies password for authentication to XDS repository</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.openmrs.username</property>
-		<description>Specifies username for authentication in OpenMRS</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.openmrs.password</property>
-		<description>Specifies password for authentication in OpenMRS</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.openmrs.provider.role.clinician</property>
-		<description>Specifies role for add provider to XDS documents</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.openmrs.provider.role.doctor</property>
-		<description>Specifies role for add provider to XDS documents</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.openmrs.moduleUsedToDetermineSoftwareVersion</property>
-		<defaultValue>isanteplusreports</defaultValue>
-		<description>Specifies the module name which will be used to determine the software version.</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.exportCcdEndpoint</property>
-		<defaultValue>https://sedish.net:8082/openmrs/ws/rest/exportccd/ccd</defaultValue>
-		<description>Specifies the export ccd module endpoint address (OpenSHR)</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.oshr.username</property>
-		<description>Specifies the OpenSHR username</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.oshr.password</property>
-		<description>Specifies the OpenSHR password</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.exportCcd.ignoreCerts</property>
-		<defaultValue>false</defaultValue>
-		<description>Determines if ccd downloading from OpenSHR should ignore certificates</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.ccd.errorHandler.implementation</property>
-		<defaultValue>outgoingmessageexceptions.CcdErrorHandlingService</defaultValue>
-		<description>
-			Specify a Spring bean name of CCD error handler service
-		</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.xdsB.errorHandler.implementation</property>
-		<defaultValue>outgoingmessageexceptions.XdsBErrorHandlingService</defaultValue>
-		<description>
-			Specify a Spring bean name of XDS.b error handler service
-		</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.pullNotificationsTaskInterval</property>
-		<defaultValue>3600</defaultValue>
-		<description>Interval time (in seconds) to execute pulling notifications from Pull Point task</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.notificationsPullPoint.username</property>
-		<description>Username to authorize int the Notifications Pull Point</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.notificationsPullPoint.password</property>
-		<description>Password to authorize int the Notifications Pull Point</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>xdssender.notificationsPullPoint.endpoint</property>
-		<description>Endpoint used to fetch Notifications from the Pull Point</description>
-	</globalProperty>
-
-	<!-- AOP
-	<advice>
-		<point>org.openmrs.api.FormService</point>
-		<class>@MODULE_PACKAGE@.advice.DuplicateFormAdvisor</class>
-	</advice>
-	 /AOP -->
-	
-	
-	<!-- Required Privileges 
-	<privilege>
-		<name>Form Entry</name>
-		<description>Allows user to access Form Entry pages/functions</description>
-	</privilege>
-	 /Required Privileges -->
+    <aware_of_modules>
+        <aware_of_module>org.openmrs.module.legacyui</aware_of_module>
+        <aware_of_module>org.openmrs.event</aware_of_module>
+    </aware_of_modules>
 
 
-	<!-- Required Global Properties 
-	<globalProperty>
-		<property>@MODULE_ID@.someProperty</property>
-		<defaultValue></defaultValue>
-		<description>
-			A description of the global property goes here.  The description
-			should explain enough for administrators to understand the purpose
-			and possible values for the global property.
-		</description>
-	</globalProperty>
-	/Required Global Properties -->
-	
-	<!--
-	<dwr>
-		<allow>
-			<create creator="new" javascript="DWRFormEntryService">
-				<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/>
-				<include method="enterForm"/>
-			</create>
-		</allow>
+    <globalProperty>
+        <property>xdssender.repositoryEndpoint</property>
+        <description>Specifies endpoint to XDS repository</description>
+    </globalProperty>
 
-		<signatures>
-			<![CDATA[
-			import @MODULE_PACKAGE@.web.DWRFormEntryService;
-			DWRFormEntryService.enterForm(Integer patientId, Integer formId, boolean useEncounter, List<String> fields);
-			]]>
-		</signatures>	
-	</dwr>
-	-->
-	
-	<!-- Servlets -->
-	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name> 
-	<servlet>
-		<servlet-name>formDownload</servlet-name>
-		<servlet-class>@MODULE_PACKAGE@.web.FormDownloadServlet</servlet-class>
-	</servlet>
-	-->
-	<!-- /Servlets -->
-	
-	
-	<!-- Internationalization -->
-	<!-- All message codes should start with @MODULE_ID@.* -->
-	<messages>
-		<lang>en</lang>
-		<file>messages.properties</file>
-	</messages>
-	<messages>
-		<lang>fr</lang>
-		<file>messages_fr.properties</file>
-	</messages>
-	<messages>
-		<lang>es</lang>
-		<file>messages_es.properties</file>
-	</messages>
-	<!-- /Internationalization -->
-	
+    <globalProperty>
+        <property>xdssender.xdsrepository.username</property>
+        <description>Specifies username for authentication to XDS repository</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.xdsrepository.password</property>
+        <description>Specifies password for authentication to XDS repository</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.openmrs.username</property>
+        <description>Specifies username for authentication in OpenMRS</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.openmrs.password</property>
+        <description>Specifies password for authentication in OpenMRS</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.openmrs.provider.role.clinician</property>
+        <description>Specifies role for add provider to XDS documents</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.openmrs.provider.role.doctor</property>
+        <description>Specifies role for add provider to XDS documents</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.openmrs.moduleUsedToDetermineSoftwareVersion</property>
+        <defaultValue>isanteplusreports</defaultValue>
+        <description>Specifies the module name which will be used to determine the software version.</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.exportCcdEndpoint</property>
+        <defaultValue>https://sedish.net:8082/openmrs/ws/rest/exportccd/ccd</defaultValue>
+        <description>Specifies the export ccd module endpoint address (OpenSHR)</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.oshr.username</property>
+        <description>Specifies the OpenSHR username</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.oshr.password</property>
+        <description>Specifies the OpenSHR password</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.exportCcd.ignoreCerts</property>
+        <defaultValue>false</defaultValue>
+        <description>Determines if ccd downloading from OpenSHR should ignore certificates</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.ccd.errorHandler.implementation</property>
+        <defaultValue>outgoingmessageexceptions.CcdErrorHandlingService</defaultValue>
+        <description>
+            Specify a Spring bean name of CCD error handler service
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.xdsB.errorHandler.implementation</property>
+        <defaultValue>outgoingmessageexceptions.XdsBErrorHandlingService</defaultValue>
+        <description>
+            Specify a Spring bean name of XDS.b error handler service
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.pullNotificationsTaskInterval</property>
+        <defaultValue>3600</defaultValue>
+        <description>Interval time (in seconds) to execute pulling notifications from Pull Point task</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.notificationsPullPoint.username</property>
+        <description>Username to authorize int the Notifications Pull Point</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.notificationsPullPoint.password</property>
+        <description>Password to authorize int the Notifications Pull Point</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>xdssender.notificationsPullPoint.endpoint</property>
+        <description>Endpoint used to fetch Notifications from the Pull Point</description>
+    </globalProperty>
+
+    <!-- AOP
+    <advice>
+        <point>org.openmrs.api.FormService</point>
+        <class>@MODULE_PACKAGE@.advice.DuplicateFormAdvisor</class>
+    </advice>
+     /AOP -->
+
+
+    <!-- Required Privileges
+    <privilege>
+        <name>Form Entry</name>
+        <description>Allows user to access Form Entry pages/functions</description>
+    </privilege>
+     /Required Privileges -->
+
+
+    <!-- Required Global Properties
+    <globalProperty>
+        <property>@MODULE_ID@.someProperty</property>
+        <defaultValue></defaultValue>
+        <description>
+            A description of the global property goes here.  The description
+            should explain enough for administrators to understand the purpose
+            and possible values for the global property.
+        </description>
+    </globalProperty>
+    /Required Global Properties -->
+
+    <!--
+    <dwr>
+        <allow>
+            <create creator="new" javascript="DWRFormEntryService">
+                <param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/>
+                <include method="enterForm"/>
+            </create>
+        </allow>
+
+        <signatures>
+            <![CDATA[
+            import @MODULE_PACKAGE@.web.DWRFormEntryService;
+            DWRFormEntryService.enterForm(Integer patientId, Integer formId, boolean useEncounter, List<String> fields);
+            ]]>
+        </signatures>
+    </dwr>
+    -->
+
+    <!-- Servlets -->
+    <!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name>
+    <servlet>
+        <servlet-name>formDownload</servlet-name>
+        <servlet-class>@MODULE_PACKAGE@.web.FormDownloadServlet</servlet-class>
+    </servlet>
+    -->
+    <!-- /Servlets -->
+
+
+    <!-- Internationalization -->
+    <!-- All message codes should start with @MODULE_ID@.* -->
+    <messages>
+        <lang>en</lang>
+        <file>messages.properties</file>
+    </messages>
+    <messages>
+        <lang>fr</lang>
+        <file>messages_fr.properties</file>
+    </messages>
+    <messages>
+        <lang>es</lang>
+        <file>messages_es.properties</file>
+    </messages>
+    <!-- /Internationalization -->
+
 </module>
 
