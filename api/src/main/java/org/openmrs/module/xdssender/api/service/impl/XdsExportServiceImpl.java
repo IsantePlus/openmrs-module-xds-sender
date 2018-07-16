@@ -7,7 +7,7 @@ import org.openmrs.Patient;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.cda.ClinicalDocumentBuilder;
-import org.openmrs.module.xdssender.api.cda.ORM_O01DocumentBuilder;
+import org.openmrs.module.xdssender.api.hl7.ORM_O01DocumentBuilder;
 import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
 import org.openmrs.module.xdssender.api.model.DocumentData;
 import org.openmrs.module.xdssender.api.model.DocumentInfo;
@@ -43,12 +43,12 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 					"text/xsl", config.getProviderRoot());
 			DocumentData clinicalDoc = new DocumentData(clinicalDocInfo, clinicalDocModel.getData());
 
-			DocumentData msgDoc = null;
-			DocumentModel msgDocModel = ormDocBuilder.buildDocument(encounter);
-			if (msgDocModel != null) {
-				DocumentInfo msgDocInfo = new DocumentInfo(encounter, patient, msgDocModel,
+			DocumentData labOrderDoc = null;
+			DocumentModel labOrderDocModel = ormDocBuilder.buildDocument(encounter);
+			if (labOrderDocModel != null) {
+				DocumentInfo labOrderDocInfo = new DocumentInfo(encounter, patient, labOrderDocModel,
 						"text/plain", config.getProviderRoot());
-				msgDoc = new DocumentData(msgDocInfo, msgDocModel.getData());
+				labOrderDoc = new DocumentData(labOrderDocInfo, labOrderDocModel.getData());
 			}
 
 			if (!messageUtil.getPatientIdentifier(clinicalDocInfo).getIdentifierType().getName().equals("ECID")) {
@@ -56,7 +56,7 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 			}
 
 			ProvideAndRegisterDocumentSetRequestType request = messageUtil.createProvideAndRegisterDocument(clinicalDoc,
-					msgDoc, encounter);
+					labOrderDoc, encounter);
 			RegistryResponseType response = xdsSender.sendProvideAndRegister(request);
 
 			if (!response.getStatus().contains("Success"))

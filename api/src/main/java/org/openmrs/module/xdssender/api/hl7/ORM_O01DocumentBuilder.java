@@ -1,4 +1,4 @@
-package org.openmrs.module.xdssender.api.cda;
+package org.openmrs.module.xdssender.api.hl7;
 
 import org.openmrs.Encounter;
 import org.openmrs.module.labintegration.api.hl7.OrderGeneratorManager;
