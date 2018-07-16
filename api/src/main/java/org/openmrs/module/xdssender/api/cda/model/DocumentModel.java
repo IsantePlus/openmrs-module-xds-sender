@@ -3,6 +3,7 @@ package org.openmrs.module.xdssender.api.cda.model;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Author;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.ClinicalDocument;
 
 import javax.xml.transform.Source;
@@ -15,6 +16,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class DocumentModel {
 	
@@ -25,6 +28,8 @@ public final class DocumentModel {
 	private String formatCode;
 	
 	private String typeCode;
+
+	private String typeCodeScheme;
 	
 	private byte[] data;
 	
@@ -48,16 +53,25 @@ public final class DocumentModel {
 	public String getTypeCode() {
 		return typeCode;
 	}
+
+	public String getTypeCodeScheme() {
+		return typeCodeScheme;
+	}
 	
 	public byte[] getData() {
 		return data;
 	}
-	
+
+	public List<Author> getAuthors() {
+		return doc != null ? doc.getAuthor() : new ArrayList<Author>();
+	}
+
 	public static DocumentModel createInstance(byte[] documentData) {
-		return createInstance(documentData, null, null, null);
+		return createInstance(documentData, null, null, null, (ClinicalDocument)null);
 	}
 	
-	public static DocumentModel createInstance(byte[] documentData, String typeCode, String formatCode, ClinicalDocument doc) {
+	public static DocumentModel createInstance(byte[] documentData, String typeCode, String typeCodeScheme,
+											   String formatCode, ClinicalDocument doc) {
 		InputStream in = null;
 		try {
 			in = new ByteArrayInputStream(documentData);
@@ -73,6 +87,7 @@ public final class DocumentModel {
 			retVal.applyFormatting();
 			log.error(retVal.html);
 			retVal.typeCode = typeCode;
+			retVal.typeCodeScheme = typeCodeScheme;
 			retVal.formatCode = formatCode;
 			retVal.doc = doc;
 			retVal.data = documentData;
@@ -85,6 +100,17 @@ public final class DocumentModel {
 		finally {
 			IOUtils.closeQuietly(in);
 		}
+	}
+
+	public static DocumentModel createInstance(byte[] documentData, String typeCode, String typeCodeScheme,
+											   String formatCode, String msg) {
+		DocumentModel retVal = new DocumentModel();
+		retVal.html = msg;
+		retVal.typeCode = typeCode;
+		retVal.typeCodeScheme = typeCodeScheme;
+		retVal.formatCode = formatCode;
+		retVal.data = documentData;
+		return retVal;
 	}
 	
 	public void applyFormatting() {

@@ -44,7 +44,7 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 		try {
 			DocumentModel docModel = docBuilder.buildDocument(patient, encounter);
 			
-			DocumentInfo docInfo = buildDocInfo(encounter, patient, docModel);
+			DocumentInfo docInfo = new DocumentInfo(encounter, patient, docModel, "text/xsl", config.getProviderRoot());
 			
 			if (!messageUtil.getPatientIdentifier(docInfo).getIdentifierType().getName().equals("ECID")) {
 				throw new Exception("Patient doesn't have ECID Identifier.");
@@ -62,29 +62,5 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-	
-	private DocumentInfo buildDocInfo(Encounter encounter, Patient patient, DocumentModel docModel) {
-		DocumentInfo docInfo = new DocumentInfo();
-		docInfo.setUniqueId(String.format("2.25.%s", UUID.randomUUID().getMostSignificantBits()).replaceAll("-", ""));
-		
-		docInfo.setRelatedEncounter(encounter);
-		
-		docInfo.setClassCode(docModel.getTypeCode());
-		docInfo.setFormatCode(docModel.getFormatCode());
-		docInfo.setCreationTime(new Date());
-		docInfo.setMimeType("text/xml");
-		docInfo.setPatient(patient);
-		
-		List<Provider> provs = new ArrayList<Provider>();
-		for (Author aut : docModel.getDoc().getAuthor()) {
-			// Load the author
-			for (II id : aut.getAssignedAuthor().getId())
-				if (id.getRoot() != null && id.getRoot().equals(config.getProviderRoot()))
-					provs.add(Context.getProviderService().getProvider(Integer.parseInt(id.getExtension())));
-		}
-		docInfo.setAuthors(provs);
-		
-		return docInfo;
 	}
 }
