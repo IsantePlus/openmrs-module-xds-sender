@@ -23,6 +23,7 @@ import org.openmrs.module.ModuleFactory;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.cda.CdaDataUtil;
+import org.openmrs.module.xdssender.api.model.DocumentData;
 import org.openmrs.module.xdssender.api.model.DocumentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,6 @@ import org.springframework.stereotype.Component;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,6 +45,14 @@ public class MessageUtil {
 	private static final String CODE_NATIONAL_NAME = "Code National";
 	
 	private static final String CODE_ST_NAME = "Code ST";
+
+	private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+	private static final String RIM_SOURCE = "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";
+
+	private static final String XDS_DOCUMENT_ENTRY_OBJECT_TYPE = "urn:uuid:7edca82f-054d-47f2-a032-9b2a5b5186c1";
+
+	private static final String OUTPATIENT_NOTE_LOINC = "34108-1";
 	
 	@Autowired
 	private CdaDataUtil cdaDataUtil;
@@ -54,9 +62,35 @@ public class MessageUtil {
 	
 	@Autowired
 	private XdsSenderConfig config;
+
+	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(DocumentData clinicalData,
+																					 DocumentData msgData,
+																					 Encounter encounter)
+			throws JAXBException {
+		// createProvideAndRegisterClinicalDocument can be replaced by methods used to generate the ORM_O01 message
+		ProvideAndRegisterDocumentSetRequestType result = createProvideAndRegisterClinicalDocument(
+				clinicalData.getDocumentContent(), clinicalData.getDocumentInfo(), encounter);
+
+		if (msgData != null) {
+			SubmitObjectsRequest registryRequest = result.getSubmitObjectsRequest();
+			String submissionSetId = "SubmissionSet02";
+			ExtrinsicObjectType msgOddRegistry = createExtrinsicObjectType(msgData.getDocumentInfo(), encounter);
+			registryRequest = addToRegistryRequest(registryRequest, msgData, msgOddRegistry,
+					submissionSetId, "cl02");
+			registryRequest = addAssociation(registryRequest, encounter,
+					getPatientIdentifier(msgData.getDocumentInfo()).getIdentifier(),
+					submissionSetId, "as02");
+			result = addDocToRequest(result, msgOddRegistry.getId(), msgData.getDocumentContent());
+			result.setSubmitObjectsRequest(registryRequest);
+		}
+
+		return result;
+	}
 	
-	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(byte[] documentContent,
-	        final DocumentInfo info, Encounter encounter) throws JAXBException, IOException {
+	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterClinicalDocument(byte[] documentContent,
+																							 final DocumentInfo info,
+																							 Encounter encounter)
+			throws JAXBException {
 		String patientId = getPatientIdentifier(info).getIdentifier();
 		String location = getPatientLocation(info).getName();
 		
@@ -297,5 +331,158 @@ public class MessageUtil {
 	
 	public Location getPatientLocation(DocumentInfo info) {
 		return info.getPatient().getPatientIdentifier().getLocation();
+	}
+
+	private ProvideAndRegisterDocumentSetRequestType addDocToRequest(ProvideAndRegisterDocumentSetRequestType requestType,
+																	 String oddRegId, byte[] docContent) {
+		ProvideAndRegisterDocumentSetRequestType.Document doc = new ProvideAndRegisterDocumentSetRequestType.Document();
+		doc.setId(oddRegId);
+		doc.setValue(docContent);
+
+		requestType.getDocument().add(doc);
+
+		return requestType;
+	}
+
+	private SubmitObjectsRequest addToRegistryRequest(SubmitObjectsRequest registryRequest, DocumentData docData,
+													  ExtrinsicObjectType docOddRegistry, final String registryPackageId,
+													  final String classificationId) throws JAXBException {
+		RegistryPackageType msgRegistryPackage = generateRegistryPackageType(docData.getDocumentInfo(), registryPackageId);
+		registryRequest
+				.getRegistryObjectList()
+				.getIdentifiable()
+				.add(new JAXBElement<ExtrinsicObjectType>(new QName(RIM_SOURCE,
+						"ExtrinsicObject"), ExtrinsicObjectType.class, docOddRegistry));
+		registryRequest
+				.getRegistryObjectList()
+				.getIdentifiable()
+				.add(new JAXBElement<RegistryPackageType>(new QName(RIM_SOURCE,
+						"RegistryPackage"), RegistryPackageType.class, msgRegistryPackage));
+		// Add classification for the submission set
+		registryRequest
+				.getRegistryObjectList()
+				.getIdentifiable()
+				.add(new JAXBElement<ClassificationType>(new QName(RIM_SOURCE,
+						"Classification"), ClassificationType.class, new ClassificationType() {
+					{
+						setId(classificationId);
+						setClassifiedObject(registryPackageId);
+						setClassificationNode(XDSConstants.UUID_XDSSubmissionSet);
+					}
+				}));
+
+		return registryRequest;
+	}
+
+	private RegistryPackageType generateRegistryPackageType(DocumentInfo info, String registryPackageId)
+			throws JAXBException {
+		String patientId = getPatientIdentifier(info).getIdentifier();
+		TS now = TS.now();
+		now.setDateValuePrecision(TS.SECONDNOTIMEZONE);
+
+		RegistryPackageType regPackage = new RegistryPackageType();
+		regPackage.setId(registryPackageId);
+		InfosetUtil.addOrOverwriteSlot(regPackage, XDSConstants.SLOT_NAME_SUBMISSION_TIME, now.getValue());
+
+		xdsUtil.addCodedValueClassification(regPackage, XDSConstants.UUID_XDSSubmissionSet_contentTypeCode,
+				info.getClassCode(), info.getClassCodeScheme(), "XDSSubmissionSet.contentTypeCode");
+		// Submission set external identifiers
+		xdsUtil.addExtenalIdentifier(regPackage, XDSConstants.UUID_XDSSubmissionSet_uniqueId,
+				String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
+				"XDSSubmissionSet.uniqueId");
+		xdsUtil.addExtenalIdentifier(regPackage, XDSConstants.UUID_XDSSubmissionSet_sourceId,
+				String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
+				"XDSSubmissionSet.sourceId");
+		xdsUtil.addExtenalIdentifier(regPackage, XDSConstants.UUID_XDSSubmissionSet_patientId,
+				String.format("%s^^^%s&%s&NI", patientId, config.getEcidRoot(), config.getEcidRoot()),
+				"XDSSubmissionSet.patientId");
+
+		return regPackage;
+	}
+
+	private SubmitObjectsRequest addAssociation(SubmitObjectsRequest registryRequest, Encounter encounter,
+												String patientId, String registryPackageId,
+												String associationId) throws JAXBException {
+		AssociationType1 association = new AssociationType1();
+		association.setId(associationId);
+		association.setAssociationType(XDSConstants.HAS_MEMBER);
+		association.setSourceObject(registryPackageId);
+		association.setTargetObject(encounter.getLocation().getUuid() + "/" + patientId + "/"
+				+ encounter.getEncounterType().getUuid() + "/" + encounter.getForm().getUuid() + "/"
+				+ FORMAT.format(encounter.getEncounterDatetime()));
+		InfosetUtil.addOrOverwriteSlot(association, XDSConstants.SLOT_NAME_SUBMISSIONSET_STATUS, "Original");
+		registryRequest
+				.getRegistryObjectList()
+				.getIdentifiable()
+				.add(new JAXBElement<AssociationType1>(
+						new QName(RIM_SOURCE, "Association"), AssociationType1.class,
+						association));
+
+		return registryRequest;
+	}
+
+	private ExtrinsicObjectType createExtrinsicObjectType(DocumentInfo info, Encounter encounter) throws JAXBException {
+		String patientId = getPatientIdentifier(info).getIdentifier();
+		String location = getPatientLocation(info).getName();
+
+		ExtrinsicObject extrinsicObject = new ExtrinsicObject(patientId, location);
+		extrinsicObject.setId(encounter);
+		extrinsicObject.setContentVersionInfo(config.getModuleUsedToDetermineSoftwareVersion());
+
+		// Get the earliest time something occurred and the latest
+		Date lastEncounter = encounter.getEncounterDatetime(), firstEncounter = encounter.getEncounterDatetime();
+		if (info.getRelatedEncounter() != null)
+			for (Obs el : info.getRelatedEncounter().getObs()) {
+				if (el.getObsDatetime().before(firstEncounter))
+					firstEncounter = el.getEncounter().getVisit().getStartDatetime();
+				if (lastEncounter != null && el.getObsDatetime().after(lastEncounter))
+					lastEncounter = el.getEncounter().getEncounterDatetime();
+			}
+
+		TS firstEncounterTs = cdaDataUtil.createTS(firstEncounter);
+		TS lastEncounterTs = cdaDataUtil.createTS(lastEncounter);
+		extrinsicObject.addOrOverwriteSlot(firstEncounterTs, lastEncounterTs);
+
+		extrinsicObject.setObjectType(XDS_DOCUMENT_ENTRY_OBJECT_TYPE);
+
+		// Add source patient information
+		PatientIdentifier nationalIdentifier = getNationalPatientIdentifier(info);
+		PatientIdentifier siteIdentifier = getSitePatientIdentifier(info);
+		TS patientDob = cdaDataUtil.createTS(info.getPatient().getBirthdate());
+		patientDob.setDateValuePrecision(TS.DAY);
+		extrinsicObject.addSourcePatientInformation(info, nationalIdentifier, siteIdentifier, config, patientDob);
+
+		addUniqueIdentifier(extrinsicObject, patientId);
+
+		setClassifications(extrinsicObject, info);
+
+		extrinsicObject.addAuthor(info, config);
+
+		return extrinsicObject;
+	}
+
+	private void addUniqueIdentifier(ExtrinsicObjectType extrinsicObject, String patientId) throws JAXBException {
+		xdsUtil.addExtenalIdentifier(extrinsicObject, XDSConstants.UUID_XDSDocumentEntry_uniqueId,
+				String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
+				"XDSDocumentEntry.uniqueId");
+		xdsUtil.addExtenalIdentifier(extrinsicObject, XDSConstants.UUID_XDSDocumentEntry_patientId,
+				String.format("%s^^^%s&%s&NI", patientId, config.getEcidRoot(), config.getEcidRoot()),
+				"XDSDocumentEntry.patientId");
+	}
+
+	private void setClassifications(ExtrinsicObjectType extrinsicObject, DocumentInfo info) throws JAXBException {
+		xdsUtil.addCodedValueClassification(extrinsicObject, XDSConstants.UUID_XDSDocumentEntry_classCode,
+				info.getClassCode(), info.getClassCodeScheme(), "XDSDocumentEntry.classCode");
+		xdsUtil.addCodedValueClassification(extrinsicObject, XDSConstants.UUID_XDSDocumentEntry_confidentialityCode,
+				"1.3.6.1.4.1.21367.2006.7.101", "Connect-a-thon confidentialityCodes", "XDSDocumentEntry.confidentialityCode");
+		xdsUtil.addCodedValueClassification(extrinsicObject, XDSConstants.UUID_XDSDocumentEntry_formatCode,
+				info.getFormatCode(), "Connect-a-thon formatCodes", "XDSDocumentEntry.formatCode");
+		xdsUtil.addCodedValueClassification(extrinsicObject,
+				XDSConstants.UUID_XDSDocumentEntry_healthCareFacilityTypeCode, "Outpatient",
+				"Connect-a-thon healthcareFacilityTypeCodes", "XDSDocumentEntry.healthCareFacilityTypeCode");
+		xdsUtil.addCodedValueClassification(extrinsicObject, XDSConstants.UUID_XDSDocumentEntry_practiceSettingCode,
+				"General Medicine", "Connect-a-thon practiceSettingCodes", "UUID_XDSDocumentEntry.practiceSettingCode");
+		xdsUtil.addCodedValueClassification(extrinsicObject, XDSConstants.UUID_XDSDocumentEntry_typeCode,
+				OUTPATIENT_NOTE_LOINC, "LOINC", "XDSDocumentEntry.typeCode");
 	}
 }
