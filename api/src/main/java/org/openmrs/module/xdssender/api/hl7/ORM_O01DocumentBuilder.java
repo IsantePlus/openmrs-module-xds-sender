@@ -20,8 +20,8 @@ public class ORM_O01DocumentBuilder {
     private static final String FORMAT_CODE = "HL7/Lab 2.5";
 
     // @see https://wiki.ihe.net/index.php/XDS_classCode_Metadata_Coding_System
-    private static final String CLASS_CODE = "PRESCRIPTIONS";
-    private static final String CLASS_CODE_SCHEME = "XDS Class Code";
+    private static final String CLASS_CODE = "34133-9";
+    private static final String CLASS_CODE_SCHEME = "LOINC";
 
     @Autowired
     private OrderGeneratorManager orderGeneratorManager;
