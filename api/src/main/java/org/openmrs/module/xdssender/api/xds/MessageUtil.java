@@ -109,9 +109,9 @@ public class MessageUtil {
 		if (encounter.getForm() == null) {
 			throw new RuntimeException("Cannot send encounter without formId");
 		}
-		oddRegistryObject.setId(info.getUniqueId() + "/" + encounter.getLocation().getUuid() + "/" + patientId + "/"
+		oddRegistryObject.setId(encounter.getLocation().getUuid() + "/" + patientId + "/"
 		        + encounter.getEncounterType().getUuid() + "/" + encounter.getForm().getUuid() + "/"
-		        + format.format(encounter.getEncounterDatetime()));
+		        + format.format(encounter.getEncounterDatetime()) + "/" + info.getUniqueId());
 		oddRegistryObject.setMimeType("text/xml");
 		
 		//software version
@@ -245,9 +245,9 @@ public class MessageUtil {
 		association.setId("as01");
 		association.setAssociationType(XDSConstants.HAS_MEMBER);
 		association.setSourceObject(SUBMITION_SET_ID);
-		association.setTargetObject(info.getUniqueId() + "/" + encounter.getLocation().getUuid() + "/" + patientId + "/"
+		association.setTargetObject(encounter.getLocation().getUuid() + "/" + patientId + "/"
 		        + encounter.getEncounterType().getUuid() + "/" + encounter.getForm().getUuid() + "/"
-		        + format.format(encounter.getEncounterDatetime()));
+		        + format.format(encounter.getEncounterDatetime()) + "/" + info.getUniqueId());
 		InfosetUtil.addOrOverwriteSlot(association, XDSConstants.SLOT_NAME_SUBMISSIONSET_STATUS, "Original");
 		registryRequest
 		        .getRegistryObjectList()

@@ -44,9 +44,9 @@ public class ExtrinsicObject extends ExtrinsicObjectType {
         if (encounter.getForm() == null) {
             throw new RuntimeException("Cannot send encounter without formId");
         }
-        this.setId(info.getUniqueId() + "/" + encounter.getLocation().getUuid() + "/" + patientId + "/"
+        this.setId(encounter.getLocation().getUuid() + "/" + patientId + "/"
                 + encounter.getEncounterType().getUuid() + "/" + encounter.getForm().getUuid() + "/"
-                + DATE_FORMAT.format(encounter.getEncounterDatetime()));
+                + DATE_FORMAT.format(encounter.getEncounterDatetime()) + "/" + info.getUniqueId());
     }
 
     public void setContentVersionInfo(String version) {
