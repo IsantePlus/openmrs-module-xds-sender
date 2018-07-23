@@ -26,8 +26,6 @@ import java.util.UUID;
 
 public class ExtrinsicObject extends ExtrinsicObjectType {
 
-    protected String MIME_TYPE = "text/xml";
-
     protected String SOFTWARE_VERSION_COMMENT = "Software Version";
 
     protected static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -42,14 +40,13 @@ public class ExtrinsicObject extends ExtrinsicObjectType {
         this.location = location;
     }
 
-    public void setId(Encounter encounter) throws RuntimeException {
+    public void setId(Encounter encounter, DocumentInfo info) throws RuntimeException {
         if (encounter.getForm() == null) {
             throw new RuntimeException("Cannot send encounter without formId");
         }
         this.setId(encounter.getLocation().getUuid() + "/" + patientId + "/"
                 + encounter.getEncounterType().getUuid() + "/" + encounter.getForm().getUuid() + "/"
-                + DATE_FORMAT.format(encounter.getEncounterDatetime()));
-        this.setMimeType(MIME_TYPE);
+                + DATE_FORMAT.format(encounter.getEncounterDatetime()) + "/" + info.getUniqueId());
     }
 
     public void setContentVersionInfo(String version) {
