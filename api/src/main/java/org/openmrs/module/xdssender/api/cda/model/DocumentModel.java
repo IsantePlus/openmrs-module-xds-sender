@@ -32,6 +32,8 @@ public final class DocumentModel {
 	private String typeCodeScheme;
 	
 	private byte[] data;
+
+	private List<Author> authors;
 	
 	private static Log log = LogFactory.getLog(DocumentModel.class);
 	
@@ -63,7 +65,7 @@ public final class DocumentModel {
 	}
 
 	public List<Author> getAuthors() {
-		return doc != null ? doc.getAuthor() : new ArrayList<Author>();
+		return authors != null ? authors : new ArrayList<Author>();
 	}
 
 	public static DocumentModel createInstance(byte[] documentData) {
@@ -91,6 +93,7 @@ public final class DocumentModel {
 			retVal.formatCode = formatCode;
 			retVal.doc = doc;
 			retVal.data = documentData;
+			retVal.authors = doc.getAuthor();
 			return retVal;
 		}
 		catch (TransformerException e) {
@@ -103,13 +106,14 @@ public final class DocumentModel {
 	}
 
 	public static DocumentModel createInstance(byte[] documentData, String typeCode, String typeCodeScheme,
-											   String formatCode, String msg) {
+											   String formatCode, String msg, List<Author> authors) {
 		DocumentModel retVal = new DocumentModel();
 		retVal.html = msg;
 		retVal.typeCode = typeCode;
 		retVal.typeCodeScheme = typeCodeScheme;
 		retVal.formatCode = formatCode;
 		retVal.data = documentData;
+		retVal.authors = authors;
 		return retVal;
 	}
 	
