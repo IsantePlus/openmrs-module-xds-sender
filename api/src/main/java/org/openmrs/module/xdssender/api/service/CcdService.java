@@ -11,10 +11,13 @@ public interface CcdService {
 	
 	@Transactional(readOnly = true)
 	Ccd getLocallyStoredCcd(Patient patient);
-	
+
+	@Transactional
+	String getHtmlParsedLocallyStoredCcd(Patient patient);
+
 	@Transactional
 	Ccd downloadAndSaveCcd(Patient patient) throws XDSException;
-	
+
 	@Transactional(readOnly = true)
 	void downloadCcdAsPDF(OutputStream stream, Patient patient);
 }

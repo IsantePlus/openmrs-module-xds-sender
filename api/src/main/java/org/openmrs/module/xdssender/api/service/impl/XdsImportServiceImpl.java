@@ -39,6 +39,7 @@ public class XdsImportServiceImpl implements XdsImportService {
 		Ccd ccd = null;
 		
 		String patientEcid = extractPatientEcid(patient);
+
 		CcdHttpResult result = xdsRetriever.sendRetrieveCCD(patientEcid);
 
 		if (result.inError()) {

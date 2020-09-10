@@ -17,6 +17,10 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
+			<artifactId>fhir2-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
 			<artifactId>labintegration-api</artifactId>
 		</dependency>
 		<dependency>
@@ -43,14 +47,6 @@
 			<groupId>org.openmrs.web</groupId>
 			<artifactId>openmrs-web</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-		</dependency>
 
 		<!-- DCM4CHEE modules (for JAX-b classes and InfoSetUtil) -->
 		<dependency>
@@ -72,9 +68,30 @@
 			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>javax.xml.ws</groupId>
+			<artifactId>jaxws-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.messaging.saaj</groupId>
+			<artifactId>saaj-impl</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-ws-core</artifactId>
 		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>ca.uhn.hapi.fhir</groupId>-->
+<!--			<artifactId>hapi-fhir-base</artifactId>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>ca.uhn.hapi.fhir</groupId>-->
+<!--			<artifactId>hapi-fhir-client</artifactId>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>ca.uhn.hapi.fhir</groupId>-->
+<!--			<artifactId>hapi-fhir-structures-r4</artifactId>-->
+<!--		</dependency>-->
+
 	</dependencies>
 
 	<build>
@@ -102,6 +119,14 @@
 							<url>http://docs.oasis-open.org/wsn/brw-2.wsdl</url>
 						</schema>
 					</schemas>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>8</source>
+					<target>8</target>
 				</configuration>
 			</plugin>
 		</plugins>
