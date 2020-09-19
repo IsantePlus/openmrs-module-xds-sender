@@ -26,6 +26,21 @@ public final class XdsUtil {
     private XdsSenderConfig config;
 
     public String parseCcdToHtml(Bundle resource, File ccdTemplate) throws IOException, ClassNotFoundException {
+//        TODO Find a better way to filter the obs of interest
+        List<String> codes = new ArrayList<String>(){{
+            add("5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Diastolic BP
+            add("8462-4");//Diastolic BP
+            add("5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Systolic BP
+            add("8480-6");//Diastolic BP
+            add("5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Height
+            add("8302-2");
+            add("5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Weight
+            add("3141-9");
+            add("5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Pulse
+            add("8867-4");
+            add("5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Temperature
+            add("8310-5");
+        }};
 
         Map<String, Object> ccdStringMap = new HashMap<>();
         List<Bundle.BundleEntryComponent> entry = resource.getEntry();
@@ -49,9 +64,12 @@ public final class XdsUtil {
                     break;
                 }
                 case "Observation": {
-//                    TODO - Rework all the mappings from Observations
-                    VitalSign vitalSign = mapObservationResource(ccdStringMap, (Observation) eResource);
-                    vitalSigns.add(vitalSign);
+//                    TODO - Rework all the mappings from Observations- limiting the fetch to height,weight,temp,pulse,BP(both systolic and diastolic)
+                    Observation obs = (Observation) eResource;
+                    if(codes.contains(obs.getCode().getCodingFirstRep().getCode())){
+                        VitalSign vitalSign = mapObservationResource(ccdStringMap, obs);
+                        vitalSigns.add(vitalSign);
+                    }
                     break;
                 }
                 case "Encounter": {
@@ -414,86 +432,86 @@ public final class XdsUtil {
     }
 
     private class MedicationPrescription {
-    	private String identifier,status,intent,category,authoredOn,requester,reasonCode,dosage;
+        private String identifier,status,intent,category,authoredOn,requester,reasonCode,dosage;
 
-		public MedicationPrescription(MedicationRequest medicationRequest) {
-		}
+        public MedicationPrescription(MedicationRequest medicationRequest) {
+        }
 
-		public MedicationPrescription(String identifier, String status, String intent, String category, String authoredOn, String requester, String reasonCode, String dosage) {
-			this.identifier = identifier;
-			this.status = status;
-			this.intent = intent;
-			this.category = category;
-			this.authoredOn = authoredOn;
-			this.requester = requester;
-			this.reasonCode = reasonCode;
-			this.dosage = dosage;
-		}
+        public MedicationPrescription(String identifier, String status, String intent, String category, String authoredOn, String requester, String reasonCode, String dosage) {
+            this.identifier = identifier;
+            this.status = status;
+            this.intent = intent;
+            this.category = category;
+            this.authoredOn = authoredOn;
+            this.requester = requester;
+            this.reasonCode = reasonCode;
+            this.dosage = dosage;
+        }
 
-		public String getIdentifier() {
-			return identifier;
-		}
+        public String getIdentifier() {
+            return identifier;
+        }
 
-		public void setIdentifier(String identifier) {
-			this.identifier = identifier;
-		}
+        public void setIdentifier(String identifier) {
+            this.identifier = identifier;
+        }
 
-		public String getStatus() {
-			return status;
-		}
+        public String getStatus() {
+            return status;
+        }
 
-		public void setStatus(String status) {
-			this.status = status;
-		}
+        public void setStatus(String status) {
+            this.status = status;
+        }
 
-		public String getIntent() {
-			return intent;
-		}
+        public String getIntent() {
+            return intent;
+        }
 
-		public void setIntent(String intent) {
-			this.intent = intent;
-		}
+        public void setIntent(String intent) {
+            this.intent = intent;
+        }
 
-		public String getCategory() {
-			return category;
-		}
+        public String getCategory() {
+            return category;
+        }
 
-		public void setCategory(String category) {
-			this.category = category;
-		}
+        public void setCategory(String category) {
+            this.category = category;
+        }
 
-		public String getAuthoredOn() {
-			return authoredOn;
-		}
+        public String getAuthoredOn() {
+            return authoredOn;
+        }
 
-		public void setAuthoredOn(String authoredOn) {
-			this.authoredOn = authoredOn;
-		}
+        public void setAuthoredOn(String authoredOn) {
+            this.authoredOn = authoredOn;
+        }
 
-		public String getRequester() {
-			return requester;
-		}
+        public String getRequester() {
+            return requester;
+        }
 
-		public void setRequester(String requester) {
-			this.requester = requester;
-		}
+        public void setRequester(String requester) {
+            this.requester = requester;
+        }
 
-		public String getReasonCode() {
-			return reasonCode;
-		}
+        public String getReasonCode() {
+            return reasonCode;
+        }
 
-		public void setReasonCode(String reasonCode) {
-			this.reasonCode = reasonCode;
-		}
+        public void setReasonCode(String reasonCode) {
+            this.reasonCode = reasonCode;
+        }
 
-		public String getDosage() {
-			return dosage;
-		}
+        public String getDosage() {
+            return dosage;
+        }
 
-		public void setDosage(String dosage) {
-			this.dosage = dosage;
-		}
-	}
+        public void setDosage(String dosage) {
+            this.dosage = dosage;
+        }
+    }
 
     private class Medication {
         private String medication, brandName, startDate, productForm, dose, route, adminInstructions, pharmInstructions, status, indications, reaction, description, dataSource;
@@ -684,91 +702,91 @@ public final class XdsUtil {
     }
 
     private class Immunization {
-    	private String identifier,status,vaccineCode,occurrenceDate,manufacturer,lotNumber,site,route,doesQuantity,note;
+        private String identifier,status,vaccineCode,occurrenceDate,manufacturer,lotNumber,site,route,doesQuantity,note;
 
-		public Immunization(org.hl7.fhir.r4.model.Immunization immunization) {
-		}
+        public Immunization(org.hl7.fhir.r4.model.Immunization immunization) {
+        }
 
-		public String getIdentifier() {
-			return identifier;
-		}
+        public String getIdentifier() {
+            return identifier;
+        }
 
-		public void setIdentifier(String identifier) {
-			this.identifier = identifier;
-		}
+        public void setIdentifier(String identifier) {
+            this.identifier = identifier;
+        }
 
-		public String getStatus() {
-			return status;
-		}
+        public String getStatus() {
+            return status;
+        }
 
-		public void setStatus(String status) {
-			this.status = status;
-		}
+        public void setStatus(String status) {
+            this.status = status;
+        }
 
-		public String getVaccineCode() {
-			return vaccineCode;
-		}
+        public String getVaccineCode() {
+            return vaccineCode;
+        }
 
-		public void setVaccineCode(String vaccineCode) {
-			this.vaccineCode = vaccineCode;
-		}
+        public void setVaccineCode(String vaccineCode) {
+            this.vaccineCode = vaccineCode;
+        }
 
-		public String getOccurrenceDate() {
-			return occurrenceDate;
-		}
+        public String getOccurrenceDate() {
+            return occurrenceDate;
+        }
 
-		public void setOccurrenceDate(String occurrenceDate) {
-			this.occurrenceDate = occurrenceDate;
-		}
+        public void setOccurrenceDate(String occurrenceDate) {
+            this.occurrenceDate = occurrenceDate;
+        }
 
-		public String getManufacturer() {
-			return manufacturer;
-		}
+        public String getManufacturer() {
+            return manufacturer;
+        }
 
-		public void setManufacturer(String manufacturer) {
-			this.manufacturer = manufacturer;
-		}
+        public void setManufacturer(String manufacturer) {
+            this.manufacturer = manufacturer;
+        }
 
-		public String getLotNumber() {
-			return lotNumber;
-		}
+        public String getLotNumber() {
+            return lotNumber;
+        }
 
-		public void setLotNumber(String lotNumber) {
-			this.lotNumber = lotNumber;
-		}
+        public void setLotNumber(String lotNumber) {
+            this.lotNumber = lotNumber;
+        }
 
-		public String getSite() {
-			return site;
-		}
+        public String getSite() {
+            return site;
+        }
 
-		public void setSite(String site) {
-			this.site = site;
-		}
+        public void setSite(String site) {
+            this.site = site;
+        }
 
-		public String getRoute() {
-			return route;
-		}
+        public String getRoute() {
+            return route;
+        }
 
-		public void setRoute(String route) {
-			this.route = route;
-		}
+        public void setRoute(String route) {
+            this.route = route;
+        }
 
-		public String getDoesQuantity() {
-			return doesQuantity;
-		}
+        public String getDoesQuantity() {
+            return doesQuantity;
+        }
 
-		public void setDoesQuantity(String doesQuantity) {
-			this.doesQuantity = doesQuantity;
-		}
+        public void setDoesQuantity(String doesQuantity) {
+            this.doesQuantity = doesQuantity;
+        }
 
-		public String getNote() {
-			return note;
-		}
+        public String getNote() {
+            return note;
+        }
 
-		public void setNote(String note) {
-			this.note = note;
-		}
-	}
+        public void setNote(String note) {
+            this.note = note;
+        }
+    }
 
     private class ProcedureRequest {
 
@@ -777,24 +795,24 @@ public final class XdsUtil {
     private class Procedure {
 
 
-		public Procedure(org.hl7.fhir.r4.model.Procedure procedure) {
+        public Procedure(org.hl7.fhir.r4.model.Procedure procedure) {
 
-		}
-	}
+        }
+    }
 
     private class Condition {
-		//Problems, Conditions, and Diagnoses
-		public Condition(org.hl7.fhir.r4.model.Condition condition) {
+        //Problems, Conditions, and Diagnoses
+        public Condition(org.hl7.fhir.r4.model.Condition condition) {
 
-		}
+        }
 
     }
 
     private class DiagnosticReport {
-		//findings and interpretation of diagnostic tests performed on patients
-		public DiagnosticReport(org.hl7.fhir.r4.model.DiagnosticReport diagnosticReport) {
+        //findings and interpretation of diagnostic tests performed on patients
+        public DiagnosticReport(org.hl7.fhir.r4.model.DiagnosticReport diagnosticReport) {
 
-		}
+        }
 
     }
 
