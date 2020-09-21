@@ -62,16 +62,17 @@ public class CcdServiceImpl implements CcdService {
         Bundle resource = (Bundle) fhirContext.newJsonParser().parseResource(ccdString);
         File ccdTemplate = new File(OpenmrsUtil.getApplicationDataDirectory(), "ccdTemplate.txt");
         String ccdFormedString = null;
-        if (!ccdTemplate.exists()) {
-            try {
+        try {
+            if (!ccdTemplate.exists()) {
                 ccdTemplate.createNewFile();
-                ccdFormedString = xdsUtil.parseCcdToHtml(resource,ccdTemplate);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
             }
+            ccdFormedString = xdsUtil.parseCcdToHtml(resource, ccdTemplate);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
+
         return ccdFormedString;
     }
 

@@ -26,8 +26,24 @@ public final class XdsUtil {
     private XdsSenderConfig config;
 
     public String parseCcdToHtml(Bundle resource, File ccdTemplate) throws IOException, ClassNotFoundException {
+//        TODO Find a better way to filter the obs of interest
+        List<String> codes = new ArrayList<String>() {{
+            add("5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Diastolic BP
+            add("8462-4");//Diastolic BP
+            add("5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Systolic BP
+            add("8480-6");//Diastolic BP
+            add("5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Height
+            add("8302-2");
+            add("5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Weight
+            add("3141-9");
+            add("5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Pulse
+            add("8867-4");
+            add("5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Temperature
+            add("8310-5");
+        }};
 
         Map<String, Object> ccdStringMap = new HashMap<>();
+        ccdStringMap.put("createdDate",resource.getMeta().getLastUpdated().toString());
         List<Bundle.BundleEntryComponent> entry = resource.getEntry();
         List<VitalSign> vitalSigns = new ArrayList<>();
         List<CcdEncounter> encounters = new ArrayList<>();
@@ -37,6 +53,7 @@ public final class XdsUtil {
         List<ProcedureRequest> procedureRequests = new ArrayList<>();
         List<Procedure> procedures = new ArrayList<>();
         List<DiagnosticReport> diagnosticReports = new ArrayList<>();
+        List<InsuranceCoverage> coverages = new ArrayList<>();
         List<Condition> conditions = new ArrayList<>();
         List<AllergyIntolerance> intolerances = new ArrayList<>();
 //		process the resource entries individually and push them to the template
@@ -49,9 +66,12 @@ public final class XdsUtil {
                     break;
                 }
                 case "Observation": {
-//                    TODO - Rework all the mappings from Observations
-                    VitalSign vitalSign = mapObservationResource(ccdStringMap, (Observation) eResource);
-                    vitalSigns.add(vitalSign);
+//                    TODO - Rework all the mappings from Observations- limiting the fetch to height,weight,temp,pulse,BP(both systolic and diastolic)
+                    Observation obs = (Observation) eResource;
+//                    System.out.println("Processing Obs:====> "+obs.getCode().getCodingFirstRep().getDisplay());
+                    if (codes.contains(obs.getCode().getCodingFirstRep().getCode())) {
+                        vitalSigns.add(mapObservationResource(obs));
+                    }
                     break;
                 }
                 case "Encounter": {
@@ -60,22 +80,22 @@ public final class XdsUtil {
                     break;
                 }
                 case "AllergyIntolerance": {
-                    AllergyIntolerance allergyIntolerance = mapAllergyIntoleranceResource(ccdStringMap, (org.hl7.fhir.r4.model.AllergyIntolerance) eResource);
+                    AllergyIntolerance allergyIntolerance = mapAllergyIntoleranceResource((org.hl7.fhir.r4.model.AllergyIntolerance) eResource);
                     intolerances.add(allergyIntolerance);
                     break;
                 }
                 case "MedicationRequest": {
-                    MedicationPrescription medicationRequest = mapPrescriptionResource(ccdStringMap, (org.hl7.fhir.r4.model.MedicationRequest) eResource);
+                    MedicationPrescription medicationRequest = mapPrescriptionResource( (org.hl7.fhir.r4.model.MedicationRequest) eResource);
                     medicationPrescriptions.add(medicationRequest);
                     break;
                 }
                 case "Medication": {
-                    Medication medication = mapMedicationResource(ccdStringMap, (org.hl7.fhir.r4.model.Medication) eResource);
+                    Medication medication = mapMedicationResource((org.hl7.fhir.r4.model.Medication) eResource);
                     medications.add(medication);
                     break;
                 }
                 case "Immunization": {
-                    Immunization medication = mapImmunizationResource(ccdStringMap, (org.hl7.fhir.r4.model.Immunization) eResource);
+                    Immunization medication = mapImmunizationResource((org.hl7.fhir.r4.model.Immunization) eResource);
                     immunizations.add(medication);
                     break;
                 }
@@ -85,22 +105,29 @@ public final class XdsUtil {
 //                    break;
                 }
                 case "Procedure": {
-                    Procedure procedure = mapProcedureResource(ccdStringMap, (org.hl7.fhir.r4.model.Procedure) eResource);
+                    Procedure procedure = mapProcedureResource((org.hl7.fhir.r4.model.Procedure) eResource);
                     procedures.add(procedure);
                     break;
                 }
                 case "Condition": {
                     //Problems, Conditions, and Diagnoses
-                    Condition condition = mapConditionResource(ccdStringMap, (org.hl7.fhir.r4.model.Condition) eResource);
+                    Condition condition = mapConditionResource((org.hl7.fhir.r4.model.Condition) eResource);
                     conditions.add(condition);
 
                     break;
                 }
                 case "DiagnosticReport": {
                     //findings and interpretation of diagnostic tests performed on patients
-                    DiagnosticReport diagnosticReport = mapDiagnosticReportResource(ccdStringMap, (org.hl7.fhir.r4.model.DiagnosticReport) eResource);
+                    DiagnosticReport diagnosticReport = mapDiagnosticReportResource((org.hl7.fhir.r4.model.DiagnosticReport) eResource);
                     diagnosticReports.add(diagnosticReport);
 
+                    break;
+                }
+                case "Coverage": {
+                    //Financial instrument which may be used to reimburse or pay for health care products and services.
+                    // Includes both insurance and self-payment.
+                    InsuranceCoverage insuranceCoverage = mapCoverageResource((org.hl7.fhir.r4.model.Coverage) eResource);
+                    coverages.add(insuranceCoverage);
                     break;
                 }
 
@@ -113,6 +140,7 @@ public final class XdsUtil {
         ccdStringMap.put("intolerances", intolerances);
         ccdStringMap.put("medications", medications);
         ccdStringMap.put("medicationPrescriptions", medicationPrescriptions);
+        ccdStringMap.put("coverages", coverages);
         ccdStringMap.put("immunizations", immunizations);
         ccdStringMap.put("procedures", procedures);
         ccdStringMap.put("conditions", conditions);
@@ -122,42 +150,54 @@ public final class XdsUtil {
         return htmlString;
     }
 
-    private Procedure mapProcedureResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.Procedure procedure) {
+    private InsuranceCoverage mapCoverageResource(Coverage coverage) {
+//        payer,type,policyId,policyHolder,coveredParty,relationship,planInformation
+        return new InsuranceCoverage(coverage.getPayorFirstRep().getDisplay(),
+                coverage.getType().getText(),
+                coverage.getIdentifierFirstRep().getValue(),
+                coverage.getPolicyHolder().getDisplay(),
+                coverage.getBeneficiary().getDisplay(),
+                coverage.getRelationship().getText(),
+                coverage.getContractFirstRep().getDisplay());
+    }
+
+    private Procedure mapProcedureResource(org.hl7.fhir.r4.model.Procedure procedure) {
         return new Procedure(procedure);
     }
 
-    private DiagnosticReport mapDiagnosticReportResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.DiagnosticReport diagnosticReport) {
+    private DiagnosticReport mapDiagnosticReportResource(org.hl7.fhir.r4.model.DiagnosticReport diagnosticReport) {
         return new DiagnosticReport(diagnosticReport);
     }
 
-    private Condition mapConditionResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.Condition condition) {
+    private Condition mapConditionResource(org.hl7.fhir.r4.model.Condition condition) {
         return new Condition(condition);
     }
 
-    private ProcedureRequest mapProcedureRequestResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.Procedure procedure) {
+    private ProcedureRequest mapProcedureRequestResource(org.hl7.fhir.r4.model.Procedure procedure) {
         //    	TODO - Finish the mappings
         return new ProcedureRequest();
     }
 
-    private Immunization mapImmunizationResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.Immunization immunization) {
+    private Immunization mapImmunizationResource(org.hl7.fhir.r4.model.Immunization immunization) {
         return new Immunization(immunization);
     }
 
-    private Medication mapMedicationResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.Medication medication) {
+    private Medication mapMedicationResource(org.hl7.fhir.r4.model.Medication medication) {
         return new Medication(medication);
     }
 
-    private MedicationPrescription mapPrescriptionResource(Map<String, Object> ccdStringMap, MedicationRequest medicationRequest) {
+    private MedicationPrescription mapPrescriptionResource( MedicationRequest medicationRequest) {
         return new MedicationPrescription(medicationRequest);
     }
 
-    private AllergyIntolerance mapAllergyIntoleranceResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.AllergyIntolerance intolerance) {
-//    	type,description,substance,reaction, status,dataSource
-        return new AllergyIntolerance(intolerance.getCategory().get(0).getDisplay(),
+    private AllergyIntolerance mapAllergyIntoleranceResource(org.hl7.fhir.r4.model.AllergyIntolerance intolerance) {
+//    	type,description,substance,reaction, status,severity,dataSource
+        return new AllergyIntolerance(intolerance.getType().getDisplay() + (intolerance.hasCategory() ? " - " + intolerance.getCategory().get(0).getCode() : ""),
                 intolerance.getCode().getCodingFirstRep().getDisplay(),
                 intolerance.getReactionFirstRep().getSubstance().getCodingFirstRep().getDisplay(),
                 intolerance.getReactionFirstRep().getManifestationFirstRep().getCodingFirstRep().getDisplay(),
                 intolerance.getClinicalStatus().getText(),
+                intolerance.getReactionFirstRep().getSeverity().getDisplay(),
                 intolerance.getMeta().getSource()
         );
     }
@@ -172,7 +212,7 @@ public final class XdsUtil {
                 encounter.getMeta().getSource());
     }
 
-    private VitalSign mapObservationResource(Map<String, Object> ccdStringMap, Observation obs) {
+    private VitalSign mapObservationResource(Observation obs) {
 //		Parse Observation Resource
 
 
@@ -198,14 +238,20 @@ public final class XdsUtil {
         CodeableConcept maritalStatus = pat.getMaritalStatus();
         ContactPoint telephone = pat.getTelecomFirstRep();
         ccdStringMap.put("familyName", patientName.getFamily());
-        ccdStringMap.put("givenName", patientName.getGiven().toString());
+        ccdStringMap.put("givenName", patientName.getGiven().toString().replace("[", "").replace("]", ""));
         ccdStringMap.put("birthDate", birthDate);
         ccdStringMap.put("gender", gender);
-        ccdStringMap.put("address", addressFirstRep.toString());
+        ccdStringMap.put("address", addressFirstRep);
         ccdStringMap.put("patientId", patientId.getValue());
         ccdStringMap.put("maritalStatus", maritalStatus.getText());
         ccdStringMap.put("telephone", telephone.getValue());
         ccdStringMap.put("patientGeneralPractitioner", patientGeneralPractitioner.toString());
+//        Not currently returned
+        ccdStringMap.put("race", "");
+        ccdStringMap.put("language", "");
+        ccdStringMap.put("ethnicity", "");
+        ccdStringMap.put("guardian", "");
+
     }
 
 
@@ -414,89 +460,90 @@ public final class XdsUtil {
     }
 
     private class MedicationPrescription {
-    	private String identifier,status,intent,category,authoredOn,requester,reasonCode,dosage;
+        private String identifier, status, intent, category, authoredOn, requester, reasonCode, dosage;
 
-		public MedicationPrescription(MedicationRequest medicationRequest) {
-		}
+        public MedicationPrescription(MedicationRequest medicationRequest) {
+        }
 
-		public MedicationPrescription(String identifier, String status, String intent, String category, String authoredOn, String requester, String reasonCode, String dosage) {
-			this.identifier = identifier;
-			this.status = status;
-			this.intent = intent;
-			this.category = category;
-			this.authoredOn = authoredOn;
-			this.requester = requester;
-			this.reasonCode = reasonCode;
-			this.dosage = dosage;
-		}
+        public MedicationPrescription(String identifier, String status, String intent, String category, String authoredOn, String requester, String reasonCode, String dosage) {
+            this.identifier = identifier;
+            this.status = status;
+            this.intent = intent;
+            this.category = category;
+            this.authoredOn = authoredOn;
+            this.requester = requester;
+            this.reasonCode = reasonCode;
+            this.dosage = dosage;
+        }
 
-		public String getIdentifier() {
-			return identifier;
-		}
+        public String getIdentifier() {
+            return identifier;
+        }
 
-		public void setIdentifier(String identifier) {
-			this.identifier = identifier;
-		}
+        public void setIdentifier(String identifier) {
+            this.identifier = identifier;
+        }
 
-		public String getStatus() {
-			return status;
-		}
+        public String getStatus() {
+            return status;
+        }
 
-		public void setStatus(String status) {
-			this.status = status;
-		}
+        public void setStatus(String status) {
+            this.status = status;
+        }
 
-		public String getIntent() {
-			return intent;
-		}
+        public String getIntent() {
+            return intent;
+        }
 
-		public void setIntent(String intent) {
-			this.intent = intent;
-		}
+        public void setIntent(String intent) {
+            this.intent = intent;
+        }
 
-		public String getCategory() {
-			return category;
-		}
+        public String getCategory() {
+            return category;
+        }
 
-		public void setCategory(String category) {
-			this.category = category;
-		}
+        public void setCategory(String category) {
+            this.category = category;
+        }
 
-		public String getAuthoredOn() {
-			return authoredOn;
-		}
+        public String getAuthoredOn() {
+            return authoredOn;
+        }
 
-		public void setAuthoredOn(String authoredOn) {
-			this.authoredOn = authoredOn;
-		}
+        public void setAuthoredOn(String authoredOn) {
+            this.authoredOn = authoredOn;
+        }
 
-		public String getRequester() {
-			return requester;
-		}
+        public String getRequester() {
+            return requester;
+        }
 
-		public void setRequester(String requester) {
-			this.requester = requester;
-		}
+        public void setRequester(String requester) {
+            this.requester = requester;
+        }
 
-		public String getReasonCode() {
-			return reasonCode;
-		}
+        public String getReasonCode() {
+            return reasonCode;
+        }
 
-		public void setReasonCode(String reasonCode) {
-			this.reasonCode = reasonCode;
-		}
+        public void setReasonCode(String reasonCode) {
+            this.reasonCode = reasonCode;
+        }
 
-		public String getDosage() {
-			return dosage;
-		}
+        public String getDosage() {
+            return dosage;
+        }
 
-		public void setDosage(String dosage) {
-			this.dosage = dosage;
-		}
-	}
+        public void setDosage(String dosage) {
+            this.dosage = dosage;
+        }
+    }
 
     private class Medication {
-        private String medication, brandName, startDate, productForm, dose, route, adminInstructions, pharmInstructions, status, indications, reaction, description, dataSource;
+        private String medication, brandName, startDate, productForm, dose, route, adminInstructions, pharmInstructions,
+                status, indications, reaction, description, dataSource;
 
         public Medication(org.hl7.fhir.r4.model.Medication medication) {
         }
@@ -623,14 +670,15 @@ public final class XdsUtil {
     }
 
     private class AllergyIntolerance {
-        private String type, description, substance, reaction, status, dataSource;
+        private String type, description, substance, reaction, status, criticality, dataSource;
 
-        public AllergyIntolerance(String type, String description, String substance, String reaction, String status, String dataSource) {
+        public AllergyIntolerance(String type, String description, String substance, String reaction, String status, String criticality, String dataSource) {
             this.type = type;
             this.description = description;
             this.substance = substance;
             this.reaction = reaction;
             this.status = status;
+            this.criticality = criticality;
             this.dataSource = dataSource;
         }
 
@@ -681,122 +729,412 @@ public final class XdsUtil {
         public void setDataSource(String dataSource) {
             this.dataSource = dataSource;
         }
+
+        public String getCriticality() {
+            return criticality;
+        }
+
+        public void setCriticality(String criticality) {
+            this.criticality = criticality;
+        }
     }
 
     private class Immunization {
-    	private String identifier,status,vaccineCode,occurrenceDate,manufacturer,lotNumber,site,route,doesQuantity,note;
+        private String identifier, vaccineCode,doseQuantity, occurrenceDate,site,route,status,notes;
 
-		public Immunization(org.hl7.fhir.r4.model.Immunization immunization) {
-		}
+        public Immunization(org.hl7.fhir.r4.model.Immunization immunization) {
+            setIdentifier(immunization.getIdentifierFirstRep().getValue());
+            setVaccineCode(immunization.getVaccineCode().getText());
+            setDoseQuantity(immunization.getDoseQuantity().getValue().toString());
+            setOccurrenceDate(immunization.getOccurrenceDateTimeType().getValueAsString());
+            setSite(immunization.getSite().getCodingFirstRep().getDisplay());
+            setRoute(immunization.getRoute().getCodingFirstRep().getDisplay());
+            setStatus(immunization.getStatus().getDisplay());
+            setNotes(immunization.getNoteFirstRep().getText());
 
-		public String getIdentifier() {
-			return identifier;
-		}
+        }
 
-		public void setIdentifier(String identifier) {
-			this.identifier = identifier;
-		}
+        public String getIdentifier() {
+            return identifier;
+        }
 
-		public String getStatus() {
-			return status;
-		}
+        public void setIdentifier(String identifier) {
+            this.identifier = identifier;
+        }
 
-		public void setStatus(String status) {
-			this.status = status;
-		}
+        public String getStatus() {
+            return status;
+        }
 
-		public String getVaccineCode() {
-			return vaccineCode;
-		}
+        public void setStatus(String status) {
+            this.status = status;
+        }
 
-		public void setVaccineCode(String vaccineCode) {
-			this.vaccineCode = vaccineCode;
-		}
+        public String getVaccineCode() {
+            return vaccineCode;
+        }
 
-		public String getOccurrenceDate() {
-			return occurrenceDate;
-		}
+        public void setVaccineCode(String vaccineCode) {
+            this.vaccineCode = vaccineCode;
+        }
 
-		public void setOccurrenceDate(String occurrenceDate) {
-			this.occurrenceDate = occurrenceDate;
-		}
+        public String getOccurrenceDate() {
+            return occurrenceDate;
+        }
 
-		public String getManufacturer() {
-			return manufacturer;
-		}
+        public void setOccurrenceDate(String occurrenceDate) {
+            this.occurrenceDate = occurrenceDate;
+        }
 
-		public void setManufacturer(String manufacturer) {
-			this.manufacturer = manufacturer;
-		}
+        public String getNotes() {
+            return notes;
+        }
 
-		public String getLotNumber() {
-			return lotNumber;
-		}
+        public void setNotes(String notes) {
+            this.notes = notes;
+        }
 
-		public void setLotNumber(String lotNumber) {
-			this.lotNumber = lotNumber;
-		}
+        public String getSite() {
+            return site;
+        }
 
-		public String getSite() {
-			return site;
-		}
+        public void setSite(String site) {
+            this.site = site;
+        }
 
-		public void setSite(String site) {
-			this.site = site;
-		}
+        public String getRoute() {
+            return route;
+        }
 
-		public String getRoute() {
-			return route;
-		}
+        public void setRoute(String route) {
+            this.route = route;
+        }
 
-		public void setRoute(String route) {
-			this.route = route;
-		}
+        public String getDoseQuantity() {
+            return doseQuantity;
+        }
 
-		public String getDoesQuantity() {
-			return doesQuantity;
-		}
+        public void setDoseQuantity(String doseQuantity) {
+            this.doseQuantity = doseQuantity;
+        }
 
-		public void setDoesQuantity(String doesQuantity) {
-			this.doesQuantity = doesQuantity;
-		}
-
-		public String getNote() {
-			return note;
-		}
-
-		public void setNote(String note) {
-			this.note = note;
-		}
-	}
+    }
 
     private class ProcedureRequest {
 
     }
 
     private class Procedure {
+        private String code,procedure,description,date,indications,outcome;
 
+        public Procedure(String code,String procedure, String description, String date, String indications, String outcome) {
+            this.code = code;
+            this.procedure = procedure;
+            this.description = description;
+            this.date = date;
+            this.indications = indications;
+            this.outcome = outcome;
+        }
 
-		public Procedure(org.hl7.fhir.r4.model.Procedure procedure) {
+        public Procedure(org.hl7.fhir.r4.model.Procedure procedure) {
+            setCode(procedure.getCode().getCodingFirstRep().getCode());
+            setProcedure(procedure.getFocalDeviceFirstRep().getAction().getCodingFirstRep().getDisplay());
+            setDescription(procedure.getFocalDeviceFirstRep().getManipulated().getDisplay());
+            setDate(procedure.getPerformedDateTimeType().getValueAsString());
+            setIndications(procedure.getCategory().getText());
+            setOutcome(procedure.getOutcome().getText());
 
-		}
-	}
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+
+        public String getProcedure() {
+            return procedure;
+        }
+
+        public void setProcedure(String procedure) {
+            this.procedure = procedure;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getDate() {
+            return date;
+        }
+
+        public void setDate(String date) {
+            this.date = date;
+        }
+
+        public String getIndications() {
+            return indications;
+        }
+
+        public void setIndications(String indications) {
+            this.indications = indications;
+        }
+
+        public String getOutcome() {
+            return outcome;
+        }
+
+        public void setOutcome(String outcome) {
+            this.outcome = outcome;
+        }
+    }
 
     private class Condition {
-		//Problems, Conditions, and Diagnoses
-		public Condition(org.hl7.fhir.r4.model.Condition condition) {
+//        A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.
+        private String code,displayName,description,type,effectiveDates,severity,notes;
 
-		}
+        public Condition() {
+        }
 
+        public Condition(String code, String displayName, String description, String type, String effectiveDates,
+                         String severity, String notes) {
+            this.code = code;
+            this.displayName = displayName;
+            this.description = description;
+            this.type = type;
+            this.effectiveDates = effectiveDates;
+            this.severity = severity;
+            this.notes = notes;
+        }
+
+        //Problems, Conditions, and Diagnoses
+        public Condition(org.hl7.fhir.r4.model.Condition condition) {
+            new Condition(condition.getCode().getCodingFirstRep().getCode(),
+                    condition.getCode().getText(),
+                    condition.getStageFirstRep().getAssessmentFirstRep().getDisplay(),
+                    condition.getCategoryFirstRep().getText(),
+                    condition.getOnsetDateTimeType().getValueAsString(),
+                    condition.getSeverity().getText(),
+                    condition.getNoteFirstRep().getText()
+                    );
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public void setDisplayName(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getEffectiveDates() {
+            return effectiveDates;
+        }
+
+        public void setEffectiveDates(String effectiveDates) {
+            this.effectiveDates = effectiveDates;
+        }
+
+        public String getNotes() {
+            return notes;
+        }
+
+        public void setNotes(String notes) {
+            this.notes = notes;
+        }
+
+        public String getSeverity() {
+            return severity;
+        }
+
+        public void setSeverity(String severity) {
+            this.severity = severity;
+        }
     }
 
     private class DiagnosticReport {
-		//findings and interpretation of diagnostic tests performed on patients
-		public DiagnosticReport(org.hl7.fhir.r4.model.DiagnosticReport diagnosticReport) {
+        private String identifier,category,name,date,result,status,conclusion,presentedForm;
 
-		}
+        //findings and interpretation of diagnostic tests performed on patients
+        public DiagnosticReport(org.hl7.fhir.r4.model.DiagnosticReport diagnosticReport) {
+            setIdentifier(diagnosticReport.getIdentifierFirstRep().getValue());
+            setCategory(diagnosticReport.getCategoryFirstRep().getText());
+            setName(diagnosticReport.getCode().getCodingFirstRep().getDisplay());
+            setDate(diagnosticReport.getEffectiveDateTimeType().getValueAsString());
+            setResult(diagnosticReport.getResultFirstRep().getDisplay());
+            setStatus(diagnosticReport.getStatus().getDisplay());
+            setConclusion(diagnosticReport.getConclusion());
+            setPresentedForm(diagnosticReport.getPresentedFormFirstRep().getUrl());
 
+        }
+
+        public String getIdentifier() {
+            return identifier;
+        }
+
+        public void setIdentifier(String identifier) {
+            this.identifier = identifier;
+        }
+
+        public String getCategory() {
+            return category;
+        }
+
+        public void setCategory(String category) {
+            this.category = category;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDate() {
+            return date;
+        }
+
+        public void setDate(String date) {
+            this.date = date;
+        }
+
+        public String getResult() {
+            return result;
+        }
+
+        public void setResult(String result) {
+            this.result = result;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public String getConclusion() {
+            return conclusion;
+        }
+
+        public void setConclusion(String conclusion) {
+            this.conclusion = conclusion;
+        }
+
+        public String getPresentedForm() {
+            return presentedForm;
+        }
+
+        public void setPresentedForm(String presentedForm) {
+            this.presentedForm = presentedForm;
+        }
     }
 
 
+    private class InsuranceCoverage {
+        private String payer, type, policyId, policyHolder, coveredParty, relationship, planInformation;
+
+        public InsuranceCoverage() {
+        }
+
+        public InsuranceCoverage(String payer, String type, String policyId, String policyHolder, String coveredParty,
+                                 String relationship, String planInformation) {
+            this.payer = payer;
+            this.type = type;
+            this.policyId = policyId;
+            this.policyHolder = policyHolder;
+            this.coveredParty = coveredParty;
+            this.relationship = relationship;
+            this.planInformation = planInformation;
+        }
+
+        public String getPayer() {
+            return payer;
+        }
+
+        public void setPayer(String payer) {
+            this.payer = payer;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getPolicyId() {
+            return policyId;
+        }
+
+        public void setPolicyId(String policyId) {
+            this.policyId = policyId;
+        }
+
+        public String getPolicyHolder() {
+            return policyHolder;
+        }
+
+        public void setPolicyHolder(String policyHolder) {
+            this.policyHolder = policyHolder;
+        }
+
+        public String getCoveredParty() {
+            return coveredParty;
+        }
+
+        public void setCoveredParty(String coveredParty) {
+            this.coveredParty = coveredParty;
+        }
+
+        public String getRelationship() {
+            return relationship;
+        }
+
+        public void setRelationship(String relationship) {
+            this.relationship = relationship;
+        }
+
+        public String getPlanInformation() {
+            return planInformation;
+        }
+
+        public void setPlanInformation(String planInformation) {
+            this.planInformation = planInformation;
+        }
+    }
 }
