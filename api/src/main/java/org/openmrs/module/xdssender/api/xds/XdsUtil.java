@@ -31,7 +31,7 @@ public final class XdsUtil {
             add("5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Diastolic BP
             add("8462-4");//Diastolic BP
             add("5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Systolic BP
-            add("8480-6");//Diastolic BP
+            add("8480-6");//
             add("5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Height
             add("8302-2");
             add("5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");//Weight
@@ -71,6 +71,10 @@ public final class XdsUtil {
 //                    System.out.println("Processing Obs:====> "+obs.getCode().getCodingFirstRep().getDisplay());
                     if (codes.contains(obs.getCode().getCodingFirstRep().getCode())) {
                         vitalSigns.add(mapObservationResource(obs));
+                    }else if(obs.getCode().getCodingFirstRep().getCode().equals("984AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")){
+//                        Process the immunizations,
+                        Immunization medication = mapImmunizationResource(obs);
+                        immunizations.add(medication);
                     }
                     break;
                 }
@@ -135,6 +139,7 @@ public final class XdsUtil {
 
         }
 
+        Collections.sort(vitalSigns);
         ccdStringMap.put("vitalSigns", vitalSigns);
         ccdStringMap.put("encounters", encounters);
         ccdStringMap.put("intolerances", intolerances);
@@ -148,6 +153,14 @@ public final class XdsUtil {
         GStringTemplateEngine templateEngine = new GStringTemplateEngine();
         String htmlString = templateEngine.createTemplate(ccdTemplate).make(ccdStringMap).toString();
         return htmlString;
+    }
+
+    private Immunization mapImmunizationResource(Observation obs) {
+//        identifier, vaccineCode,doseQuantity, occurrenceDate,site,route,status,notes
+        return new Immunization(obs.getValueCodeableConcept().getCodingFirstRep().getDisplay()
+                ,obs.getCode().getCodingFirstRep().getCode()
+        ,""
+        ,obs.getIssued().toString(),"","","",obs.getValueCodeableConcept().getCodingFirstRep().getDisplay());
     }
 
     private InsuranceCoverage mapCoverageResource(Coverage coverage) {
@@ -223,7 +236,8 @@ public final class XdsUtil {
                 , obs.getReferenceRangeFirstRep().getText()
                 , obs.getCode().getCodingFirstRep().getCode()
                 , obs.getCode().getCodingFirstRep().getDisplay()
-                , obs.getIssued().toString(), obs.getMeta().getSource());
+//                TODO switch to fetching the source details from the encounter
+                , obs.getIssued(), obs.getMeta().getSource());
     }
 
     private static void mapPatientResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.Patient pat) {
@@ -319,10 +333,11 @@ public final class XdsUtil {
         return String.format(config.getPatientRoot(), patient.getId().toString());// use the local identifier as last effort!
     }
 
-    private class VitalSign {
-        private String id, name, value, range, interpretationCode, description, date, dataSource;
+    private class VitalSign implements Comparable<VitalSign> {
+        private String id, name, value, range, interpretationCode, description, dataSource;
+        private Date date;
 
-        public VitalSign(String id, String name, String value, String range, String interpretationCode, String description, String date, String dataSource) {
+        public VitalSign(String id, String name, String value, String range, String interpretationCode, String description, Date date, String dataSource) {
             this.id = id;
             this.name = name;
             this.value = value;
@@ -381,11 +396,11 @@ public final class XdsUtil {
             this.description = description;
         }
 
-        public String getDate() {
+        public Date getDate() {
             return date;
         }
 
-        public void setDate(String date) {
+        public void setDate(Date date) {
             this.date = date;
         }
 
@@ -395,6 +410,11 @@ public final class XdsUtil {
 
         public void setDataSource(String dataSource) {
             this.dataSource = dataSource;
+        }
+
+        @Override
+        public int compareTo(VitalSign o) {
+            return getDate().compareTo(o.getDate());
         }
     }
 
@@ -741,6 +761,18 @@ public final class XdsUtil {
 
     private class Immunization {
         private String identifier, vaccineCode,doseQuantity, occurrenceDate,site,route,status,notes;
+
+        public Immunization(String identifier, String vaccineCode, String doseQuantity, String occurrenceDate,
+                            String site, String route, String status, String notes) {
+            this.identifier = identifier;
+            this.vaccineCode = vaccineCode;
+            this.doseQuantity = doseQuantity;
+            this.occurrenceDate = occurrenceDate;
+            this.site = site;
+            this.route = route;
+            this.status = status;
+            this.notes = notes;
+        }
 
         public Immunization(org.hl7.fhir.r4.model.Immunization immunization) {
             setIdentifier(immunization.getIdentifierFirstRep().getValue());
