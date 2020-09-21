@@ -48,10 +48,10 @@ public class ShrImportServiceImpl implements XdsImportService {
 			result = shrRetriever.sendRetrieveCCD(patient);
 		} catch (Exception e) {
 			LOGGER.error("Unable to load CCD content", e);
-			return ccd;
+			return null;
 		}
 
-		if(result != null && result.getTotal() > 0) {
+		if(result != null && result.hasTotal() && result.getTotal() > 0) {
 			ccd = new Ccd();
 			ccd.setPatient(patient);
 			ccd.setDocument(fhirContext.newJsonParser().encodeResourceToString(result));
