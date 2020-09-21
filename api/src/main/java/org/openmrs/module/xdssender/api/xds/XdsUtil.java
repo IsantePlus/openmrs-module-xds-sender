@@ -43,7 +43,7 @@ public final class XdsUtil {
         }};
 
         Map<String, Object> ccdStringMap = new HashMap<>();
-        ccdStringMap.put("createdDate",resource.getMeta().getLastUpdated().toString());
+        ccdStringMap.put("createdDate", resource.getMeta().getLastUpdated().toString());
         List<Bundle.BundleEntryComponent> entry = resource.getEntry();
         List<VitalSign> vitalSigns = new ArrayList<>();
         List<CcdEncounter> encounters = new ArrayList<>();
@@ -69,12 +69,41 @@ public final class XdsUtil {
 //                    TODO - Rework all the mappings from Observations- limiting the fetch to height,weight,temp,pulse,BP(both systolic and diastolic)
                     Observation obs = (Observation) eResource;
 //                    System.out.println("Processing Obs:====> "+obs.getCode().getCodingFirstRep().getDisplay());
+
                     if (codes.contains(obs.getCode().getCodingFirstRep().getCode())) {
                         vitalSigns.add(mapObservationResource(obs));
-                    }else if(obs.getCode().getCodingFirstRep().getCode().equals("984AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")){
-//                        Process the immunizations,
-                        Immunization medication = mapImmunizationResource(obs);
-                        immunizations.add(medication);
+                    } else {
+//                        Process other obs
+                        switch (obs.getCode().getCodingFirstRep().getCode()) {
+                            case "984AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
+//                                Process the immunizations
+                                Immunization medication = mapImmunizationResource(obs);
+                                immunizations.add(medication);
+                                break;
+                            }
+                            case "1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA":
+                            case "159614AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
+//                                Process tonsillitis diagnosis
+                                Condition condition = mapConditionResource(obs);
+                                conditions.add(condition);
+                                break;
+                            }
+//                            case "1442AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"://Nevirapine{
+                            case "1282AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"://AMOXICILLIN
+                            {
+//                                Process medication order
+                                Medication medication = mapMedicationResource(obs);
+                                medications.add(medication);
+
+                                break;
+                            }
+                            case "1271AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
+                                DiagnosticReport diagnosticReport = mapDiagnosticReportResource(obs);
+                                diagnosticReports.add(diagnosticReport);
+                            }
+
+                        }
+
                     }
                     break;
                 }
@@ -89,7 +118,7 @@ public final class XdsUtil {
                     break;
                 }
                 case "MedicationRequest": {
-                    MedicationPrescription medicationRequest = mapPrescriptionResource( (org.hl7.fhir.r4.model.MedicationRequest) eResource);
+                    MedicationPrescription medicationRequest = mapPrescriptionResource((org.hl7.fhir.r4.model.MedicationRequest) eResource);
                     medicationPrescriptions.add(medicationRequest);
                     break;
                 }
@@ -155,12 +184,25 @@ public final class XdsUtil {
         return htmlString;
     }
 
+
+    private Medication mapMedicationResource(Observation obs) {
+//        medication, brandName, startDate, productForm, dose, route, adminInstructions, pharmInstructions,
+//                status, indications, reaction, description, dataSource
+        return new Medication(
+                obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
+                obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
+                obs.getEffectiveDateTimeType().getValue(),
+                "", "", "", "", "", "", "", "", "", ""
+        );
+    }
+
+
     private Immunization mapImmunizationResource(Observation obs) {
 //        identifier, vaccineCode,doseQuantity, occurrenceDate,site,route,status,notes
         return new Immunization(obs.getValueCodeableConcept().getCodingFirstRep().getDisplay()
-                ,obs.getCode().getCodingFirstRep().getCode()
-        ,""
-        ,obs.getIssued().toString(),"","","",obs.getValueCodeableConcept().getCodingFirstRep().getDisplay());
+                , obs.getCode().getCodingFirstRep().getCode()
+                , ""
+                , obs.getIssued().toString(), "", "", "", obs.getValueCodeableConcept().getCodingFirstRep().getDisplay());
     }
 
     private InsuranceCoverage mapCoverageResource(Coverage coverage) {
@@ -182,8 +224,26 @@ public final class XdsUtil {
         return new DiagnosticReport(diagnosticReport);
     }
 
+    private DiagnosticReport mapDiagnosticReportResource(Observation obs) {
+//        identifier, category, name, date, result, status, conclusion, presentedForm
+        return new DiagnosticReport(obs.getCode().getCodingFirstRep().getCode(),
+                obs.getCode().getCodingFirstRep().getDisplay(),
+                obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
+                obs.getEffectiveDateTimeType().getValue().toString(),
+                "", "", "", "");
+    }
+
     private Condition mapConditionResource(org.hl7.fhir.r4.model.Condition condition) {
         return new Condition(condition);
+    }
+
+    private Condition mapConditionResource(Observation obs) {
+//        code, displayName, description, type, effectiveDates, severity, notes
+        Coding codingFirstRep = obs.getCode().getCodingFirstRep();
+        return new Condition(codingFirstRep.getCode(),
+                obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
+                codingFirstRep.getDisplay(),
+                codingFirstRep.getDisplay(), obs.getIssued(), "", "");
     }
 
     private ProcedureRequest mapProcedureRequestResource(org.hl7.fhir.r4.model.Procedure procedure) {
@@ -199,7 +259,7 @@ public final class XdsUtil {
         return new Medication(medication);
     }
 
-    private MedicationPrescription mapPrescriptionResource( MedicationRequest medicationRequest) {
+    private MedicationPrescription mapPrescriptionResource(MedicationRequest medicationRequest) {
         return new MedicationPrescription(medicationRequest);
     }
 
@@ -562,13 +622,14 @@ public final class XdsUtil {
     }
 
     private class Medication {
-        private String medication, brandName, startDate, productForm, dose, route, adminInstructions, pharmInstructions,
+        private String medication, brandName, productForm, dose, route, adminInstructions, pharmInstructions,
                 status, indications, reaction, description, dataSource;
+        private Date startDate;
 
         public Medication(org.hl7.fhir.r4.model.Medication medication) {
         }
 
-        public Medication(String medication, String brandName, String startDate, String productForm, String dose, String route, String adminInstructions, String pharmInstructions, String status, String indications, String reaction, String description, String dataSource) {
+        public Medication(String medication, String brandName, Date startDate, String productForm, String dose, String route, String adminInstructions, String pharmInstructions, String status, String indications, String reaction, String description, String dataSource) {
             this.medication = medication;
             this.brandName = brandName;
             this.startDate = startDate;
@@ -600,11 +661,11 @@ public final class XdsUtil {
             this.brandName = brandName;
         }
 
-        public String getStartDate() {
+        public Date getStartDate() {
             return startDate;
         }
 
-        public void setStartDate(String startDate) {
+        public void setStartDate(Date startDate) {
             this.startDate = startDate;
         }
 
@@ -760,7 +821,7 @@ public final class XdsUtil {
     }
 
     private class Immunization {
-        private String identifier, vaccineCode,doseQuantity, occurrenceDate,site,route,status,notes;
+        private String identifier, vaccineCode, doseQuantity, occurrenceDate, site, route, status, notes;
 
         public Immunization(String identifier, String vaccineCode, String doseQuantity, String occurrenceDate,
                             String site, String route, String status, String notes) {
@@ -857,9 +918,9 @@ public final class XdsUtil {
     }
 
     private class Procedure {
-        private String code,procedure,description,date,indications,outcome;
+        private String code, procedure, description, date, indications, outcome;
 
-        public Procedure(String code,String procedure, String description, String date, String indications, String outcome) {
+        public Procedure(String code, String procedure, String description, String date, String indications, String outcome) {
             this.code = code;
             this.procedure = procedure;
             this.description = description;
@@ -928,13 +989,15 @@ public final class XdsUtil {
     }
 
     private class Condition {
-//        A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.
-        private String code,displayName,description,type,effectiveDates,severity,notes;
+        //        A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.
+        private String code, displayName, description, type, severity, notes;
+        private Date effectiveDates;
+
 
         public Condition() {
         }
 
-        public Condition(String code, String displayName, String description, String type, String effectiveDates,
+        public Condition(String code, String displayName, String description, String type, Date effectiveDates,
                          String severity, String notes) {
             this.code = code;
             this.displayName = displayName;
@@ -951,10 +1014,10 @@ public final class XdsUtil {
                     condition.getCode().getText(),
                     condition.getStageFirstRep().getAssessmentFirstRep().getDisplay(),
                     condition.getCategoryFirstRep().getText(),
-                    condition.getOnsetDateTimeType().getValueAsString(),
+                    condition.getOnsetDateTimeType().getValue(),
                     condition.getSeverity().getText(),
                     condition.getNoteFirstRep().getText()
-                    );
+            );
         }
 
         public String getCode() {
@@ -989,11 +1052,11 @@ public final class XdsUtil {
             this.type = type;
         }
 
-        public String getEffectiveDates() {
+        public Date getEffectiveDates() {
             return effectiveDates;
         }
 
-        public void setEffectiveDates(String effectiveDates) {
+        public void setEffectiveDates(Date effectiveDates) {
             this.effectiveDates = effectiveDates;
         }
 
@@ -1015,7 +1078,19 @@ public final class XdsUtil {
     }
 
     private class DiagnosticReport {
-        private String identifier,category,name,date,result,status,conclusion,presentedForm;
+        private String identifier, category, name, date, result, status, conclusion, presentedForm;
+
+        public DiagnosticReport(String identifier, String category, String name, String date, String result,
+                                String status, String conclusion, String presentedForm) {
+            this.identifier = identifier;
+            this.category = category;
+            this.name = name;
+            this.date = date;
+            this.result = result;
+            this.status = status;
+            this.conclusion = conclusion;
+            this.presentedForm = presentedForm;
+        }
 
         //findings and interpretation of diagnostic tests performed on patients
         public DiagnosticReport(org.hl7.fhir.r4.model.DiagnosticReport diagnosticReport) {
