@@ -31,6 +31,10 @@ public class ShrImportServiceImpl implements XdsImportService {
 	// @Qualifier("fhirContext")
  	private FhirContext fhirContext;
 
+	public FhirContext getFhirContext() {
+		return fhirContext;
+	}
+
 	public void setFhirContext(FhirContext fhirContext) {
 		this.fhirContext = fhirContext;
 	}
@@ -40,7 +44,7 @@ public class ShrImportServiceImpl implements XdsImportService {
 		Ccd ccd = null;
 		Bundle result;
 		try {
-			shrRetriever.setFhirContext(fhirContext);
+			shrRetriever.setFhirContext(this.getFhirContext());
 			result = shrRetriever.sendRetrieveCCD(patient);
 		} catch (Exception e) {
 			LOGGER.error("Unable to load CCD content", e);
