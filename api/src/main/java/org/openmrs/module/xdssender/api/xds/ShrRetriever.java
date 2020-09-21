@@ -47,17 +47,22 @@ public class ShrRetriever {
 					.returnBundle(Bundle.class).execute();
 
 			// Loop through the Golden Record Patient resource links
-			for (Bundle.BundleEntryComponent entry : linkedPatientBundle.getEntry()) {
-				Resource candidatePatient = entry.getResource();
+			try {
+				for (Bundle.BundleEntryComponent entry : linkedPatientBundle.getEntry()) {
+					Resource candidatePatient = entry.getResource();
 
-				if (candidatePatient.hasType("Patient") &&
-						candidatePatient.getMeta().getTagFirstRep().getCode().equals("5c827da5-4858-4f3d-a50c-62ece001efea")
-						&& ((org.hl7.fhir.r4.model.Patient) candidatePatient).hasLink()) {
-					// Join ids of all MPI-linked patients
-					patientIds = ((org.hl7.fhir.r4.model.Patient) candidatePatient).getLink().stream()
-							.map(link -> link.getOther().getResource().getIdElement().getIdPart()).collect(
-									Collectors.joining(","));
+					if (candidatePatient.hasType("Patient") &&
+							candidatePatient.getMeta().getTagFirstRep().getCode().equals("5c827da5-4858-4f3d-a50c-62ece001efea")
+							&& ((org.hl7.fhir.r4.model.Patient) candidatePatient).hasLink()) {
+						// Join ids of all MPI-linked patients
+						patientIds = ((org.hl7.fhir.r4.model.Patient) candidatePatient).getLink().stream()
+								.map(link -> link.getOther().getResource().getIdElement().getIdPart()).collect(
+										Collectors.joining(","));
+					}
 				}
+			} catch (Exception e) {
+				LOGGER.error("Failed to get linked Patients from MPI: ", e);
+				patientIds = patient.getUuid();
 			}
 
 			// Get SHR Bundle for collected patient ids
