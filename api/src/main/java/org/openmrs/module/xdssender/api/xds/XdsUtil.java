@@ -311,23 +311,27 @@ public final class XdsUtil {
         Identifier patientId = pat.getIdentifierFirstRep();
         CodeableConcept maritalStatus = pat.getMaritalStatus();
         ContactPoint telephone = pat.getTelecomFirstRep();
-        ccdStringMap.put("familyName", patientName.getFamily());
-        ccdStringMap.put("givenName", patientName.getGiven().toString().replace("[", "").replace("]", ""));
-        ccdStringMap.put("birthDate", birthDate);
-        ccdStringMap.put("gender", gender);
-        ccdStringMap.put("address", addressFirstRep);
-        ccdStringMap.put("patientId", patientId.getValue());
-        ccdStringMap.put("maritalStatus", maritalStatus.getText());
-        ccdStringMap.put("telephone", telephone.getValue());
-        ccdStringMap.put("patientGeneralPractitioner", patientGeneralPractitioner.toString());
+        putValue(ccdStringMap,"familyName", patientName.getFamily());
+        putValue(ccdStringMap,"givenName", patientName.getGiven().toString().replace("[", "").replace("]", ""));
+        putValue(ccdStringMap,"birthDate", birthDate.toString());
+        putValue(ccdStringMap,"gender", gender);
+        putValue(ccdStringMap,"address", addressFirstRep.getText());
+        putValue(ccdStringMap,"patientId", patientId.getValue());
+        putValue(ccdStringMap,"maritalStatus", maritalStatus.getText());
+        putValue(ccdStringMap,"telephone", telephone.getValue());
+        putValue(ccdStringMap,"patientGeneralPractitioner", patientGeneralPractitioner.toString());
 //        Not currently returned
-        ccdStringMap.put("race", "");
-        ccdStringMap.put("language", "");
-        ccdStringMap.put("ethnicity", "");
-        ccdStringMap.put("guardian", "");
+        putValue(ccdStringMap,"race", "");
+        putValue(ccdStringMap,"language", "");
+        putValue(ccdStringMap,"ethnicity", "");
+        putValue(ccdStringMap,"guardian", "");
 
     }
 
+    private static void putValue(Map<String, Object> ccdStringMap, String key, String value) {
+        if(!ccdStringMap.containsKey(key) || ((String) ccdStringMap.get(key)).isEmpty())
+            ccdStringMap.put(key, value);
+    }
 
     /**
      * Add external identifier
