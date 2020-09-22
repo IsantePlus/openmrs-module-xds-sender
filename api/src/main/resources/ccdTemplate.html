@@ -144,7 +144,6 @@
         <p class="section_links ft15"><a href="#encounters">Encounters</a></p>
         <p class="section_links ft15"><a href="#medications_requests">Medication Requests</a></p>
         <p class="section_links ft15"><a href="#medications">Medications</a></p>
-        <p class="section_links ft15"><a href="#insurance">Insurance providers</a></p>
         <p class="section_links ft15"><a href="#problems">Problems, Conditions, and Diagnoses</a></p>
         <p class="section_links ft15"><a href="#procedures">Surgeries/Procedures</a></p>
         <p class="section_links ft15"><a href="#results">Results</a></p>
@@ -464,6 +463,7 @@
                 <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Code</th>
                     <th>Value</th>
                     <th>Date</th>
                     <th>Location</th>
@@ -478,9 +478,10 @@
                 <% vitalSigns.each{ vitalSign -> %>
                 <tr>
                     <td><%= vitalSign.name  %></td>
+                    <td><%= vitalSign.identifier  %></td>
                     <td><%= vitalSign.value  %></td>
                     <td><%= vitalSign.date  %></td>
-                    <td><%= vitalSign.dataSource  %></td>
+                    <td><%= vitalSign.location  %></td>
                 </tr>
                 <%}
                 }else{ %>

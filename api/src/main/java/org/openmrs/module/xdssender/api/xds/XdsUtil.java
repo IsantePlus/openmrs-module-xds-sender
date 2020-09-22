@@ -202,12 +202,7 @@ public final class XdsUtil {
     private Immunization mapImmunizationResource(Observation obs) {
 //        identifier, vaccineCode,doseQuantity, occurrenceDate,site,route,status,
         String identifier = null;
-        for (Coding coding : obs.getCode().getCoding()) {
-            if ("http://loinc.org".equals(coding.getSystem())) {
-                identifier = coding.getCode();
-                break;
-            }
-        }
+        identifier = getLoincCode(obs);
 
         return new Immunization(
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay()
@@ -238,12 +233,7 @@ public final class XdsUtil {
     private DiagnosticReport mapDiagnosticReportResource(Observation obs) {
 //        identifier, category, name, date, result, status, conclusion, presentedForm
         String identifier = null;
-        for (Coding coding : obs.getCode().getCoding()) {
-            if ("http://loinc.org".equals(coding.getSystem())) {
-                identifier = coding.getCode();
-                break;
-            }
-        }
+        identifier = getLoincCode(obs);
         return new DiagnosticReport(
                 identifier != null ? identifier : obs.getCode().getCodingFirstRep().getCode(),
                 obs.getCode().getCodingFirstRep().getDisplay(),
@@ -259,17 +249,22 @@ public final class XdsUtil {
     private Condition mapConditionResource(Observation obs) {
 //        code, displayName, description, type, effectiveDates, severity, notes
         String identifier = null;
-        for (Coding coding : obs.getCode().getCoding()) {
-            if ("http://loinc.org".equals(coding.getSystem())) {
-                identifier = coding.getCode();
-                break;
-            }
-        }
+        identifier = getLoincCode(obs);
         Coding codingFirstRep = obs.getCode().getCodingFirstRep();
         return new Condition(identifier != null ? identifier : codingFirstRep.getCode(),
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 codingFirstRep.getDisplay(),
                 codingFirstRep.getDisplay(), obs.getIssued(), "", "");
+    }
+
+    private String getLoincCode(Observation obs) {
+        for (Coding coding : obs.getCode().getCoding()) {
+            if ("http://loinc.org".equals(coding.getSystem())) {
+                return coding.getCode();
+            }
+        }
+
+        return obs.getCode().getCodingFirstRep().getCode();
     }
 
     private ProcedureRequest mapProcedureRequestResource(org.hl7.fhir.r4.model.Procedure procedure) {
@@ -349,11 +344,16 @@ public final class XdsUtil {
         putValue(ccdStringMap,"givenName", patientName.getGiven().toString().replace("[", "").replace("]", ""));
         putValue(ccdStringMap,"birthDate", birthDate.toString());
         putValue(ccdStringMap,"gender", gender);
-        putValue(ccdStringMap,"address", addressFirstRep.getText());
+        putValue(ccdStringMap,"address", addressFirstRep);
+
+
+
+
+
         putValue(ccdStringMap,"patientId", patientId.getValue());
         putValue(ccdStringMap,"maritalStatus", maritalStatus.getText());
         putValue(ccdStringMap,"telephone", telephone.getValue());
-        putValue(ccdStringMap,"patientGeneralPractitioner", patientGeneralPractitioner.toString());
+        putValue(ccdStringMap,"patientGeneralPractitioner", patientGeneralPractitioner.getDisplay());
 //        Not currently returned
         putValue(ccdStringMap,"race", "");
         putValue(ccdStringMap,"language", "");
@@ -362,9 +362,17 @@ public final class XdsUtil {
 
     }
 
-    private static void putValue(Map<String, Object> ccdStringMap, String key, String value) {
-        if(!ccdStringMap.containsKey(key) || ((String) ccdStringMap.get(key)).isEmpty())
-            ccdStringMap.put(key, value);
+    private static void putValue(Map<String, Object> ccdStringMap, String key, Object value) {
+        try {
+            if(value != null &&
+                    (!ccdStringMap.containsKey(key)
+                            || ccdStringMap.get(key) == null
+                            || ((String) ccdStringMap.get(key)).isEmpty())) {
+                ccdStringMap.put(key, value);
+            }
+        } catch (Exception e) {
+            return;
+        }
     }
 
     /**
@@ -432,10 +440,10 @@ public final class XdsUtil {
     }
 
     private class VitalSign implements Comparable<VitalSign> {
-        private String id, name, value, range, interpretationCode, description, dataSource;
+        private String id, name, value, range, interpretationCode, description, location;
         private Date date;
 
-        public VitalSign(String id, String name, String value, String range, String interpretationCode, String description, Date date, String dataSource) {
+        public VitalSign(String id, String name, String value, String range, String interpretationCode, String description, Date date, String location) {
             this.id = id;
             this.name = name;
             this.value = value;
@@ -443,7 +451,7 @@ public final class XdsUtil {
             this.interpretationCode = interpretationCode;
             this.description = description;
             this.date = date;
-            this.dataSource = dataSource;
+            this.location = location;
         }
 
         public String getId() {
@@ -502,12 +510,12 @@ public final class XdsUtil {
             this.date = date;
         }
 
-        public String getDataSource() {
-            return dataSource;
+        public String getLocation() {
+            return location;
         }
 
-        public void setDataSource(String dataSource) {
-            this.dataSource = dataSource;
+        public void setLocation(String location) {
+            this.location = location;
         }
 
         @Override
