@@ -192,7 +192,7 @@ public final class XdsUtil {
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getEffectiveDateTimeType().getValue(),
-                "", "", "", "", "", "", "", "", "", ""
+                "", "", "", "", "", "", "", "", "", obs.getEncounter().getResource().getLocationFirstRep().getLocation().getDisplay()
         );
     }
 
