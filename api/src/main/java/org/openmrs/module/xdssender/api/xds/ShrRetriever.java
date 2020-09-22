@@ -78,7 +78,7 @@ public class ShrRetriever {
 						}
 
 						// Join ids of all MPI-linked patients
-						if(patientIdList.size() > 0) {
+						if(!patientIdList.isEmpty()) {
 							String mpiPatientIds = String.join(",", patientIdList);
 
 							Bundle linkedPatientIdentifiers = mpiClient.search()
@@ -96,6 +96,7 @@ public class ShrRetriever {
 										if(i.hasSystem() && i.getSystem().equals("urn:ietf:rfc:3986")) {
 											String[] uuidString = i.getValue().split("/");
 											patientIdList.add(uuidString[uuidString.length - 1]);
+											break;
 										}
 									}
 								}
