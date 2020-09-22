@@ -192,7 +192,7 @@ public final class XdsUtil {
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getEffectiveDateTimeType().getValue(),
-                "", "", "", "", "", "", "", "", "", ""
+                "", "", "", "", "", "", "", "", "", obs.getEncounter().getResource().getLocationFirstRep().getLocation().getDisplay()
         );
     }
 
@@ -297,7 +297,7 @@ public final class XdsUtil {
                 , obs.getCode().getCodingFirstRep().getCode()
                 , obs.getCode().getCodingFirstRep().getDisplay()
 //                TODO switch to fetching the source details from the encounter
-                , obs.getIssued(), obs.getMeta().getSource());
+                , obs.getIssued(), obs.getEncounter().getResource().getLocationFirstRep().getLocation().getDisplay());
     }
 
     private static void mapPatientResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.Patient pat) {
