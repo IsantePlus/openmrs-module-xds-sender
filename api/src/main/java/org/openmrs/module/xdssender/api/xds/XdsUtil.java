@@ -194,7 +194,7 @@ public final class XdsUtil {
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getEffectiveDateTimeType().getValue(),
                 "", "", "", "", "", "", "",
-                "", "", ((Encounter)obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay()
+                "", "", ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay()
         );
     }
 
@@ -245,7 +245,7 @@ public final class XdsUtil {
             }
         }
         return new DiagnosticReport(
-                identifier != null ? identifier: obs.getCode().getCodingFirstRep().getCode(),
+                identifier != null ? identifier : obs.getCode().getCodingFirstRep().getCode(),
                 obs.getCode().getCodingFirstRep().getDisplay(),
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getEffectiveDateTimeType().getValue().toString(),
@@ -290,13 +290,14 @@ public final class XdsUtil {
     }
 
     private AllergyIntolerance mapAllergyIntoleranceResource(org.hl7.fhir.r4.model.AllergyIntolerance intolerance) {
+        org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceReactionComponent reactionFirstRep = intolerance.getReactionFirstRep();
 //    	type,description,substance,reaction, status,severity,dataSource
         return new AllergyIntolerance(intolerance.getType().getDisplay() + (intolerance.hasCategory() ? " - " + intolerance.getCategory().get(0).getCode() : ""),
                 intolerance.getCode().getCodingFirstRep().getDisplay(),
-                intolerance.getReactionFirstRep().getSubstance().getCodingFirstRep().getDisplay(),
-                intolerance.getReactionFirstRep().getManifestationFirstRep().getCodingFirstRep().getDisplay(),
-                intolerance.getClinicalStatus().getText(),
-                intolerance.getReactionFirstRep().getSeverity().getDisplay(),
+                reactionFirstRep.getSubstance() != null ? reactionFirstRep.getSubstance().getCodingFirstRep().getDisplay() : "",
+                reactionFirstRep.getManifestationFirstRep() != null ? reactionFirstRep.getManifestationFirstRep().getCodingFirstRep().getDisplay() : "",
+                intolerance.getClinicalStatus() != null ? intolerance.getClinicalStatus().getText() : "",
+                reactionFirstRep.getSeverity() != null ? reactionFirstRep.getSeverity().getDisplay() : "",
                 intolerance.getMeta().getSource()
         );
     }
@@ -318,19 +319,19 @@ public final class XdsUtil {
         String name = null;
         for (Coding coding : obs.getCode().getCoding()) {
             if ("http://loinc.org".equals(coding.getSystem())) {
-                identifier=coding.getCode();
-                name=coding.getDisplay();
+                identifier = coding.getCode();
+                name = coding.getDisplay();
             }
         }
         return new VitalSign(
-                 identifier != null ? identifier : obs.getCode().getCodingFirstRep().getCode()
+                identifier != null ? identifier : obs.getCode().getCodingFirstRep().getCode()
                 , name != null ? name : obs.getCode().getCodingFirstRep().getDisplay()
                 , obs.getValueQuantity().getValue().toString()
                 , obs.getReferenceRangeFirstRep().getText()
                 , obs.getCode().getCodingFirstRep().getCode()
                 , obs.getCode().getCodingFirstRep().getDisplay()
 //                TODO switch to fetching the source details from the encounter
-                , obs.getIssued(), ((Encounter)obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay());
+                , obs.getIssued(), ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay());
     }
 
     private static void mapPatientResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.Patient pat) {
