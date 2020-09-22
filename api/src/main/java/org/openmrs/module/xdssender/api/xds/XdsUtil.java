@@ -18,6 +18,7 @@ import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component("xdssender.XdsUtil")
 public final class XdsUtil {
@@ -192,14 +193,24 @@ public final class XdsUtil {
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getEffectiveDateTimeType().getValue(),
-                "", "", "", "", "", "", "", "", "", obs.getEncounter().getResource().getLocationFirstRep().getLocation().getDisplay()
+                "", "", "", "", "", "", "",
+                "", "", ((Encounter)obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay()
         );
     }
 
 
     private Immunization mapImmunizationResource(Observation obs) {
-//        identifier, vaccineCode,doseQuantity, occurrenceDate,site,route,status,notes
-        return new Immunization(obs.getValueCodeableConcept().getCodingFirstRep().getDisplay()
+//        identifier, vaccineCode,doseQuantity, occurrenceDate,site,route,status,
+        String identifier = null;
+        for (Coding coding : obs.getCode().getCoding()) {
+            if ("http://loinc.org".equals(coding.getSystem())) {
+                identifier = coding.getCode();
+                break;
+            }
+        }
+
+        return new Immunization(
+                obs.getValueCodeableConcept().getCodingFirstRep().getDisplay()
                 , obs.getCode().getCodingFirstRep().getCode()
                 , ""
                 , obs.getIssued().toString(), "", "", "", obs.getValueCodeableConcept().getCodingFirstRep().getDisplay());
@@ -226,7 +237,15 @@ public final class XdsUtil {
 
     private DiagnosticReport mapDiagnosticReportResource(Observation obs) {
 //        identifier, category, name, date, result, status, conclusion, presentedForm
-        return new DiagnosticReport(obs.getCode().getCodingFirstRep().getCode(),
+        String identifier = null;
+        for (Coding coding : obs.getCode().getCoding()) {
+            if ("http://loinc.org".equals(coding.getSystem())) {
+                identifier = coding.getCode();
+                break;
+            }
+        }
+        return new DiagnosticReport(
+                identifier != null ? identifier: obs.getCode().getCodingFirstRep().getCode(),
                 obs.getCode().getCodingFirstRep().getDisplay(),
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getEffectiveDateTimeType().getValue().toString(),
@@ -239,8 +258,15 @@ public final class XdsUtil {
 
     private Condition mapConditionResource(Observation obs) {
 //        code, displayName, description, type, effectiveDates, severity, notes
+        String identifier = null;
+        for (Coding coding : obs.getCode().getCoding()) {
+            if ("http://loinc.org".equals(coding.getSystem())) {
+                identifier = coding.getCode();
+                break;
+            }
+        }
         Coding codingFirstRep = obs.getCode().getCodingFirstRep();
-        return new Condition(codingFirstRep.getCode(),
+        return new Condition(identifier != null ? identifier : codingFirstRep.getCode(),
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 codingFirstRep.getDisplay(),
                 codingFirstRep.getDisplay(), obs.getIssued(), "", "");
@@ -286,18 +312,25 @@ public final class XdsUtil {
     }
 
     private VitalSign mapObservationResource(Observation obs) {
-//		Parse Observation Resource
-
 
 //		id, name, value, range, interpretationCode, description, date, dataSource
-        return new VitalSign(obs.getId()
-                , obs.getCode().getCodingFirstRep().getDisplay()
+        String identifier = null;
+        String name = null;
+        for (Coding coding : obs.getCode().getCoding()) {
+            if ("http://loinc.org".equals(coding.getSystem())) {
+                identifier=coding.getCode();
+                name=coding.getDisplay();
+            }
+        }
+        return new VitalSign(
+                 identifier != null ? identifier : obs.getCode().getCodingFirstRep().getCode()
+                , name != null ? name : obs.getCode().getCodingFirstRep().getDisplay()
                 , obs.getValueQuantity().getValue().toString()
                 , obs.getReferenceRangeFirstRep().getText()
                 , obs.getCode().getCodingFirstRep().getCode()
                 , obs.getCode().getCodingFirstRep().getDisplay()
 //                TODO switch to fetching the source details from the encounter
-                , obs.getIssued(), obs.getEncounter().getResource().getLocationFirstRep().getLocation().getDisplay());
+                , obs.getIssued(), ((Encounter)obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay());
     }
 
     private static void mapPatientResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.Patient pat) {
