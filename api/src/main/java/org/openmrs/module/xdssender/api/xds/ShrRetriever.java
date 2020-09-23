@@ -38,7 +38,7 @@ public class ShrRetriever {
 	public Bundle sendRetrieveCCD(Patient patient) {
 		try {
 			String mpiIdentifier = config.getLocalPatientIdRoot() + patient.getUuid();
-			// http://52.37.13.123/ws/fhir2/pid/openmrsid/c8030be3-360a-40a6-9aa8-594c53c1a70c
+
 			IGenericClient mpiClient = fhirContext.getRestfulClientFactory().newGenericClient(config.getMpiEndpoint());
 			// By default, just get this instance's patient
 			String patientIds = patient.getUuid();

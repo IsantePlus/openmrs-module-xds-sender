@@ -382,11 +382,11 @@
             <table>
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Category</th>
                     <th>Name</th>
+                    <th>Category</th>
                     <th>Date</th>
                     <th>Result</th>
+                    <th>Code</th>
                 </tr>
                 </thead>
             </table>
@@ -397,11 +397,11 @@
                 <% if(diagnosticReports){ %>
                 <% diagnosticReports.each{ diagnosticReport -> %>
                 <tr>
-                    <td><%= diagnosticReport.identifier %></td>
-                    <td><%= diagnosticReport.category %></td>
                     <td><%= diagnosticReport.name %></td>
+                    <td><%= diagnosticReport.category %></td>
                     <td><%= diagnosticReport.date %></td>
                     <td><%= diagnosticReport.result %></td>
+                    <td><%= diagnosticReport.identifier %></td>
                 </tr>
                 <%}
                 }else{ %>

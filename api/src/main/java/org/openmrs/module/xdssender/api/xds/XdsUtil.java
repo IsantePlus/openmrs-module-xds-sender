@@ -226,7 +226,7 @@ public final class XdsUtil {
     private Immunization mapImmunizationResource(Observation obs) {
 //        identifier, vaccineCode,doseQuantity, occurrenceDate,site,route,status,
         String identifier = null;
-        identifier = getLoincCode(obs);
+        identifier = getLoincCode(obs.getCode());
 
         return new Immunization(
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay()
@@ -259,10 +259,8 @@ public final class XdsUtil {
 
     private DiagnosticReport mapDiagnosticReportResource(Observation obs) {
 //        identifier, category, name, date, result, status, conclusion, presentedForm
-        String identifier = null;
-        identifier = getLoincCode(obs);
         return new DiagnosticReport(
-                identifier != null ? identifier : getLoincCode(obs),
+                getLoincCode(obs.getValueCodeableConcept()),
                 obs.getCode().getCodingFirstRep().getDisplay(),
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getEffectiveDateTimeType().getValue().toString(),
@@ -276,7 +274,7 @@ public final class XdsUtil {
     private Condition mapConditionResource(Observation obs) {
 //        code, displayName, description, type, effectiveDates, severity, notes
         String identifier = null;
-        identifier = getLoincCode(obs);
+        identifier = getLoincCode(obs.getCode());
         Coding codingFirstRep = obs.getCode().getCodingFirstRep();
         return new Condition(identifier != null ? identifier : codingFirstRep.getCode(),
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
@@ -284,14 +282,14 @@ public final class XdsUtil {
                 codingFirstRep.getDisplay(), obs.getIssued(), "", "");
     }
 
-    private String getLoincCode(Observation obs) {
-        for (Coding coding : obs.getCode().getCoding()) {
+    private String getLoincCode(CodeableConcept cc) {
+        for (Coding coding : cc.getCoding()) {
             if ("http://loinc.org".equals(coding.getSystem())) {
                 return coding.getCode();
             }
         }
 
-        return obs.getCode().getCodingFirstRep().getCode();
+        return cc.getCodingFirstRep().getCode();
     }
 
     private ProcedureRequest mapProcedureRequestResource(org.hl7.fhir.r4.model.Procedure procedure) {
@@ -612,6 +610,15 @@ public final class XdsUtil {
         public void setDataSource(String dataSource) {
             this.dataSource = dataSource;
         }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
     }
 
     private class MedicationPrescription {
