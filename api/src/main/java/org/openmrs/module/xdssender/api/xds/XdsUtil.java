@@ -18,7 +18,6 @@ import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Component("xdssender.XdsUtil")
 public final class XdsUtil {
@@ -84,18 +83,20 @@ public final class XdsUtil {
                             }
                             case "1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA":
                             case "159614AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
-//                                Process tonsillitis diagnosis
                                 Condition condition = mapConditionResource(obs);
                                 conditions.add(condition);
                                 break;
                             }
-//                            case "1442AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"://Nevirapine{
-                            case "1282AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"://AMOXICILLIN
+                            case "1442AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA":// Current Medication Order (Parent)
                             {
-//                                Process medication order
-                                Medication medication = mapMedicationResource(obs);
+                                MedicationPrescription medicationRequest = mapMedicationRequest(obs);
+                                medicationPrescriptions.add(medicationRequest);
+                                break;
+                            }
+                            case "163711AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
+                                // Current Medication Dispensed Construct
+                                Medication medication = mapMedicationList(obs);
                                 medications.add(medication);
-
                                 break;
                             }
                             case "1271AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
@@ -124,7 +125,7 @@ public final class XdsUtil {
                     break;
                 }
                 case "Medication": {
-                    Medication medication = mapMedicationResource((org.hl7.fhir.r4.model.Medication) eResource);
+                    Medication medication = mapMedicationRequest((org.hl7.fhir.r4.model.Medication) eResource);
                     medications.add(medication);
                     break;
                 }
@@ -186,17 +187,42 @@ public final class XdsUtil {
     }
 
 
-    private Medication mapMedicationResource(Observation obs) {
-//        medication, brandName, startDate, productForm, dose, route, adminInstructions, pharmInstructions,
-//                status, indications, reaction, description, dataSource
-        return new Medication(
-                obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
-                obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
-                obs.getEffectiveDateTimeType().getValue(),
-                "", "", "", "", "", "", "",
-                "", "", ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay()
-        );
+    private MedicationPrescription mapMedicationRequest(Observation obs) {
+        // String identifier, String status, String intent, String category, String authoredOn, String requester, String reasonCode, String dosage
+        return new MedicationPrescription(obs.getValue().toString(),
+                obs.getStatus().getDisplay(),
+                "",
+                obs.hasCode() ? obs.getCode().getCodingFirstRep().getDisplay() : "",
+                obs.getEffectiveDateTimeType().getValue().toString(),
+                ((Encounter) obs.getEncounter().getResource()).getParticipantFirstRep().getIndividual().getDisplay(),
+                "",
+                obs.getValue().toString(),
+                ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay());
+     }
+
+    private String getMedName(Observation obs) {
+        try {
+            return obs.hasHasMember() && obs.getHasMember().size() > 1 ?
+                    ((Observation) ((Reference)obs.getHasMember().toArray()[1]).getResource()).getValueCodeableConcept().getCodingFirstRep().getDisplay() :
+                    obs.getValue().toString();
+        } catch (Exception e) {
+            return obs.getValue().toString();
+        }
     }
+
+    private Medication mapMedicationList(Observation obs) {
+        //        medication, brandName, startDate, productForm, dose, route, adminInstructions, pharmInstructions,
+        //                status, indications, reaction, description, dataSource
+        return new Medication(
+                obs.getValue().toString(),
+                getMedName(obs),
+                obs.getEffectiveDateTimeType().getValue(),
+                "", "", "", "", "",
+                obs.getStatus().getDisplay(), "", "",
+                obs.getValue().toString(),
+                ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay());
+    }
+
 
 
     private Immunization mapImmunizationResource(Observation obs) {
@@ -208,7 +234,10 @@ public final class XdsUtil {
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay()
                 , obs.getCode().getCodingFirstRep().getCode()
                 , ""
-                , obs.getIssued().toString(), "", "", "", obs.getValueCodeableConcept().getCodingFirstRep().getDisplay());
+                , obs.getEffectiveDateTimeType().getValue().toString(),
+                ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay(),
+                "", "",
+                obs.getValueCodeableConcept().getCodingFirstRep().getDisplay());
     }
 
     private InsuranceCoverage mapCoverageResource(Coverage coverage) {
@@ -235,7 +264,7 @@ public final class XdsUtil {
         String identifier = null;
         identifier = getLoincCode(obs);
         return new DiagnosticReport(
-                identifier != null ? identifier : obs.getCode().getCodingFirstRep().getCode(),
+                identifier != null ? identifier : getLoincCode(obs),
                 obs.getCode().getCodingFirstRep().getDisplay(),
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getEffectiveDateTimeType().getValue().toString(),
@@ -276,7 +305,7 @@ public final class XdsUtil {
         return new Immunization(immunization);
     }
 
-    private Medication mapMedicationResource(org.hl7.fhir.r4.model.Medication medication) {
+    private Medication mapMedicationRequest(org.hl7.fhir.r4.model.Medication medication) {
         return new Medication(medication);
     }
 
@@ -299,12 +328,13 @@ public final class XdsUtil {
 
     private CcdEncounter mapEncounterResource(Map<String, Object> ccdStringMap, Encounter encounter) {
 //    	encounter, providers, location, date, indications, dataSource
-        return new CcdEncounter(encounter.getClass_().getSystem()+"|"+encounter.getClass_().getCode(),
+        return new CcdEncounter(encounter.getTypeFirstRep().getCodingFirstRep().getDisplay(),
                 encounter.getParticipantFirstRep().getIndividual().getDisplay(),
                 encounter.getLocationFirstRep().getLocation().getDisplay(),
                 encounter.getMeta().getLastUpdated().toString(),
                 null,
-                encounter.getMeta().getSource());
+                encounter.getMeta().getSource(),
+                encounter.getTypeFirstRep().getCodingFirstRep().getDisplay());
     }
 
     private VitalSign mapObservationResource(Observation obs) {
@@ -525,12 +555,13 @@ public final class XdsUtil {
     }
 
     private class CcdEncounter {
-        private String encounter, providers, location, date, indications, dataSource;
+        private String encounter, providers, location, date, indications, dataSource, type;
 
-        public CcdEncounter(String encounter, String providers, String location, String date, String indications, String dataSource) {
+        public CcdEncounter(String encounter, String providers, String location, String date, String indications, String dataSource, String type) {
             this.encounter = encounter;
             this.providers = providers;
             this.location = location;
+            this.type = type;
             this.date = date;
             this.indications = indications;
             this.dataSource = dataSource;
@@ -586,12 +617,12 @@ public final class XdsUtil {
     }
 
     private class MedicationPrescription {
-        private String identifier, status, intent, category, authoredOn, requester, reasonCode, dosage;
+        private String identifier, status, intent, category, authoredOn, requester, reasonCode, dosage, location;
 
         public MedicationPrescription(MedicationRequest medicationRequest) {
         }
 
-        public MedicationPrescription(String identifier, String status, String intent, String category, String authoredOn, String requester, String reasonCode, String dosage) {
+        public MedicationPrescription(String identifier, String status, String intent, String category, String authoredOn, String requester, String reasonCode, String dosage, String location) {
             this.identifier = identifier;
             this.status = status;
             this.intent = intent;
@@ -600,6 +631,7 @@ public final class XdsUtil {
             this.requester = requester;
             this.reasonCode = reasonCode;
             this.dosage = dosage;
+            this.location = location;
         }
 
         public String getIdentifier() {
@@ -665,6 +697,12 @@ public final class XdsUtil {
         public void setDosage(String dosage) {
             this.dosage = dosage;
         }
+        public String getLocation() {  return location;    }
+
+        public void setLocation(String location) {
+            this.location = location;
+        }
+
     }
 
     private class Medication {

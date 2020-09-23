@@ -214,7 +214,7 @@
                 <% if(encounters){ %>
                 <% encounters.each{ encounter -> %>
                 <tr>
-                    <td><%= encounter.encounter  %></td>
+                    <td><%= encounter.type  %></td>
                     <td><%= encounter.providers  %></td>
                     <td><%= encounter.location  %></td>
                     <td><%= encounter.date  %></td>
@@ -236,7 +236,9 @@
                 <thead>
                 <tr>
                     <th>Medication</th>
-                    <th>Description</th>
+                    <th>Date Requested</th>
+                    <th>Requester</th>
+                    <th>Category</th>
                     <th>Location</th>
                 </tr>
                 </thead>
@@ -248,9 +250,12 @@
                 <% if(medicationPrescriptions){ %>
                 <% medicationPrescriptions.each{ medicationPrescription -> %>
                 <tr>
-                    <td><%= medicationPrescription.medication  %></td>
-                    <td><%= medicationPrescription.description  %></td>
-                    <td><%= medicationPrescription.dataSource  %></td>
+                    <td><%= medicationPrescription.identifier  %></td>
+                    <td><%= medicationPrescription.authoredOn  %></td>
+                    <td><%= medicationPrescription.requester  %></td>
+                    <td><%= medicationPrescription.category  %></td>
+                    <td><%= medicationPrescription.location %></td>
+
                 </tr>
                 <%}
                 }else{ %>
@@ -269,9 +274,7 @@
                 <thead>
                 <tr>
                     <th>Medication</th>
-                    <th>Brand Name</th>
                     <th>Start Date</th>
-                    <th>Description</th>
                     <th>Location</th>
                 </tr>
                 </thead>
@@ -283,10 +286,8 @@
                 <% if(medications){ %>
                 <% medications.each{ medication -> %>
                 <tr>
-                    <td><%= medication.medication  %></td>
                     <td><%= medication.brandName  %></td>
                     <td><%= medication.startDate  %></td>
-                    <td><%= medication.description  %></td>
                     <td><%= medication.dataSource  %></td>
                 </tr>
                 <%}
@@ -306,12 +307,10 @@
             <table>
                 <thead>
                 <tr>
-                    <th>Code</th>
-                    <th>Display Name</th>
+                    <th>Name</th>
                     <th>Problem Type</th>
                     <th>Effective Dates</th>
-                    <th>Severity</th>
-                    <th>Notes</th>
+                    <th>Code</th>
                 </tr>
                 </thead>
             </table>
@@ -322,12 +321,10 @@
                 <% if(conditions){ %>
                 <% conditions.each{ condition -> %>
                 <tr>
-                    <td><%= condition.code %></td>
                     <td><%= condition.displayName %></td>
                     <td><%= condition.type %></td>
                     <td><%= condition.effectiveDates %></td>
-                    <td><%= condition.severity %></td>
-                    <td><%= condition.notes %></td>
+                    <td><%= condition.code %></td>
                 </tr>
                 <%}
                 }else{ %>
@@ -463,10 +460,10 @@
                 <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Code</th>
                     <th>Value</th>
                     <th>Date</th>
                     <th>Location</th>
+                    <th>Code</th>
                 </tr>
                 </thead>
             </table>
@@ -478,10 +475,10 @@
                 <% vitalSigns.each{ vitalSign -> %>
                 <tr>
                     <td><%= vitalSign.name  %></td>
-                    <td><%= vitalSign.identifier  %></td>
                     <td><%= vitalSign.value  %></td>
                     <td><%= vitalSign.date  %></td>
                     <td><%= vitalSign.location  %></td>
+                    <td><%= vitalSign.id  %></td>
                 </tr>
                 <%}
                 }else{ %>
