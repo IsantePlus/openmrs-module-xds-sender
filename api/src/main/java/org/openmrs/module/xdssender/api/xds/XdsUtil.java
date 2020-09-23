@@ -223,8 +223,6 @@ public final class XdsUtil {
                 ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay());
     }
 
-
-
     private Immunization mapImmunizationResource(Observation obs) {
 //        identifier, vaccineCode,doseQuantity, occurrenceDate,site,route,status,
         String identifier = null;

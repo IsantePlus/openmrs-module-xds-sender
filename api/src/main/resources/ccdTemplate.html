@@ -286,7 +286,7 @@
                 <% if(medications){ %>
                 <% medications.each{ medication -> %>
                 <tr>
-                    <td><%= medication.brandName  %></td>
+                    <td><%= medication.description  %></td>
                     <td><%= medication.startDate  %></td>
                     <td><%= medication.dataSource  %></td>
                 </tr>
@@ -342,12 +342,12 @@
             <table>
                 <thead>
                 <tr>
-                    <th>Code</th>
                     <th>Procedure</th>
                     <th>Description</th>
                     <th>Date</th>
                     <th>Indications</th>
                     <th>Outcome</th>
+                    <th>Code</th>
                 </tr>
                 </thead>
             </table>
@@ -358,12 +358,12 @@
                 <% if(procedures){ %>
                 <% procedures.each{ procedure -> %>
                 <tr>
-                    <td><%= procedure.code %></td>
                     <td><%= procedure.procedure %></td>
                     <td><%= procedure.description %></td>
                     <td><%= procedure.date %></td>
                     <td><%= procedure.indications %></td>
                     <td><%= procedure.outcome %></td>
+                    <td><%= procedure.code %></td>
                 </tr>
                 <%}
                 }else{ %>
@@ -387,9 +387,6 @@
                     <th>Name</th>
                     <th>Date</th>
                     <th>Result</th>
-                    <th>Status</th>
-                    <th>Conclusion</th>
-                    <th>Supporting Document(s)</th>
                 </tr>
                 </thead>
             </table>
@@ -405,9 +402,6 @@
                     <td><%= diagnosticReport.name %></td>
                     <td><%= diagnosticReport.date %></td>
                     <td><%= diagnosticReport.result %></td>
-                    <td><%= diagnosticReport.status %></td>
-                    <td><%= diagnosticReport.conclusion %></td>
-                    <td><%= diagnosticReport.presentedForm %></td>
                 </tr>
                 <%}
                 }else{ %>
@@ -426,9 +420,9 @@
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Vaccine Code</th>
                     <th>Date</th>
                     <th>Location</th>
+                    <th>Vaccine Code</th>
                 </tr>
                 </thead>
             </table>
@@ -440,9 +434,9 @@
                 <% immunizations.each{ immunization -> %>
                 <tr>
                     <td><%= immunization.identifier %></td>
-                    <td><%= immunization.vaccineCode %></td>
                     <td><%= immunization.occurrenceDate %></td>
                     <td><%= immunization.site %></td>
+                    <td><%= immunization.vaccineCode %></td>
                 </tr>
                 <%}
                 }else{ %>
