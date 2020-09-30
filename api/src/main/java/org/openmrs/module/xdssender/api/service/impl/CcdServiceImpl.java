@@ -55,10 +55,23 @@ public class CcdServiceImpl implements CcdService {
         return ccdDao.find(patient);
     }
 
+
+
+
     @Override
     public String getHtmlParsedLocallyStoredCcd(Patient patient) {
-        XdsUtil xdsUtil = new XdsUtil();
         String ccdString = getLocallyStoredCcd(patient).getDocument();
+        return getCcdString(ccdString);
+    }
+
+    @Override
+    public String getHtmlParsedLocallyStoredCcd(Ccd ccd) {
+        String ccdString = ccd.getDocument();
+        return getCcdString(ccdString);
+    }
+
+    private String getCcdString(String ccdString) {
+        XdsUtil xdsUtil = new XdsUtil();
         Bundle resource = (Bundle) fhirContext.newJsonParser().parseResource(ccdString);
         File ccdTemplate = new File(OpenmrsUtil.getApplicationDataDirectory(), "ccdTemplate.txt");
         String ccdFormedString = null;
