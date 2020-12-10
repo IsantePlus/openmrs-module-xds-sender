@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.openmrs.module</groupId>
 		<artifactId>xds-sender</artifactId>
-		<version>1.0.0</version>
+		<version>2.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>xds-sender-omod</artifactId>
@@ -50,5 +50,33 @@
 			</testResource>
 		</testResources>
 	</build>
-
+	<profiles>
+		<profile>
+			<id>github-packages</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-deploy-plugin</artifactId>
+						<executions>
+							<execution>
+								<!-- Deploy OpenMRS omod file -->
+								<id>deploy-file</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>deploy-file</goal>
+								</goals>
+								<configuration>
+									<url>https://maven.pkg.github.com/isanteplus/isanteplus-packages</url>
+									<file>target/${project.parent.artifactId}-${project.version}.omod</file>
+									<repositoryId>github-packages</repositoryId>
+									<pomFile>pom.xml</pomFile>
+									<packaging>omod</packaging>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
