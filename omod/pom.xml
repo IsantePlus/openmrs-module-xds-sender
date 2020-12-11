@@ -69,8 +69,11 @@
 									<url>https://maven.pkg.github.com/isanteplus/isanteplus-packages</url>
 									<file>target/${project.parent.artifactId}-${project.version}.omod</file>
 									<repositoryId>github-packages</repositoryId>
-									<pomFile>pom.xml</pomFile>
 									<packaging>omod</packaging>
+									<generatePom>false</generatePom>
+									<artifactId>${project.parent.artifactId}</artifactId>
+									<version>${project.version}</version>
+									<groupId>${groupId}</groupId>
 								</configuration>
 							</execution>
 						</executions>
