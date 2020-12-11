@@ -210,28 +210,28 @@
 		<repository>
 			<id>openmrs-repo</id>
 			<name>OpenMRS Nexus Repository</name>
-			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+			<url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
 		</repository>
 		<repository>
 			<id>central</id>
 			<name>Maven Repository Switchboard</name>
 			<layout>default</layout>
-			<url>http://repo1.maven.org/maven2</url>
+			<url>https://repo1.maven.org/maven2</url>
 		</repository>
 		<repository>
 			<id>dcm4che</id>
-			<url>http://dcm4che.org/maven2</url>
+			<url>https://dcm4che.org/maven2</url>
 		</repository>
 		<repository>
 			<id>marc-te-main</id>
-			<url>http://te.marc-hi.ca/mvn</url>
+			<url>https://te.marc-hi.ca/mvn</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>openmrs-repo</id>
 			<name>OpenMRS Nexus Repository</name>
-			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+			<url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>

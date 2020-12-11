@@ -113,10 +113,10 @@
 					<generatePackage>org.openmrs.module.xdssender.notificationspullpoint</generatePackage>
 					<schemas>
 						<schema>
-							<url>http://docs.oasis-open.org/wsn/bw-2.wsdl</url>
+							<url>https://docs.oasis-open.org/wsn/bw-2.wsdl</url>
 						</schema>
 						<schema>
-							<url>http://docs.oasis-open.org/wsn/brw-2.wsdl</url>
+							<url>https://docs.oasis-open.org/wsn/brw-2.wsdl</url>
 						</schema>
 					</schemas>
 				</configuration>
