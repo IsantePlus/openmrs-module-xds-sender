@@ -11,7 +11,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>xds-sender</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<packaging>pom</packaging>
 	<name>XDS Sender</name>
 	<description>Module for sending XDS.b documents for encounters</description>
@@ -204,13 +204,13 @@
 		<repository>
 			<id>openmrs-repo</id>
 			<name>OpenMRS Nexus Repository</name>
-			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+			<url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
 		</repository>
 		<repository>
 			<id>central</id>
 			<name>Maven Repository Switchboard</name>
 			<layout>default</layout>
-			<url>http://repo1.maven.org/maven2</url>
+			<url>https://repo1.maven.org/maven2</url>
 		</repository>
 		<repository>
 			<id>dcm4che</id>
@@ -220,16 +220,73 @@
 			<id>marc-te-main</id>
 			<url>http://te.marc-hi.ca/mvn</url>
 		</repository>
+		<repository>
+			<id>santesute-main</id>
+			<url>http://santesuite.org/mvn</url>
+			<name>SanteSuite</name>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>openmrs-repo</id>
 			<name>OpenMRS Nexus Repository</name>
-			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+			<url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-
+	<profiles>
+		<profile>
+			<!-- Github Packages Integration -->
+			<id>github-packages</id>
+			<distributionManagement>
+				<!-- Deploy to Github Packages -->
+				<repository>
+					<id>github-packages</id>
+					<name>Github iSantePlus Packages</name>
+					<url>https://maven.pkg.github.com/isanteplus/isanteplus-packages</url>
+					<uniqueVersion>false</uniqueVersion>
+				</repository>
+				<snapshotRepository>
+					<id>github-packages</id>
+					<name>Github iSantePlus Packages</name>
+					<url>https://maven.pkg.github.com/isanteplus/isanteplus-packages</url>
+					<uniqueVersion>true</uniqueVersion>
+				</snapshotRepository>
+			</distributionManagement>
+			<repositories>
+				<!-- Use the Github Packages Repo first when looking up dependencies -->
+				<repository>
+					<id>github-packages</id>
+					<name>Github iSantePlus Packages</name>
+					<url>https://maven.pkg.github.com/isanteplus/isanteplus-packages</url>
+				</repository>
+			</repositories>
+			<build>
+				<plugins>
+					<!-- Disable possible test jar generation -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>none</phase>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-pmd-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>validate</id>
+								<phase>none</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
