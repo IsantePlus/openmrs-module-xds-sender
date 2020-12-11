@@ -220,7 +220,7 @@
 		</repository>
 		<repository>
 			<id>dcm4che</id>
-			<url>https://dcm4che.org/maven2</url>
+			<url>http://dcm4che.org/maven2</url>
 		</repository>
 		<repository>
 			<id>marc-te-main</id>
