@@ -224,7 +224,7 @@
 		</repository>
 		<repository>
 			<id>marc-te-main</id>
-			<url>https://te.marc-hi.ca/mvn</url>
+			<url>http://te.marc-hi.ca/mvn</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
