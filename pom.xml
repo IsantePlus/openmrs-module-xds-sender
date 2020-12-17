@@ -242,7 +242,6 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-
 	<profiles>
 		<profile>
 			<!-- Github Packages Integration -->
