@@ -83,6 +83,11 @@ public class XdsSenderConfig {
 
 	private static final String NOTIFICATIONS_PULL_POINT_PASSWORD = "xdssender.notificationsPullPoint.password";
 
+	private static final String SHR_TYPE = "xdssender.shrType";
+
+	private static final String MPI_ENDPOINT = "xdssender.mpiEndpoint";
+
+
 	public static XdsSenderConfig getInstance() {
 		return Context.getRegisteredComponent("xdssender.XdsSenderConfig", XdsSenderConfig.class);
 	}
@@ -95,7 +100,11 @@ public class XdsSenderConfig {
 	public String getShrRoot() {
 		return getProperty(SHR_ROOT, "1.2.3.4.5");
 	}
-	
+
+	public String getMpiEndpoint() {
+		return getProperty(MPI_ENDPOINT, "1.2.3.4.5");
+	}
+
 	public String getEncounterRoot() {
 		return getProperty(ENCOUNTER_ROOT, "1.2.3.4.5.2");
 	}
@@ -123,7 +132,9 @@ public class XdsSenderConfig {
 	public String getEcidRoot() {
 		return getProperty(ECID_ROOT, "2.16.840.1.113883.4.56");
 	}
-	
+
+	public String getShrType() { return getProperty(SHR_TYPE, "fhir"); }
+
 	public String getCodeNationalRoot() {
 		return getProperty(CODE_NATIONAL_ROOT, "2.25.212283553061960040061731875660599129565");
 	}
@@ -167,6 +178,8 @@ public class XdsSenderConfig {
 	public String getExportCcdEndpoint() {
 		return getProperty(XDSSENDER_EXPORT_CCD_ENDPOINT);
 	}
+
+	public String getLocalPatientIdRoot() { return getProperty("mpi-client.pid.local"); }
 	
 	public String getOshrUsername() {
 		return getProperty(XDSSENDER_OSHR_USERNAME);
@@ -233,4 +246,6 @@ public class XdsSenderConfig {
 	private <T> T getComponentByGlobalProperty(String propertyName, Class<T> type) {
 		return Context.getRegisteredComponent(getProperty(propertyName), type);
 	}
+
+
 }
