@@ -1,7 +1,6 @@
 package org.openmrs.module.xdssender.api.notificationspullpoint.impl;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
@@ -10,12 +9,13 @@ import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.Result;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.pool.ConnFactory;
+import org.openmrs.api.context.Context;
+import org.openmrs.hl7.HL7Service;
+import org.openmrs.module.labintegration.api.hl7.messages.util.OruR01Util;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.notificationspullpoint.NotificationsPullPointClient;
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessages;
@@ -34,6 +34,7 @@ import org.springframework.ws.transport.context.TransportContext;
 import org.springframework.ws.transport.context.TransportContextHolder;
 import org.springframework.ws.transport.http.HttpUrlConnection;
 import org.springframework.xml.transform.StringResult;
+import org.w3c.dom.Element;
 
 import ca.uhn.hl7v2.model.Message;
 import okhttp3.MediaType;
@@ -64,9 +65,15 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 			response = (GetMessagesResponse) getResponseHttpClient(request);
 			List<Message> result = new ArrayList<>();
 
+			HL7Service hl7Service = Context.getHL7Service();
 			for (NotificationMessageHolderType notification : response.getNotificationMessage()) {
 				// TODO: Ensure that this casting is working properly
-				result.add((Message) notification.getMessage().getAny());
+				Element el = (Element) notification.getMessage().getAny();
+				// Message e = new PipeParser().parse(el.getTextContent());
+				String parsedMesage = OruR01Util.changeMessageVersionFrom251To25(el.getTextContent().replace("\n", Character.toString((char) 13)));
+				Message message = hl7Service.parseHL7String(parsedMesage);
+				
+				result.add(message);
 			}
 
 			return result;
@@ -118,15 +125,15 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 			.method("POST", body)
 			.addHeader("Content-Type", "text/xml; charset=utf-8")
 			.addHeader("Accept", "text/xml, text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2")
-			.addHeader("Accept-Encoding", "gzip")
 			.addHeader("Authorization",  generateBasicAuthenticationHeader(
 				config.getNotificationsPullPointUsername(), config.getNotificationsPullPointPassword()))
 			.build();
 		Response response = client.newCall(request).execute();
 
-        JAXBContext jaxbContext = JAXBContext.newInstance("org.oasis_open.docs.wsn.b_2");
+        JAXBContext jaxbContext = JAXBContext.newInstance("org.openmrs.module.xdssender.notificationspullpoint");
 		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        Object res = unmarshaller.unmarshal(IOUtils.toInputStream(response.body().string()));
+        String responseText = response.body().string();
+		Object res = unmarshaller.unmarshal(IOUtils.toInputStream(responseText));
 
 		return res;
 
