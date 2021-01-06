@@ -13,6 +13,7 @@ import org.openmrs.module.labintegration.api.model.OrderDestination;
 import org.openmrs.module.xdssender.api.cda.CdaDataUtil;
 import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,7 +35,8 @@ public class ORM_O01DocumentBuilder {
     private static final String CLASS_CODE = "34133-9";
     private static final String CLASS_CODE_SCHEME = "LOINC";
 
-    private CdaDataUtil cdaDataUtil = CdaDataUtil.getInstance();
+    @Autowired
+    private CdaDataUtil cdaDataUtil;
 
     @Autowired
     private OrderGeneratorManager orderGeneratorManager;
