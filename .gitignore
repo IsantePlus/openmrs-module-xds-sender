@@ -11,3 +11,6 @@ target
 *.war
 *.ear
 /target/*
+
+# Mac OSX
+.DS_Store
