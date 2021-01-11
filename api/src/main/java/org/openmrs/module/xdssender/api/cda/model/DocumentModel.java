@@ -87,7 +87,7 @@ public final class DocumentModel {
 			DocumentModel retVal = new DocumentModel();
 			retVal.html = sw.toString();
 			retVal.applyFormatting();
-			log.error(retVal.html);
+			log.debug(retVal.html);
 			retVal.typeCode = typeCode;
 			retVal.typeCodeScheme = typeCodeScheme;
 			retVal.formatCode = formatCode;
