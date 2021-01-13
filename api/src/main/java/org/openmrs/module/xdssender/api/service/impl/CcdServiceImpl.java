@@ -22,8 +22,11 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Service(value = "xdsSender.CcdService")
 public class CcdServiceImpl implements CcdService {
@@ -55,25 +58,48 @@ public class CcdServiceImpl implements CcdService {
         return ccdDao.find(patient);
     }
 
-
-
-
     @Override
     public String getHtmlParsedLocallyStoredCcd(Patient patient) {
-        String ccdString = getLocallyStoredCcd(patient).getDocument();
-        return getCcdString(ccdString);
+        Ccd ccd;
+        if(patient != null) {
+             ccd = getLocallyStoredCcd(patient);
+        } else {
+            ccd = null;
+        }
+
+        return getHtmlParsedLocallyStoredCcd(ccd);
     }
 
     @Override
     public String getHtmlParsedLocallyStoredCcd(Ccd ccd) {
-        String ccdString = ccd.getDocument();
+        String ccdString;
+
+        if(ccd != null){
+            ccdString = ccd.getDocument();
+        } else {
+            ccdString = null;
+        }
+
         return getCcdString(ccdString);
     }
 
     private String getCcdString(String ccdString) {
+        // TODO: Internationalization
+        if(isNullOrEmpty(ccdString)) {
+            return "<h1>Unable to find or render CCD for Patient</h1>";
+        }
+
         XdsUtil xdsUtil = new XdsUtil();
         Bundle resource = (Bundle) fhirContext.newJsonParser().parseResource(ccdString);
-        File ccdTemplate = new File(OpenmrsUtil.getApplicationDataDirectory(), "ccdTemplate.txt");
+
+        File ccdTemplate = null;
+
+        try {
+            ccdTemplate = new File(CcdServiceImpl.class.getClassLoader().getResource("ccdTemplate.html").toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
         String ccdFormedString = null;
         try {
             if (!ccdTemplate.exists()) {
@@ -93,12 +119,8 @@ public class CcdServiceImpl implements CcdService {
     public Ccd downloadAndSaveCcd(Patient patient) throws XDSException {
         Ccd ccd;
 
-        if (true) {
-            shrImportService.setFhirContext(fhirContext);
-            ccd = shrImportService.retrieveCCD(patient);
-        } else {
-            ccd = xdsImportService.retrieveCCD(patient);
-        }
+        shrImportService.setFhirContext(fhirContext);
+        ccd = shrImportService.retrieveCCD(patient);
 
         if (ccd != null) {
             ccd = ccdDao.saveOrUpdate(ccd);

@@ -40,7 +40,7 @@ public class ShrImportServiceImpl implements XdsImportService {
 	}
 
 	@Override
-	public Ccd retrieveCCD(Patient patient) throws XDSException {
+	public Ccd retrieveCCD(Patient patient) {
 		Ccd ccd = null;
 		Bundle result;
 		try {
