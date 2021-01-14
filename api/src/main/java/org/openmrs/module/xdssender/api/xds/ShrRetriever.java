@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Resource;
@@ -39,7 +41,8 @@ public class ShrRetriever {
 		try {
 			String mpiIdentifier = config.getLocalPatientIdRoot() + patient.getUuid();
 
-			IGenericClient mpiClient = fhirContext.getRestfulClientFactory().newGenericClient(config.getMpiEndpoint());
+			IGenericClient mpiClient = getAuthenticatedClient(config.getMpiEndpoint(), config.getOshrUsername(), config.getOshrPassword());
+
 			// By default, just get this instance's patient
 			String patientIds = patient.getUuid();
 
@@ -121,8 +124,7 @@ public class ShrRetriever {
 			}
 
 			// Get SHR Bundle for collected patient ids
-			IGenericClient shrClient = fhirContext.getRestfulClientFactory().newGenericClient(config.getExportCcdEndpoint());
-
+			IGenericClient shrClient = getAuthenticatedClient(config.getExportCcdEndpoint(), config.getOshrUsername(), config.getOshrPassword());
 			Bundle returnBundle =  shrClient.search().byUrl("/Patient?_id=" + patientIds + "&_revinclude=*").returnBundle(Bundle.class)
 					.execute();
 
@@ -146,5 +148,15 @@ public class ShrRetriever {
 			}
 		}
 		return patientEcid;
+	}
+
+	public IGenericClient getAuthenticatedClient(String targetUrl, String username, String password) {
+		IClientInterceptor authInterceptor = new BasicAuthInterceptor(username, password);
+		fhirContext.getRestfulClientFactory().setSocketTimeout(200 * 1000);
+
+		IGenericClient client = fhirContext.getRestfulClientFactory().newGenericClient(targetUrl);
+		client.registerInterceptor(authInterceptor);
+
+		return client;
 	}
 }

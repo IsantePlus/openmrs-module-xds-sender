@@ -1,0 +1,479 @@
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: sans-serif;
+        color: rgb(64,64,64);
+        padding: 0;
+        margin: 0;
+    }
+
+    table {
+        border-collapse: collapse;
+        table-layout: fixed;
+        width: 100%;
+        background: white;
+    }
+
+    th, td {
+        border: 1px solid lightgray;
+        padding: 8px;
+        text-align: left;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        word-break: break-all;
+
+    &:first-child {
+         width: 90px;
+     }
+    &:last-child {
+         text-align: right;
+         width: 60px;
+     }
+    }
+
+    th {
+        background: teal;
+        color: white;
+        text-transform: uppercase;
+        font-weight: normal;
+    }
+
+    table tr:first-child td {
+        border-top: none;
+    }
+
+    .container {
+        width: 100%;
+        padding: 24px;
+    }
+
+    .head {
+        flex: 0 0 37px; // for Safari and IE
+    overflow-y: scroll;
+    }
+
+    .doc_head {
+        flex: 0 0 37px; // for Safari and IE
+    overflow-y: scroll;
+        text-align: center !important;
+    }
+
+    .p_header{
+        text-align: left;
+        padding-left: 59px;
+        margin-top: 11px;
+        margin-bottom: 11px;
+        font: bold 11px 'Verdana';
+        text-decoration: underline;
+        color: #444444;
+        line-height: 13px;
+    }
+
+    .section_links{
+        text-align: left;
+        padding-left: 93px;
+        margin-top: 1px;
+        margin-bottom: 0px;
+        font: 11px 'Verdana';
+        text-decoration: underline;
+        color: #444444;
+        line-height: 13px;
+    }
+
+
+</style>
+<div class="container"> <!--provides a wrapper for testing the scroll-->
+    <!--Patient Demographic Summary-->
+
+    <div class="doc_head">
+
+        <p>Continuity of Care Document <br>Created On: ${createdDate}</p>
+
+    </div> <!--/.tWrap__head-->
+
+
+    <!--Patient Demographic Summary-->
+    <div>
+        <div class="head">
+            <table>
+                <thead>
+                <tr>
+                    <th colspan = "6">Demographics</th>
+                </tr>
+                </thead>
+            </table>
+        </div> <!--/.tWrap__head-->
+        <div>
+            <table>
+                <tbody>
+                <tr>
+                    <td>Patient:</td>
+                    <td>${givenName} ${familyName}</td>
+                    <td>Identifier:</td>
+                    <td>${patientId}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>${address.city}</td>
+                    <td>Gender:</td>
+                    <td>${gender}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>${address.state}, ${address.country}</td>
+                    <td>Birth Date:</td>
+                    <td>${birthDate}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <p class="p_header">Table of Contents</p>
+        <p class="section_links ft15"><a href="#allergies">Allergies and Adverse Reactions</a></p>
+        <p class="section_links ft15"><a href="#encounters">Encounters</a></p>
+        <p class="section_links ft15"><a href="#medications_requests">Medication Requests</a></p>
+        <p class="section_links ft15"><a href="#medications">Medications</a></p>
+        <p class="section_links ft15"><a href="#problems">Problems, Conditions, and Diagnoses</a></p>
+        <p class="section_links ft15"><a href="#procedures">Surgeries/Procedures</a></p>
+        <p class="section_links ft15"><a href="#results">Results</a></p>
+        <p class="section_links ft15"><a href="#immunizations">Immunizations</a></p>
+        <p class="section_links ft15"><a href="#vitals">Vital Signs</a></p>
+
+    </div> <!--/.tWrap-->
+
+    <p id="allergies" class="p_header">Allergies and Adverse Reactions</p>
+
+    <div>
+        <div class="head">
+            <table>
+                <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Substance</th>
+                    <th>Reaction</th>
+                    <th>Status</th>
+                    <th>Severity</th>
+                </tr>
+                </thead>
+            </table>
+        </div> <!--/.tWrap__head-->
+        <div>
+            <table>
+                <tbody>
+                <% if(intolerances){ %>
+                <% intolerances.each{ intolerance -> %>
+                <tr>
+                    <td><%= intolerance.type  %></td>
+                    <td><%= intolerance.description  %></td>
+                    <td><%= intolerance.substance  %></td>
+                    <td><%= intolerance.reaction  %></td>
+                    <td><%= intolerance.status  %></td>
+                    <td><%= intolerance.criticality  %></td>
+                </tr>
+                <%}
+                }else{ %>
+                <tr><td colspan = "7">No Data</td></tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div> <!--/.tWrap-->
+
+
+    <p id="encounters" class="p_header">Encounters</p>
+
+    <div>
+
+        <div class="head">
+            <table>
+                <thead>
+                <tr>
+                    <th>Encounter</th>
+                    <th>Providers</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+            </table>
+        </div> <!--/.tWrap__head-->
+        <div>
+            <table>
+                <tbody>
+                <% if(encounters){ %>
+                <% encounters.each{ encounter -> %>
+                <tr>
+                    <td><%= encounter.type  %></td>
+                    <td><%= encounter.providers  %></td>
+                    <td><%= encounter.location  %></td>
+                    <td><%= encounter.date  %></td>
+                </tr>
+                <%}
+                }else{ %>
+                <tr><td colspan = "6">No Data</td></tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div> <!--/.tWrap-->
+
+    <p id="medications_requests" class="p_header">Medication Requests</p>
+
+    <div>
+        <div class="head">
+            <table>
+                <thead>
+                <tr>
+                    <th>Medication</th>
+                    <th>Date Requested</th>
+                    <th>Requester</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                </tr>
+                </thead>
+            </table>
+        </div> <!--/.tWrap__head-->
+        <div>
+            <table>
+                <tbody>
+                <% if(medicationPrescriptions){ %>
+                <% medicationPrescriptions.each{ medicationPrescription -> %>
+                <tr>
+                    <td><%= medicationPrescription.identifier  %></td>
+                    <td><%= medicationPrescription.authoredOn  %></td>
+                    <td><%= medicationPrescription.requester  %></td>
+                    <td><%= medicationPrescription.category  %></td>
+                    <td><%= medicationPrescription.location %></td>
+
+                </tr>
+                <%}
+                }else{ %>
+                <tr><td colspan = "9">No Data</td></tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div> <!--/.tWrap-->
+
+    <p id="medications" class="p_header">Medications</p>
+
+    <div>
+        <div class="head">
+            <table>
+                <thead>
+                <tr>
+                    <th>Medication</th>
+                    <th>Start Date</th>
+                    <th>Location</th>
+                </tr>
+                </thead>
+            </table>
+        </div> <!--/.tWrap__head-->
+        <div>
+            <table>
+                <tbody>
+                <% if(medications){ %>
+                <% medications.each{ medication -> %>
+                <tr>
+                    <td><%= medication.description  %></td>
+                    <td><%= medication.startDate  %></td>
+                    <td><%= medication.dataSource  %></td>
+                </tr>
+                <%}
+                }else{ %>
+                <tr><td colspan = "13">No Data</td></tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div> <!--/.tWrap-->
+
+    <p id="problems" class="p_header">Problems, Conditions, and Diagnoses</p>
+
+    <div>
+
+        <div class="head">
+            <table>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Problem Type</th>
+                    <th>Effective Dates</th>
+                    <th>Code</th>
+                </tr>
+                </thead>
+            </table>
+        </div> <!--/.tWrap__head-->
+        <div>
+            <table>
+                <tbody>
+                <% if(conditions){ %>
+                <% conditions.each{ condition -> %>
+                <tr>
+                    <td><%= condition.displayName %></td>
+                    <td><%= condition.type %></td>
+                    <td><%= condition.effectiveDates %></td>
+                    <td><%= condition.code %></td>
+                </tr>
+                <%}
+                }else{ %>
+                <tr><td colspan = "7">No Data</td></tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div> <!--/.tWrap-->
+
+    <p id="procedures" class="p_header">Surgeries/Procedures</p>
+
+    <div>
+        <div class="head">
+            <table>
+                <thead>
+                <tr>
+                    <th>Procedure</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th>Indications</th>
+                    <th>Outcome</th>
+                    <th>Code</th>
+                </tr>
+                </thead>
+            </table>
+        </div> <!--/.tWrap__head-->
+        <div>
+            <table>
+                <tbody>
+                <% if(procedures){ %>
+                <% procedures.each{ procedure -> %>
+                <tr>
+                    <td><%= procedure.procedure %></td>
+                    <td><%= procedure.description %></td>
+                    <td><%= procedure.date %></td>
+                    <td><%= procedure.indications %></td>
+                    <td><%= procedure.outcome %></td>
+                    <td><%= procedure.code %></td>
+                </tr>
+                <%}
+                }else{ %>
+                <tr><td colspan = "6">No Data</td></tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div> <!--/.tWrap-->
+
+
+    <p id="results" class="p_header">Results</p>
+
+    <div>
+        <div class="head">
+            <table>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Result</th>
+                    <th>Code</th>
+                </tr>
+                </thead>
+            </table>
+        </div> <!--/.tWrap__head-->
+        <div>
+            <table>
+                <tbody>
+                <% if(diagnosticReports){ %>
+                <% diagnosticReports.each{ diagnosticReport -> %>
+                <tr>
+                    <td><%= diagnosticReport.name %></td>
+                    <td><%= diagnosticReport.category %></td>
+                    <td><%= diagnosticReport.date %></td>
+                    <td><%= diagnosticReport.result %></td>
+                    <td><%= diagnosticReport.identifier %></td>
+                </tr>
+                <%}
+                }else{ %>
+                <tr><td colspan = "8">No Data</td></tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div> <!--/.tWrap-->
+
+    <p id="immunizations" class="p_header">Immunizations</p>
+
+    <div>
+        <div class="head">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Vaccine Code</th>
+                </tr>
+                </thead>
+            </table>
+        </div> <!--/.tWrap__head-->
+        <div>
+            <table>
+                <tbody>
+                <% if(immunizations){ %>
+                <% immunizations.each{ immunization -> %>
+                <tr>
+                    <td><%= immunization.identifier %></td>
+                    <td><%= immunization.occurrenceDate %></td>
+                    <td><%= immunization.site %></td>
+                    <td><%= immunization.vaccineCode %></td>
+                </tr>
+                <%}
+                }else{ %>
+                <tr><td colspan = "8">No Data</td></tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div> <!--/.tWrap-->
+    <p id="vitals" class="p_header">Vital Signs</p>
+
+    <div>
+        <div class="head">
+            <table>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Code</th>
+                </tr>
+                </thead>
+            </table>
+        </div> <!--/.tWrap__head-->
+        <div>
+            <table>
+                <tbody>
+                <% if(vitalSigns){ %>
+                <% vitalSigns.each{ vitalSign -> %>
+                <tr>
+                    <td><%= vitalSign.name  %></td>
+                    <td><%= vitalSign.value  %></td>
+                    <td><%= vitalSign.date  %></td>
+                    <td><%= vitalSign.location  %></td>
+                    <td><%= vitalSign.id  %></td>
+                </tr>
+                <%}
+                }else{ %>
+                <tr><td colspan = "8">No Data</td></tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div> <!--/.tWrap-->
+</div> <!--/.container-->
