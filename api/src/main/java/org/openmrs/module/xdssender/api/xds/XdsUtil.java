@@ -331,13 +331,13 @@ public final class XdsUtil {
             displayDesc = encounter.getClass_().getCode();
         }
 
-        return new CcdEncounter(displayDesc,
+        return new CcdEncounter(encounter.toString(),
                 encounter.getParticipantFirstRep().getIndividual().getDisplay(),
                 encounter.getLocationFirstRep().getLocation().getDisplay(),
                 encounter.getMeta().getLastUpdated().toString(),
                 null,
                 encounter.getMeta().getSource(),
-                encounter.getTypeFirstRep().getCodingFirstRep().getDisplay());
+                displayDesc);
     }
 
     private VitalSign mapObservationResource(Observation obs) {
