@@ -324,7 +324,14 @@ public final class XdsUtil {
 
     private CcdEncounter mapEncounterResource(Map<String, Object> ccdStringMap, Encounter encounter) {
 //    	encounter, providers, location, date, indications, dataSource
-        return new CcdEncounter(encounter.getTypeFirstRep().getCodingFirstRep().getDisplay(),
+        String displayDesc = "";
+        if(encounter.getTypeFirstRep().hasCoding()) {
+           displayDesc = encounter.getTypeFirstRep().getCodingFirstRep().getDisplay();
+        } else if (encounter.hasClass_()) {
+            displayDesc = encounter.getClass_().getCode();
+        }
+
+        return new CcdEncounter(displayDesc,
                 encounter.getParticipantFirstRep().getIndividual().getDisplay(),
                 encounter.getLocationFirstRep().getLocation().getDisplay(),
                 encounter.getMeta().getLastUpdated().toString(),
