@@ -170,7 +170,9 @@ public final class XdsUtil {
 
         }
 
-        Collections.sort(vitalSigns);
+        Collections.sort(vitalSigns, Collections.reverseOrder());
+        Collections.sort(encounters, Collections.reverseOrder());
+
         ccdStringMap.put("vitalSigns", vitalSigns);
         ccdStringMap.put("encounters", encounters);
         ccdStringMap.put("intolerances", intolerances);
@@ -571,7 +573,7 @@ public final class XdsUtil {
         }
     }
 
-    private class CcdEncounter {
+    private class CcdEncounter implements Comparable<CcdEncounter> {
         private String encounter, providers, location, date, indications, dataSource, type;
 
         public CcdEncounter(String encounter, String providers, String location, String date, String indications, String dataSource, String type) {
@@ -638,6 +640,11 @@ public final class XdsUtil {
 
         public void setType(String type) {
             this.type = type;
+        }
+
+        @Override
+        public int compareTo(CcdEncounter e) {
+            return getDate().compareTo(e.getDate());
         }
 
     }
