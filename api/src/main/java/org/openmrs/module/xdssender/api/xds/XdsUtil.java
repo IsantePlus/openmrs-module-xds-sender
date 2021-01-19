@@ -264,7 +264,7 @@ public final class XdsUtil {
                 obs.getCode().getCodingFirstRep().getDisplay(),
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getEffectiveDateTimeType().getValue().toString(),
-                "", "", "", "");
+                "", "", "", "", getLocationFromPatient(obs.getSubject()));
     }
 
     private Condition mapConditionResource(org.hl7.fhir.r4.model.Condition condition) {
@@ -279,7 +279,8 @@ public final class XdsUtil {
         return new Condition(identifier != null ? identifier : codingFirstRep.getCode(),
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 codingFirstRep.getDisplay(),
-                codingFirstRep.getDisplay(), obs.getIssued(), "", "");
+                codingFirstRep.getDisplay(), obs.getIssued(), "", "",
+                getLocationFromPatient(obs.getSubject()));
     }
 
     private String getLoincCode(CodeableConcept cc) {
@@ -312,17 +313,8 @@ public final class XdsUtil {
     private AllergyIntolerance mapAllergyIntoleranceResource(org.hl7.fhir.r4.model.AllergyIntolerance intolerance) {
         org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceReactionComponent reactionFirstRep = intolerance.getReactionFirstRep();
 
-        org.hl7.fhir.r4.model.Patient patient = (org.hl7.fhir.r4.model.Patient) intolerance.getPatient().getResource();
-        String location = "";
+        String location = getLocationFromPatient(intolerance.getPatient());
         String recordedDate = intolerance.hasRecordedDate() ? intolerance.getRecordedDate().toString() : "";
-
-        if(patient != null && patient.hasIdentifier()) {
-            try {
-                location = ((Reference) patient.getIdentifierFirstRep().getExtensionFirstRep().getValue()).getDisplay();
-            } catch (Exception e) {
-                // ignore for now
-            }
-        }
 
         return new AllergyIntolerance(intolerance.getType().getDisplay() + (intolerance.hasCategory() ? " - " + intolerance.getCategory().get(0).getCode() : ""),
                 intolerance.getCode().getCodingFirstRep().getDisplay(),
@@ -332,6 +324,20 @@ public final class XdsUtil {
                 reactionFirstRep.getSeverity() != null ? reactionFirstRep.getSeverity().getDisplay() : "",
                 intolerance.getMeta().getSource(), location, recordedDate
         );
+    }
+
+    private String getLocationFromPatient(Reference patientRef) {
+        org.hl7.fhir.r4.model.Patient patient = (org.hl7.fhir.r4.model.Patient) patientRef.getResource();
+
+        if(patient != null && patient.hasIdentifier()) {
+            try {
+                return ((Reference) patient.getIdentifierFirstRep().getExtensionFirstRep().getValue()).getDisplay();
+            } catch (Exception e) {
+                // Ignore for now
+            }
+        }
+
+        return "";
     }
 
     private CcdEncounter mapEncounterResource(Map<String, Object> ccdStringMap, Encounter encounter) {
@@ -390,10 +396,6 @@ public final class XdsUtil {
         putValue(ccdStringMap,"birthDate", birthDate.toString());
         putValue(ccdStringMap,"gender", gender);
         putValue(ccdStringMap,"address", addressFirstRep);
-
-
-
-
 
         putValue(ccdStringMap,"patientId", patientId.getValue());
         putValue(ccdStringMap,"maritalStatus", maritalStatus.getText());
@@ -721,6 +723,7 @@ public final class XdsUtil {
         public void setDosage(String dosage) {
             this.dosage = dosage;
         }
+
         public String getLocation() {  return location;    }
 
         public void setLocation(String location) {
@@ -1046,15 +1049,17 @@ public final class XdsUtil {
     }
 
     private class Procedure {
-        private String code, procedure, description, date, indications, outcome;
+        private String code, procedure, description, date, indications, outcome, location;
 
-        public Procedure(String code, String procedure, String description, String date, String indications, String outcome) {
+        public Procedure(String code, String procedure, String description, String date,
+                         String indications, String outcome, String location) {
             this.code = code;
             this.procedure = procedure;
             this.description = description;
             this.date = date;
             this.indications = indications;
             this.outcome = outcome;
+            this.location = location;
         }
 
         public Procedure(org.hl7.fhir.r4.model.Procedure procedure) {
@@ -1064,7 +1069,7 @@ public final class XdsUtil {
             setDate(procedure.getPerformedDateTimeType().getValueAsString());
             setIndications(procedure.getCategory().getText());
             setOutcome(procedure.getOutcome().getText());
-
+            setLocation(getLocationFromPatient(procedure.getSubject()));
         }
 
         public String getCode() {
@@ -1114,11 +1119,15 @@ public final class XdsUtil {
         public void setOutcome(String outcome) {
             this.outcome = outcome;
         }
+
+        public String getLocation() { return location; }
+
+        public void setLocation(String location) { this.location = location; }
     }
 
     private class Condition {
         //        A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.
-        private String code, displayName, description, type, severity, notes;
+        private String code, displayName, description, type, severity, notes, location;
         private Date effectiveDates;
 
 
@@ -1126,7 +1135,7 @@ public final class XdsUtil {
         }
 
         public Condition(String code, String displayName, String description, String type, Date effectiveDates,
-                         String severity, String notes) {
+                         String severity, String notes, String location) {
             this.code = code;
             this.displayName = displayName;
             this.description = description;
@@ -1134,6 +1143,7 @@ public final class XdsUtil {
             this.effectiveDates = effectiveDates;
             this.severity = severity;
             this.notes = notes;
+            this.location = location;
         }
 
         //Problems, Conditions, and Diagnoses
@@ -1144,7 +1154,8 @@ public final class XdsUtil {
                     condition.getCategoryFirstRep().getText(),
                     condition.getOnsetDateTimeType().getValue(),
                     condition.getSeverity().getText(),
-                    condition.getNoteFirstRep().getText()
+                    condition.getNoteFirstRep().getText(),
+                    getLocationFromPatient(condition.getSubject())
             );
         }
 
@@ -1203,13 +1214,17 @@ public final class XdsUtil {
         public void setSeverity(String severity) {
             this.severity = severity;
         }
+
+        public String getLocation() { return location; }
+
+        public void setLocation(String location) { this.location = location; }
     }
 
     private class DiagnosticReport {
-        private String identifier, category, name, date, result, status, conclusion, presentedForm;
+        private String identifier, category, name, date, result, status, conclusion, presentedForm, location;
 
         public DiagnosticReport(String identifier, String category, String name, String date, String result,
-                                String status, String conclusion, String presentedForm) {
+                                String status, String conclusion, String presentedForm, String location) {
             this.identifier = identifier;
             this.category = category;
             this.name = name;
@@ -1218,6 +1233,7 @@ public final class XdsUtil {
             this.status = status;
             this.conclusion = conclusion;
             this.presentedForm = presentedForm;
+            this.location = location;
         }
 
         //findings and interpretation of diagnostic tests performed on patients
@@ -1230,7 +1246,7 @@ public final class XdsUtil {
             setStatus(diagnosticReport.getStatus().getDisplay());
             setConclusion(diagnosticReport.getConclusion());
             setPresentedForm(diagnosticReport.getPresentedFormFirstRep().getUrl());
-
+            setLocation(getLocationFromPatient(diagnosticReport.getSubject()));
         }
 
         public String getIdentifier() {
@@ -1296,6 +1312,10 @@ public final class XdsUtil {
         public void setPresentedForm(String presentedForm) {
             this.presentedForm = presentedForm;
         }
+
+        public String getLocation() { return location; }
+
+        public void setLocation(String location) { this.location = location; }
     }
 
 
