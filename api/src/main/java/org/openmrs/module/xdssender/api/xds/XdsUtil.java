@@ -311,14 +311,26 @@ public final class XdsUtil {
 
     private AllergyIntolerance mapAllergyIntoleranceResource(org.hl7.fhir.r4.model.AllergyIntolerance intolerance) {
         org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceReactionComponent reactionFirstRep = intolerance.getReactionFirstRep();
-//    	type,description,substance,reaction, status,severity,dataSource
+
+        org.hl7.fhir.r4.model.Patient patient = (org.hl7.fhir.r4.model.Patient) intolerance.getPatient().getResource();
+        String location = "";
+        String recordedDate = intolerance.hasRecordedDate() ? intolerance.getRecordedDate().toString() : "";
+
+        if(patient != null && patient.hasIdentifier()) {
+            try {
+                location = ((Reference) patient.getIdentifierFirstRep().getExtensionFirstRep().getValue()).getDisplay();
+            } catch (Exception e) {
+                // ignore for now
+            }
+        }
+
         return new AllergyIntolerance(intolerance.getType().getDisplay() + (intolerance.hasCategory() ? " - " + intolerance.getCategory().get(0).getCode() : ""),
                 intolerance.getCode().getCodingFirstRep().getDisplay(),
                 reactionFirstRep.getSubstance() != null ? reactionFirstRep.getSubstance().getCodingFirstRep().getDisplay() : "",
                 reactionFirstRep.getManifestationFirstRep() != null ? reactionFirstRep.getManifestationFirstRep().getCodingFirstRep().getDisplay() : "",
                 intolerance.getClinicalStatus() != null ? intolerance.getClinicalStatus().getText() : "",
                 reactionFirstRep.getSeverity() != null ? reactionFirstRep.getSeverity().getDisplay() : "",
-                intolerance.getMeta().getSource()
+                intolerance.getMeta().getSource(), location, recordedDate
         );
     }
 
@@ -847,9 +859,11 @@ public final class XdsUtil {
     }
 
     private class AllergyIntolerance {
-        private String type, description, substance, reaction, status, criticality, dataSource;
+        private String type, description, substance, reaction, status, criticality, dataSource, location, date;
 
-        public AllergyIntolerance(String type, String description, String substance, String reaction, String status, String criticality, String dataSource) {
+        public AllergyIntolerance(String type, String description, String substance,
+                                  String reaction, String status, String criticality,
+                                  String dataSource, String location, String date) {
             this.type = type;
             this.description = description;
             this.substance = substance;
@@ -857,6 +871,8 @@ public final class XdsUtil {
             this.status = status;
             this.criticality = criticality;
             this.dataSource = dataSource;
+            this.location = location;
+            this.date = date;
         }
 
         public String getType() {
@@ -913,6 +929,22 @@ public final class XdsUtil {
 
         public void setCriticality(String criticality) {
             this.criticality = criticality;
+        }
+
+        public String getDate() {
+            return date;
+        }
+
+        public void setDate(String date) {
+            this.date = date;
+        }
+
+        public String getLocation() {
+            return location;
+        }
+
+        public void setLocation(String location) {
+            this.location = location;
         }
     }
 
