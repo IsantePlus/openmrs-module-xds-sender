@@ -55,9 +55,12 @@ public class ORM_O01DocumentBuilder {
 
     public DocumentModel buildDocument(Encounter encounter) {
         DocumentModel documentModel = null;
+        log.debug("Searching order destination SCC");
         if (OrderDestination.searchForExistence(encounter, OrderDestination.SCC)) {
             try {
+                log.debug("Order destination found");
                 String message = orderGeneratorManager.generateORMO01Message(encounter, OrderDestination.SCC);
+                log.debug("Generated HL7 message +++++ " + message);
                 byte[] data = message.getBytes(StandardCharsets.UTF_8);
 
                 List<Author> authors = getDocumentAuthors(encounter);
