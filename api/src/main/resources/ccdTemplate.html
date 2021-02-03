@@ -165,6 +165,8 @@
                     <th>Reaction</th>
                     <th>Status</th>
                     <th>Severity</th>
+                    <th>Location</th>
+                    <th>Date</th>
                 </tr>
                 </thead>
             </table>
@@ -181,6 +183,8 @@
                     <td><%= intolerance.reaction  %></td>
                     <td><%= intolerance.status  %></td>
                     <td><%= intolerance.criticality  %></td>
+                    <td><%= intolerance.location %></td>
+                    <td><%= intolerance.date %></td>
                 </tr>
                 <%}
                 }else{ %>
@@ -310,6 +314,7 @@
                     <th>Name</th>
                     <th>Problem Type</th>
                     <th>Effective Dates</th>
+                    <th>Location</th>
                     <th>Code</th>
                 </tr>
                 </thead>
@@ -324,6 +329,7 @@
                     <td><%= condition.displayName %></td>
                     <td><%= condition.type %></td>
                     <td><%= condition.effectiveDates %></td>
+                    <td><%= condition.location %></td>
                     <td><%= condition.code %></td>
                 </tr>
                 <%}
@@ -347,6 +353,7 @@
                     <th>Date</th>
                     <th>Indications</th>
                     <th>Outcome</th>
+                    <th>Location</th>
                     <th>Code</th>
                 </tr>
                 </thead>
@@ -363,6 +370,7 @@
                     <td><%= procedure.date %></td>
                     <td><%= procedure.indications %></td>
                     <td><%= procedure.outcome %></td>
+                    <td><%= procedure.location %></td>
                     <td><%= procedure.code %></td>
                 </tr>
                 <%}
@@ -387,6 +395,7 @@
                     <th>Date</th>
                     <th>Result</th>
                     <th>Code</th>
+                    <th>Location</th>
                 </tr>
                 </thead>
             </table>
@@ -402,6 +411,7 @@
                     <td><%= diagnosticReport.date %></td>
                     <td><%= diagnosticReport.result %></td>
                     <td><%= diagnosticReport.identifier %></td>
+                    <td><%= diagnosticReport.location %></td>
                 </tr>
                 <%}
                 }else{ %>
