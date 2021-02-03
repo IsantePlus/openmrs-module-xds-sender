@@ -1,6 +1,11 @@
 package org.openmrs.module.xdssender.api.service.impl;
 
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dcm4chee.xds2.infoset.ihe.ProvideAndRegisterDocumentSetRequestType;
+import org.dcm4chee.xds2.infoset.ihe.ProvideAndRegisterDocumentSetRequestType.Document;
 import org.dcm4chee.xds2.infoset.rim.RegistryResponseType;
 import org.openmrs.Encounter;
 import org.openmrs.Patient;
@@ -19,6 +24,8 @@ import org.springframework.stereotype.Component;
 
 @Component("xdsSender.XdsExportService")
 public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExportService {
+
+	private final Log log = LogFactory.getLog(this.getClass());
 
 	@Autowired
 	private ClinicalDocumentBuilder clinicalDocBuilder;
@@ -57,6 +64,9 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 
 			ProvideAndRegisterDocumentSetRequestType request = messageUtil.createProvideAndRegisterDocument(clinicalDoc,
 					labOrderDoc, encounter);
+
+			logRequest(request);
+			
 			RegistryResponseType response = xdsSender.sendProvideAndRegister(request);
 
 			if (!response.getStatus().contains("Success"))
@@ -68,4 +78,30 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 			throw new RuntimeException(e);
 		}
 	}
+
+	private void logRequest(ProvideAndRegisterDocumentSetRequestType req) {
+		log.debug("###### SubmitObjectRequest:"+req.getSubmitObjectsRequest());
+		List<Document> docs = req.getDocument();
+		log.debug("###### Documents:"+docs);
+		if (docs != null) {
+		  StringBuilder sb = new StringBuilder();
+		  sb.append("######Number of Documents:").append(docs.size());
+		  int dumpValLen;
+		  for (Document d : docs) {
+			sb.append("\nDocument ID:"+d.getId())
+			.append("       size:").append(d.getValue().length)
+			.append("       value:");
+			try {
+			  dumpValLen = Math.min(d.getValue().length, 40);
+			  sb.append(new String(d.getValue(), 0, dumpValLen));
+			  if (dumpValLen == 40)
+				sb.append("...");
+			} catch (Exception x) {
+			  log.warn("Failed to convert value in String!", x);
+			}
+		  }
+		  log.debug(sb.toString());
+		}
+	  }
+
 }

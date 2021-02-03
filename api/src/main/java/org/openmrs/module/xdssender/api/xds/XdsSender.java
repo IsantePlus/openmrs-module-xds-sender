@@ -3,6 +3,7 @@ package org.openmrs.module.xdssender.api.xds;
 import org.dcm4chee.xds2.infoset.ihe.ProvideAndRegisterDocumentSetRequestType;
 import org.dcm4chee.xds2.infoset.rim.RegistryResponseType;
 import org.dcm4chee.xds2.infoset.util.DocumentRepositoryPortTypeFactory;
+import org.dcm4chee.xds2.infoset.util.XDSDocumentAttachmentHandler;
 import org.dcm4chee.xds2.infoset.ws.repository.DocumentRepositoryPortType;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.handler.AuthenticationHandler;
@@ -33,6 +34,8 @@ public class XdsSender {
 		        .getXdsRepositoryEndpoint());
 		
 		DocumentRepositoryPortTypeFactory.addHandler((BindingProvider) port, xdsDocumentMessageHandler);
+
+		DocumentRepositoryPortTypeFactory.addHandler((BindingProvider)port, new XDSDocumentAttachmentHandler());
 		
 		((BindingProvider) port).getRequestContext().put(BindingProvider.USERNAME_PROPERTY,
 		    config.getXdsRepositoryUsername());
