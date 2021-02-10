@@ -6,9 +6,11 @@ import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.codec.binary.Base64;
@@ -59,6 +61,9 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 
 		request.setMaximumNumber(MAX_MESSAGES_PER_REQUEST);
 
+		Map<QName, String> otherAttrs = request.getOtherAttributes();
+		otherAttrs.get(new QName("facility"));
+
 		GetMessagesResponse response;
 		try {
 			// response = (GetMessagesResponse) getResponse(request);
@@ -70,8 +75,13 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 				// TODO: Ensure that this casting is working properly
 				Element el = (Element) notification.getMessage().getAny();
 				// Message e = new PipeParser().parse(el.getTextContent());
-				String parsedMesage = OruR01Util.changeMessageVersionFrom251To25(el.getTextContent().replace("\n", Character.toString((char) 13)));
-				Message message = hl7Service.parseHL7String(parsedMesage);
+				String parsedMessage = OruR01Util.changeMessageVersionFrom251To25(
+					el.getTextContent()
+					.replace("\n", Character.toString((char) 13)) // Replace new line character with it's ASCII equivalent
+					.replaceAll("\\[[0-9]{4}\\]", "")); 			// Remove the time component from the birthdate to fix a HL7 parsing error
+
+				log.debug(parsedMessage);
+				Message message = hl7Service.parseHL7String(parsedMessage);
 				
 				result.add(message);
 			}
