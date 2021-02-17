@@ -6,7 +6,6 @@ import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -15,10 +14,14 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.openmrs.Location;
+import org.openmrs.LocationAttribute;
+import org.openmrs.LocationTag;
 import org.openmrs.api.context.Context;
 import org.openmrs.hl7.HL7Service;
 import org.openmrs.module.labintegration.api.hl7.messages.util.OruR01Util;
 import org.openmrs.module.xdssender.XdsSenderConfig;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.notificationspullpoint.NotificationsPullPointClient;
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessages;
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessagesResponse;
@@ -48,6 +51,9 @@ import okhttp3.Response;
 @Component("xdssender.NotificationsPullPointClientImpl")
 public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport implements NotificationsPullPointClient {
 
+	// TODO: Move this parameter to the Global Properties section and allow for multiple location tags
+	private static final String LOCATION_TAG_NAME = "Login Location"; 
+
 	private static final Logger log = LoggerFactory.getLogger(NotificationsPullPointClientImpl.class);
 
 	private BigInteger MAX_MESSAGES_PER_REQUEST = BigInteger.valueOf(100);
@@ -57,13 +63,37 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 
 	@Override
 	public List<Message> getNewMessages() {
+		LocationTag loginLocationTag = Context.getLocationService().getLocationTagByName(LOCATION_TAG_NAME);		
+		List<Location> locations =  Context.getLocationService().getLocationsByTag(loginLocationTag);
+		List<Message> returnMessages = new ArrayList<Message>();
+		
+		for (Location location : locations) {
+			returnMessages.addAll(this.getNewMessages(location));
+		}
+		
+		if (returnMessages.size() > 0) {
+			return returnMessages;
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public List<Message> getNewMessages(Location currentLocation) {
 		GetMessages request = new GetMessages();
+		String siteCode = null;
 
 		request.setMaximumNumber(MAX_MESSAGES_PER_REQUEST);
 
-		Map<QName, String> otherAttrs = request.getOtherAttributes();
-		otherAttrs.get(new QName("facility"));
-
+		for (LocationAttribute attribute : currentLocation.getAttributes()) {
+			if (attribute.getAttributeType().getUuid().equals(XdsSenderConstants.LOCATION_SITECODE_ATTRIBUTE_UUID)) {
+				siteCode = attribute.getValue().toString();
+			}
+		}
+			
+		log.debug("Location SiteCode, Name: ID: SiteCode {}", currentLocation.getName() + ": " + currentLocation.getId() + ": " + siteCode);
+		request.getOtherAttributes().put(new QName("facility"), siteCode);
+		
 		GetMessagesResponse response;
 		try {
 			// response = (GetMessagesResponse) getResponse(request);
@@ -166,8 +196,6 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		
 		if (requestPayload instanceof GetMessages) {
 			log.debug("Setting content length");
-			// conn.setRequestProperty("Content-Length", "" + 536);
-			// conn.setFixedLengthStreamingMode(536);
 			log.debug(conn.getRequestProperty("Content-Length"));
 		}
 	}
@@ -176,4 +204,5 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		byte[] bytesEncoded = Base64.encodeBase64((userName + ":" + userPassword).getBytes(Charset.forName("UTF-8")));
 		return "Basic " + new String(bytesEncoded, Charset.forName("UTF-8"));
 	}
+
 }
