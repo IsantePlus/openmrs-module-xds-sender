@@ -53,30 +53,36 @@ public class EncounterEventListener implements EventListener {
 			if (Event.Action.CREATED.toString().equals(messageAction)
 			        || Event.Action.UPDATED.toString().equals(messageAction)) {
 				
+				LOGGER.debug("Encounter event detected");
 				String uuid = ((MapMessage) message).getString("uuid");
 				List<String> encounterTypesToProcess = null;
 				String propEncounterTypesToProcess = Context.getAdministrationService()
 				        .getGlobalProperty(PROP_ENCOUNTER_TYPE_TO_PROCESS);
 				
 				if (propEncounterTypesToProcess != null) {
+					LOGGER.debug("Encounter types to filter detected");
 					
-					encounterTypesToProcess = Arrays.asList(propEncounterTypesToProcess.split(WILDCARD_MATCH));
+					encounterTypesToProcess = Arrays.asList(propEncounterTypesToProcess.split(","));
 					if (encounterTypesToProcess.size() > 0) {
 						if (encounterTypesToProcess.contains(WILDCARD_MATCH)) {
+							LOGGER.debug("Sending for all encounter types");
 							exportEncounter(uuid);
 							
 						} else {
 							LOGGER.debug("Found {} encounter types to filter from global config",
 							    encounterTypesToProcess.size());
-							for (String encounterUUID : encounterTypesToProcess) {
+							for (String encounterTypeUuid : encounterTypesToProcess) {
 								LOGGER.debug("Matching encounter types to send XDS repository: {}", uuid);
-								if (encounterUUID.equals(uuid)) {
+								Encounter e = Context.getEncounterService().getEncounterByUuid(uuid);
+								if (encounterTypeUuid.equals(e.getEncounterType().getUuid().toString())) {
+									LOGGER.debug("Exporting encounter type {} to XDS repository", uuid);
 									exportEncounter(uuid);
 									
 								}
 							}
 						}
 					} else {
+						LOGGER.debug("No Encounter types filter detected");
 						exportEncounter(uuid);
 						
 					}
