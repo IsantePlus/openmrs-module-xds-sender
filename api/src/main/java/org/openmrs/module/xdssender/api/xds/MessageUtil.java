@@ -1,5 +1,15 @@
 package org.openmrs.module.xdssender.api.xds;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+
 import org.dcm4chee.xds2.common.XDSConstants;
 import org.dcm4chee.xds2.infoset.ihe.ProvideAndRegisterDocumentSetRequestType;
 import org.dcm4chee.xds2.infoset.rim.AssociationType1;
@@ -27,15 +37,6 @@ import org.openmrs.module.xdssender.api.model.DocumentData;
 import org.openmrs.module.xdssender.api.model.DocumentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 @Component("xdssender.MessageUtil")
 public class MessageUtil {
@@ -88,6 +89,34 @@ public class MessageUtil {
 
 		return result;
 	}
+
+	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(DocumentData clinicalData,
+	        DocumentData[] additionalData, Encounter encounter) throws JAXBException {
+		// createProvideAndRegisterClinicalDocument can be replaced by methods used to generate the ORM_O01 message
+		ProvideAndRegisterDocumentSetRequestType result = createProvideAndRegisterClinicalDocument(
+		    clinicalData.getDocumentContent(), clinicalData.getDocumentInfo(), encounter);
+		
+		if (additionalData != null && additionalData.length > 0) {
+			Integer setid = 2;
+			
+			for (DocumentData msgData : additionalData) {
+				SubmitObjectsRequest registryRequest = result.getSubmitObjectsRequest();
+				
+				ExtrinsicObjectType msgOddRegistry = createExtrinsicObjectType(msgData.getDocumentInfo(), encounter);
+				registryRequest.getRegistryObjectList().getIdentifiable().add(new JAXBElement<ExtrinsicObjectType>(
+				        new QName(RIM_SOURCE, "ExtrinsicObject"), ExtrinsicObjectType.class, msgOddRegistry));
+				registryRequest = addAssociation(registryRequest, msgOddRegistry, SUBMITION_SET_ID, "as" + String.format("%02d", setid));
+				result = addDocToRequest(result, msgOddRegistry.getId(), msgData.getDocumentContent());
+				
+				result.setSubmitObjectsRequest(registryRequest);
+				
+				setid++;
+				
+			}
+		}
+		
+		return result;
+	}	
 	
 	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterClinicalDocument(byte[] documentContent,
 																							 final DocumentInfo info,
@@ -134,7 +163,8 @@ public class MessageUtil {
 					lastEncounter = el.getEncounter().getEncounterDatetime();
 			}
 		
-		TS firstEncounterTs = cdaDataUtil.createTS(firstEncounter), lastEncounterTs = cdaDataUtil.createTS(lastEncounter), creationTimeTs = TS
+		TS firstEncounterTs = cdaDataUtil.createTS(firstEncounter), lastEncounterTs = cdaDataUtil.createTS(lastEncounter);
+		TS
 		        .now();
 		
 		firstEncounterTs.setDateValuePrecision(TS.MINUTENOTIMEZONE);
