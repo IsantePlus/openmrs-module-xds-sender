@@ -90,6 +90,7 @@ public class MessageUtil {
 		return result;
 	}
 
+	// TODO: Add unit test
 	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(DocumentData clinicalData,
 	        DocumentData[] additionalData, Encounter encounter) throws JAXBException {
 		// createProvideAndRegisterClinicalDocument can be replaced by methods used to generate the ORM_O01 message
