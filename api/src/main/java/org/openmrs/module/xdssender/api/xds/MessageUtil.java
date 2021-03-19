@@ -92,12 +92,12 @@ public class MessageUtil {
 
 	// TODO: Add unit test
 	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(DocumentData clinicalData,
-	        DocumentData[] additionalData, Encounter encounter) throws JAXBException {
+	        List<DocumentData> additionalData, Encounter encounter) throws JAXBException {
 		// createProvideAndRegisterClinicalDocument can be replaced by methods used to generate the ORM_O01 message
 		ProvideAndRegisterDocumentSetRequestType result = createProvideAndRegisterClinicalDocument(
 		    clinicalData.getDocumentContent(), clinicalData.getDocumentInfo(), encounter);
 		
-		if (additionalData != null && additionalData.length > 0) {
+		if (additionalData != null && additionalData.size() > 0) {
 			Integer setid = 2;
 			
 			for (DocumentData msgData : additionalData) {
