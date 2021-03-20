@@ -1,5 +1,6 @@
 package org.openmrs.module.xdssender.api.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -12,8 +13,9 @@ import org.openmrs.Patient;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.cda.ClinicalDocumentBuilder;
-import org.openmrs.module.xdssender.api.hl7.ORM_O01DocumentBuilder;
 import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
+import org.openmrs.module.xdssender.api.fhir.FhirResourceDocumentBuilder;
+import org.openmrs.module.xdssender.api.hl7.ORM_O01DocumentBuilder;
 import org.openmrs.module.xdssender.api.model.DocumentData;
 import org.openmrs.module.xdssender.api.model.DocumentInfo;
 import org.openmrs.module.xdssender.api.service.XdsExportService;
@@ -32,6 +34,9 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 
 	@Autowired
 	private ORM_O01DocumentBuilder ormDocBuilder;
+	
+	@Autowired 
+	private FhirResourceDocumentBuilder fhirResourceBuilder;
 
 	@Autowired
 	private MessageUtil messageUtil;
@@ -49,6 +54,8 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 			DocumentInfo clinicalDocInfo = new DocumentInfo(encounter, patient, clinicalDocModel,
 					"text/xsl", config.getProviderRoot());
 			DocumentData clinicalDoc = new DocumentData(clinicalDocInfo, clinicalDocModel.getData());
+			
+			List<DocumentData> additionalData = new ArrayList<DocumentData>();
 
 			DocumentData labOrderDoc = null;
 			DocumentModel labOrderDocModel = ormDocBuilder.buildDocument(encounter);
@@ -56,14 +63,26 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 				DocumentInfo labOrderDocInfo = new DocumentInfo(encounter, patient, labOrderDocModel,
 						"text/plain", config.getProviderRoot());
 				labOrderDoc = new DocumentData(labOrderDocInfo, labOrderDocModel.getData());
+				additionalData.add(labOrderDoc);
 			}
 
+			DocumentData patientFhirResourceDoc = null;
+			DocumentModel patientFhirResourceDocModel = fhirResourceBuilder.buildDocument(patient, encounter);
+			if (patientFhirResourceDocModel != null) {
+				DocumentInfo patientFhirResourceDocInfo = new DocumentInfo(encounter, patient, patientFhirResourceDocModel,
+						"text/plain", config.getProviderRoot());
+				patientFhirResourceDoc = new DocumentData(patientFhirResourceDocInfo, patientFhirResourceDocModel.getData());
+				
+				additionalData.add(patientFhirResourceDoc);
+			}			
+			
+			// TODO: Replace the ECID with the Golden Record in a configurable fashion (Using global configs)
 			if (!messageUtil.getPatientIdentifier(clinicalDocInfo).getIdentifierType().getName().equals("ECID")) {
 				throw new Exception("Patient doesn't have ECID Identifier.");
 			}
 
 			ProvideAndRegisterDocumentSetRequestType request = messageUtil.createProvideAndRegisterDocument(clinicalDoc,
-					labOrderDoc, encounter);
+					additionalData, encounter);
 
 			logRequest(request);
 			
