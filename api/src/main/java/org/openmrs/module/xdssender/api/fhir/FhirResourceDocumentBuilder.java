@@ -1,11 +1,6 @@
 package org.openmrs.module.xdssender.api.fhir;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import ca.uhn.fhir.context.FhirContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -19,12 +14,19 @@ import org.openmrs.EncounterRole;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.module.fhir2.api.translators.PatientTranslator;
+import org.openmrs.module.fhir2.api.translators.impl.PatientTranslatorImpl;
+import org.openmrs.module.xdssender.XdsSenderConstants;
+import org.openmrs.module.xdssender.api.cda.CdaDataUtil;
 import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
 import org.openmrs.module.xdssender.api.fhir.exceptions.ResourceGenerationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import ca.uhn.fhir.context.FhirContext;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class FhirResourceDocumentBuilder {
@@ -32,13 +34,13 @@ public class FhirResourceDocumentBuilder {
 
 	private static final String CLASS_CODE = "34133-9";
 
-	private static final String CLASS_CODE_SCHEME = "LOINC";
-
 	private final Log log = LogFactory.getLog(this.getClass());
-    
-    private Patient patient;
 
     @Autowired
+    private CdaDataUtil cdaDataUtil;
+
+    private Patient patient;
+
     private PatientTranslator patientTranslator;
 
     public Patient getPatient() {
@@ -49,11 +51,6 @@ public class FhirResourceDocumentBuilder {
         this.patient = patient;
     }
 
-    public FhirResourceDocumentBuilder(Patient patient) {
-        this.patient = patient;
-    }
-    
-
     public String getFormatCode() {
         return FORMAT_CODE;
     }
@@ -61,16 +58,14 @@ public class FhirResourceDocumentBuilder {
     public static String getClassCode() {
         return CLASS_CODE;
     }
-
-    public static String getClassCodeScheme() {
-        return CLASS_CODE_SCHEME;
-    }
     
     /**
      * @should return valid Patient FHIR resource 
      */
     public Resource generateFhirResource(Object openmrsEntity) throws ResourceGenerationException {
 		Resource resource = null;
+
+        patientTranslator = new PatientTranslatorImpl();
     	
     	if (openmrsEntity instanceof Patient) {
     		resource = patientTranslator.toFhirResource((Patient)openmrsEntity);
@@ -96,7 +91,7 @@ public class FhirResourceDocumentBuilder {
 
             List<Author> authors = getDocumentAuthors(encounter);
 
-            documentModel = DocumentModel.createInstance(data, getClassCode(), getClassCodeScheme(), getFormatCode(),
+            documentModel = DocumentModel.createInstance(data, getClassCode(), XdsSenderConstants.CODE_SYSTEM_NAME_LOINC, getFormatCode(),
                     message, authors);
         } catch (Exception e) {
         	log.error("Unable to build document", e);
