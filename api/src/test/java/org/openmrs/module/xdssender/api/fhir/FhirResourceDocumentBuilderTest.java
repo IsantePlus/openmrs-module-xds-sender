@@ -25,8 +25,8 @@ public class FhirResourceDocumentBuilderTest extends BaseModuleContextSensitiveT
     public void testBuildDocument() {
         Patient patient = Context.getPatientService().getPatient(10);
         Encounter encounter = Context.getEncounterService().getEncounter(21);
-        FhirResourceDocumentBuilder fhirResourceDocumentBuilder = new FhirResourceDocumentBuilder();
-        DocumentModel dm = fhirResourceDocumentBuilder.buildDocument(patient,encounter);
+        FhirResourceDocumentBuilderImpl fhirResourceDocumentBuilder = new FhirResourceDocumentBuilderImpl();
+        DocumentModel dm = fhirResourceDocumentBuilder.buildDocument(patient, encounter);
         assertNotNull(dm);
     }
 }
