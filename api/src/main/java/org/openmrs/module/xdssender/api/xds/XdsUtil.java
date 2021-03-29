@@ -173,6 +173,14 @@ public final class XdsUtil {
 
         Collections.sort(vitalSigns, Collections.reverseOrder());
         Collections.sort(encounters, Collections.reverseOrder());
+        Collections.sort(intolerances, Collections.reverseOrder());
+        Collections.sort(medications, Collections.reverseOrder());
+        Collections.sort(medicationPrescriptions, Collections.reverseOrder());
+        Collections.sort(coverages, Collections.reverseOrder());
+        Collections.sort(immunizations, Collections.reverseOrder());
+        Collections.sort(procedures, Collections.reverseOrder());
+        Collections.sort(conditions, Collections.reverseOrder());
+        Collections.sort(diagnosticReports, Collections.reverseOrder());
 
         ccdStringMap.put("vitalSigns", vitalSigns);
         ccdStringMap.put("encounters", encounters);
@@ -650,7 +658,7 @@ public final class XdsUtil {
 
     }
 
-    private class MedicationPrescription {
+    private class MedicationPrescription implements Comparable<MedicationPrescription>  {
         private String identifier, status, intent, category, authoredOn, requester, reasonCode, dosage, location;
 
         public MedicationPrescription(MedicationRequest medicationRequest) {
@@ -738,9 +746,14 @@ public final class XdsUtil {
             this.location = location;
         }
 
+        @Override
+        public int compareTo(MedicationPrescription o) {
+            return getAuthoredOn().compareTo(o.getAuthoredOn());
+        }
+
     }
 
-    private class Medication {
+    private class Medication implements Comparable<Medication> {
         private String medication, brandName, productForm, dose, route, adminInstructions, pharmInstructions,
                 status, indications, reaction, description, dataSource;
         private Date startDate;
@@ -867,9 +880,14 @@ public final class XdsUtil {
         public void setDataSource(String dataSource) {
             this.dataSource = dataSource;
         }
+
+        @Override
+        public int compareTo(Medication o) {
+            return getStartDate().compareTo(o.getStartDate());
+        }
     }
 
-    private class AllergyIntolerance {
+    private class AllergyIntolerance implements Comparable<AllergyIntolerance> {
         private String type, description, substance, reaction, status, criticality, dataSource, location, date;
 
         public AllergyIntolerance(String type, String description, String substance,
@@ -957,9 +975,15 @@ public final class XdsUtil {
         public void setLocation(String location) {
             this.location = location;
         }
+        @Override
+        public int compareTo(AllergyIntolerance o) {
+            return getDate().compareTo(o.getDate());
+        }
+
+
     }
 
-    private class Immunization {
+    private class Immunization implements Comparable<Immunization>{
         private String identifier, vaccineCode, doseQuantity, occurrenceDate, site, route, status, notes;
 
         public Immunization(String identifier, String vaccineCode, String doseQuantity, String occurrenceDate,
@@ -1050,13 +1074,19 @@ public final class XdsUtil {
             this.doseQuantity = doseQuantity;
         }
 
+        @Override
+        public int compareTo(Immunization o) {
+            return getOccurrenceDate().compareTo(o.getOccurrenceDate());
+        }
+
+
     }
 
     private class ProcedureRequest {
 
     }
 
-    private class Procedure {
+    private class Procedure implements Comparable<Procedure> {
         private String code, procedure, description, date, indications, outcome, location;
 
         public Procedure(String code, String procedure, String description, String date,
@@ -1131,9 +1161,15 @@ public final class XdsUtil {
         public String getLocation() { return location; }
 
         public void setLocation(String location) { this.location = location; }
+
+        @Override
+        public int compareTo(Procedure o) {
+            return getDate().compareTo(o.getDate());
+        }
+
     }
 
-    private class Condition {
+    private class Condition implements Comparable<Condition> {
         //        A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.
         private String code, displayName, description, type, severity, notes, location;
         private Date effectiveDates;
@@ -1226,9 +1262,15 @@ public final class XdsUtil {
         public String getLocation() { return location; }
 
         public void setLocation(String location) { this.location = location; }
+
+        @Override
+        public int compareTo(Condition o) {
+            return getEffectiveDates().compareTo(o.getEffectiveDates());
+        }
+
     }
 
-    private class DiagnosticReport {
+    private class DiagnosticReport implements Comparable<DiagnosticReport> {
         private String identifier, category, name, date, result, status, conclusion, presentedForm, location;
 
         public DiagnosticReport(String identifier, String category, String name, String date, String result,
@@ -1324,6 +1366,12 @@ public final class XdsUtil {
         public String getLocation() { return location; }
 
         public void setLocation(String location) { this.location = location; }
+
+        @Override
+        public int compareTo(DiagnosticReport o) {
+            return getDate().compareTo(o.getDate());
+        }
+
     }
 
 
