@@ -99,14 +99,15 @@ public final class XdsUtil {
                                 medications.add(medication);
                                 break;
                             }
-                            case "1271AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
-                                DiagnosticReport diagnosticReport = mapDiagnosticReportResource(obs);
-                                diagnosticReports.add(diagnosticReport);
-                            }
-
                         }
 
                     }
+
+                    if(obs.hasCategory() && obs.getCategoryFirstRep().getCodingFirstRep().getCode() == "laboratory"){
+                        DiagnosticReport diagnosticReport = mapDiagnosticReportResource(obs);
+                        diagnosticReports.add(diagnosticReport);
+                    }
+
                     break;
                 }
                 case "Encounter": {
