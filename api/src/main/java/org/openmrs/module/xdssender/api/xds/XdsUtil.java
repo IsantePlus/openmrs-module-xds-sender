@@ -271,11 +271,11 @@ public final class XdsUtil {
     private DiagnosticReport mapDiagnosticReportResource(Observation obs) {
 //        identifier, category, name, date, result, status, conclusion, presentedForm
         return new DiagnosticReport(
-                getLoincCode(obs.getValueCodeableConcept()),
+                getLoincCode(obs.getCode()),
+                obs.getCategoryFirstRep().getCodingFirstRep().getDisplay(),
                 obs.getCode().getCodingFirstRep().getDisplay(),
-                obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
                 obs.getEffectiveDateTimeType().getValue().toString(),
-                "", "", "", "", getLocationFromPatient(obs.getSubject()));
+                obs.getValue().toString(), obs.getStatus().getDisplay(), "", "", getLocationFromPatient(obs.getSubject()));
     }
 
     private Condition mapConditionResource(org.hl7.fhir.r4.model.Condition condition) {
@@ -363,7 +363,7 @@ public final class XdsUtil {
         return new CcdEncounter(encounter.toString(),
                 encounter.getParticipantFirstRep().getIndividual().getDisplay(),
                 encounter.getLocationFirstRep().getLocation().getDisplay(),
-                encounter.getMeta().getLastUpdated().toString(),
+                encounter.getPeriod().getStart().toString(),
                 null,
                 encounter.getMeta().getSource(),
                 displayDesc);
