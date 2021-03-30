@@ -68,8 +68,6 @@ public final class XdsUtil {
                 case "Observation": {
 //                    TODO - Rework all the mappings from Observations- limiting the fetch to height,weight,temp,pulse,BP(both systolic and diastolic)
                     Observation obs = (Observation) eResource;
-//                    System.out.println("Processing Obs:====> "+obs.getCode().getCodingFirstRep().getDisplay());
-
                     if (codes.contains(obs.getCode().getCodingFirstRep().getCode())) {
                         vitalSigns.add(mapObservationResource(obs));
                     } else {
@@ -360,10 +358,19 @@ public final class XdsUtil {
             displayDesc = encounter.getClass_().getCode();
         }
 
+        Period period = encounter.getPeriod();
+        String encounterPeriod = null;
+        if(period !=null){
+            Date start = period.getStart();
+            if(start!=null){
+                encounterPeriod = start.toString();
+            }
+
+        }
         return new CcdEncounter(encounter.toString(),
                 encounter.getParticipantFirstRep().getIndividual().getDisplay(),
                 encounter.getLocationFirstRep().getLocation().getDisplay(),
-                encounter.getPeriod().getStart().toString(),
+                encounterPeriod,
                 null,
                 encounter.getMeta().getSource(),
                 displayDesc);
