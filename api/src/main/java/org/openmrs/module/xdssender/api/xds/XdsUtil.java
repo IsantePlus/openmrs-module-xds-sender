@@ -504,6 +504,22 @@ public final class XdsUtil {
         return String.format(config.getPatientRoot(), patient.getId().toString());// use the local identifier as last effort!
     }
 
+    /**
+     * Compare Dates for Sorting
+     */
+    public int compareDates(Date d1, Date d2) {
+        if(d1 == null) {
+            return (d2 == null ? 0 : -1);
+        }
+
+        // d1 can't be null here:
+        if(d2 == null) {
+            return 1;
+        }
+
+        return d1.compareTo(d2);
+    }
+
     private class VitalSign implements Comparable<VitalSign> {
         private String id, name, value, range, interpretationCode, description, location;
         private Date date;
@@ -585,8 +601,10 @@ public final class XdsUtil {
 
         @Override
         public int compareTo(VitalSign o) {
-            return getDate().compareTo(o.getDate());
+            return compareDates(getDate(),o.getDate());
         }
+
+
     }
 
     private class CcdEncounter implements Comparable<CcdEncounter> {
@@ -660,7 +678,9 @@ public final class XdsUtil {
 
         @Override
         public int compareTo(CcdEncounter e) {
-            return getDate().compareTo(e.getDate());
+            return getDate() == null ?
+                    (e.getDate() == null ? 0 : -1)
+                    : getDate().compareTo(e.getDate());
         }
 
     }
@@ -982,11 +1002,11 @@ public final class XdsUtil {
         public void setLocation(String location) {
             this.location = location;
         }
+
         @Override
         public int compareTo(AllergyIntolerance o) {
             return getDate().compareTo(o.getDate());
         }
-
 
     }
 
