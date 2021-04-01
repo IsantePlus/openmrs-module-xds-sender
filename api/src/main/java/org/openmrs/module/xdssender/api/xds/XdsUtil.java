@@ -421,6 +421,7 @@ public final class XdsUtil {
 
     private static void mapPatientResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.Patient pat) {
         //					parse patient resource
+        XdsUtil util = new XdsUtil();
         HumanName patientName = pat.getNameFirstRep();
         Date birthDate = pat.getBirthDate();
         String gender = pat.getGender().getDisplay();
@@ -432,7 +433,7 @@ public final class XdsUtil {
         ContactPoint telephone = pat.getTelecomFirstRep();
         putValue(ccdStringMap, "familyName", patientName.getFamily());
         putValue(ccdStringMap, "givenName", patientName.getGiven().toString().replace("[", "").replace("]", ""));
-        putValue(ccdStringMap, "birthDate", birthDate.toString());
+        putValue(ccdStringMap, "birthDate",  util.formatDate(birthDate));
         putValue(ccdStringMap, "gender", gender);
         putValue(ccdStringMap, "address", addressFirstRep);
 

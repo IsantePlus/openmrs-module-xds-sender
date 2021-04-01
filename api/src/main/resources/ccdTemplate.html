@@ -118,13 +118,13 @@
                 </tr>
                 <tr>
                     <td></td>
-                    <td>${address.city}</td>
+                    <td>${address.city ?: ""}</td>
                     <td>Gender:</td>
                     <td>${gender}</td>
                 </tr>
                 <tr>
                     <td></td>
-                    <td>${address.state}, ${address.country}</td>
+                    <td>${address.state ?: ""} ${address.country ?: ""}</td>
                     <td>Birth Date:</td>
                     <td>${birthDate}</td>
                 </tr>
