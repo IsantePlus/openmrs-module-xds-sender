@@ -709,11 +709,16 @@ public final class XdsUtil {
 
         @Override
         public int compareTo(CcdEncounter e) {
-            return getDate() == null ?
-                    (e.getDate() == null ? 0 : -1)
-                    : getDate().compareTo(e.getDate());
+            int r;
+            try {
+                r = getDate() == null ?
+                        (e.getDate() == null ? 0 : -1)
+                        : getDate().compareTo(e.getDate());
+                return r;
+            } catch (Exception ex) {
+                return 0;
+            }
         }
-
     }
 
     private class MedicationPrescription implements Comparable<MedicationPrescription> {
