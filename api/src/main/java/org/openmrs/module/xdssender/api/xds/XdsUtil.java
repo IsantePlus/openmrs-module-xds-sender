@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component("xdssender.XdsUtil")
@@ -24,6 +26,8 @@ public final class XdsUtil {
 
     @Autowired
     private XdsSenderConfig config;
+
+    private DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 
     public String parseCcdToHtml(Bundle resource, File ccdTemplate) throws IOException, ClassNotFoundException {
 //        TODO Find a better way to filter the obs of interest
@@ -68,9 +72,10 @@ public final class XdsUtil {
                 case "Observation": {
 //                    TODO - Rework all the mappings from Observations- limiting the fetch to height,weight,temp,pulse,BP(both systolic and diastolic)
                     Observation obs = (Observation) eResource;
-//                    System.out.println("Processing Obs:====> "+obs.getCode().getCodingFirstRep().getDisplay());
-
-                    if (codes.contains(obs.getCode().getCodingFirstRep().getCode())) {
+                    if (isLabResult(obs)) {
+                        DiagnosticReport diagnosticReport = mapDiagnosticReportResource(obs);
+                        diagnosticReports.add(diagnosticReport);
+                    } else if (codes.contains(obs.getCode().getCodingFirstRep().getCode())) {
                         vitalSigns.add(mapObservationResource(obs));
                     } else {
 //                        Process other obs
@@ -99,11 +104,6 @@ public final class XdsUtil {
                                 medications.add(medication);
                                 break;
                             }
-                            case "1271AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
-                                DiagnosticReport diagnosticReport = mapDiagnosticReportResource(obs);
-                                diagnosticReports.add(diagnosticReport);
-                            }
-
                         }
 
                     }
@@ -172,6 +172,14 @@ public final class XdsUtil {
 
         Collections.sort(vitalSigns, Collections.reverseOrder());
         Collections.sort(encounters, Collections.reverseOrder());
+        Collections.sort(intolerances, Collections.reverseOrder());
+        Collections.sort(medications, Collections.reverseOrder());
+        Collections.sort(medicationPrescriptions, Collections.reverseOrder());
+        Collections.sort(coverages, Collections.reverseOrder());
+        Collections.sort(immunizations, Collections.reverseOrder());
+        Collections.sort(procedures, Collections.reverseOrder());
+        Collections.sort(conditions, Collections.reverseOrder());
+        Collections.sort(diagnosticReports, Collections.reverseOrder());
 
         ccdStringMap.put("vitalSigns", vitalSigns);
         ccdStringMap.put("encounters", encounters);
@@ -188,6 +196,23 @@ public final class XdsUtil {
         return htmlString;
     }
 
+    private boolean isLabResult(Observation obs) {
+        boolean isResult = false;
+        for (int i = 0; i < obs.getCategory().size(); i++) {
+            CodeableConcept codeableConcept = obs.getCategory().get(i);
+            for (int j = 0; j < codeableConcept.getCoding().size(); j++) {
+                if (codeableConcept.getCoding().get(j).getCode().equalsIgnoreCase("laboratory")) {
+                    isResult = true;
+                    break;
+                }
+            }
+            if (isResult) {
+                break;
+            }
+        }
+        return isResult;
+    }
+
 
     private MedicationPrescription mapMedicationRequest(Observation obs) {
         // String identifier, String status, String intent, String category, String authoredOn, String requester, String reasonCode, String dosage
@@ -195,17 +220,17 @@ public final class XdsUtil {
                 obs.getStatus().getDisplay(),
                 "",
                 obs.hasCode() ? obs.getCode().getCodingFirstRep().getDisplay() : "",
-                obs.getEffectiveDateTimeType().getValue().toString(),
+                obs.getEffectiveDateTimeType().getValue(),
                 ((Encounter) obs.getEncounter().getResource()).getParticipantFirstRep().getIndividual().getDisplay(),
                 "",
                 obs.getValue().toString(),
                 ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay());
-     }
+    }
 
     private String getMedName(Observation obs) {
         try {
             return obs.hasHasMember() && obs.getHasMember().size() > 1 ?
-                    ((Observation) ((Reference)obs.getHasMember().toArray()[1]).getResource()).getValueCodeableConcept().getCodingFirstRep().getDisplay() :
+                    ((Observation) ((Reference) obs.getHasMember().toArray()[1]).getResource()).getValueCodeableConcept().getCodingFirstRep().getDisplay() :
                     obs.getValue().toString();
         } catch (Exception e) {
             return obs.getValue().toString();
@@ -218,11 +243,13 @@ public final class XdsUtil {
         return new Medication(
                 obs.getValue().toString(),
                 getMedName(obs),
-                obs.getEffectiveDateTimeType().getValue(),
+                obs.getIssued(),
                 "", "", "", "", "",
                 obs.getStatus().getDisplay(), "", "",
                 obs.getValue().toString(),
-                ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay());
+                ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay(),
+                //                TODO map next refill date and the number of days
+                null,0);
     }
 
     private Immunization mapImmunizationResource(Observation obs) {
@@ -234,7 +261,7 @@ public final class XdsUtil {
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay()
                 , obs.getCode().getCodingFirstRep().getCode()
                 , ""
-                , obs.getEffectiveDateTimeType().getValue().toString(),
+                , obs.getEffectiveDateTimeType().getValue(),
                 ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay(),
                 "", "",
                 obs.getValueCodeableConcept().getCodingFirstRep().getDisplay());
@@ -261,12 +288,19 @@ public final class XdsUtil {
 
     private DiagnosticReport mapDiagnosticReportResource(Observation obs) {
 //        identifier, category, name, date, result, status, conclusion, presentedForm
+
+        String result = "";
+        if (obs.getValue() instanceof Quantity) {
+            result = obs.getValueQuantity().getValue().toPlainString();
+        } else if (obs.getValue() instanceof CodeableConcept) {
+            result = obs.getValueCodeableConcept().getCodingFirstRep().getDisplay();
+        }
         return new DiagnosticReport(
-                getLoincCode(obs.getValueCodeableConcept()),
+                getLoincCode(obs.getCode()),
+                obs.getCategoryFirstRep().getCodingFirstRep().getDisplay(),
                 obs.getCode().getCodingFirstRep().getDisplay(),
-                obs.getValueCodeableConcept().getCodingFirstRep().getDisplay(),
-                obs.getEffectiveDateTimeType().getValue().toString(),
-                "", "", "", "", getLocationFromPatient(obs.getSubject()));
+                obs.getEffectiveDateTimeType().getValue(),
+                result, obs.getStatus().getDisplay(), "", "", getLocationFromPatient(obs.getSubject()));
     }
 
     private Condition mapConditionResource(org.hl7.fhir.r4.model.Condition condition) {
@@ -316,7 +350,7 @@ public final class XdsUtil {
         org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceReactionComponent reactionFirstRep = intolerance.getReactionFirstRep();
 
         String location = getLocationFromPatient(intolerance.getPatient());
-        String recordedDate = intolerance.hasRecordedDate() ? intolerance.getRecordedDate().toString() : "";
+        Date recordedDate = intolerance.hasRecordedDate() ? intolerance.getRecordedDate() : null;
 
         return new AllergyIntolerance(intolerance.getType().getDisplay() + (intolerance.hasCategory() ? " - " + intolerance.getCategory().get(0).getCode() : ""),
                 intolerance.getCode().getCodingFirstRep().getDisplay(),
@@ -331,7 +365,7 @@ public final class XdsUtil {
     private String getLocationFromPatient(Reference patientRef) {
         org.hl7.fhir.r4.model.Patient patient = (org.hl7.fhir.r4.model.Patient) patientRef.getResource();
 
-        if(patient != null && patient.hasIdentifier()) {
+        if (patient != null && patient.hasIdentifier()) {
             try {
                 return ((Reference) patient.getIdentifierFirstRep().getExtensionFirstRep().getValue()).getDisplay();
             } catch (Exception e) {
@@ -343,18 +377,23 @@ public final class XdsUtil {
     }
 
     private CcdEncounter mapEncounterResource(Map<String, Object> ccdStringMap, Encounter encounter) {
-//    	encounter, providers, location, date, indications, dataSource
+//    	encounter, providers, location, date, indications, dataSource, type
         String displayDesc = "";
-        if(encounter.getTypeFirstRep().hasCoding()) {
-           displayDesc = encounter.getTypeFirstRep().getCodingFirstRep().getDisplay();
+        if (encounter.getTypeFirstRep().hasCoding()) {
+            displayDesc = encounter.getTypeFirstRep().getCodingFirstRep().getDisplay();
         } else if (encounter.hasClass_()) {
             displayDesc = encounter.getClass_().getCode();
         }
 
+        Period period = encounter.getPeriod();
+        Date encounterPeriod = null;
+        if (period != null) {
+            encounterPeriod = period.getStart();
+        }
         return new CcdEncounter(encounter.toString(),
                 encounter.getParticipantFirstRep().getIndividual().getDisplay(),
                 encounter.getLocationFirstRep().getLocation().getDisplay(),
-                encounter.getMeta().getLastUpdated().toString(),
+                encounterPeriod,
                 null,
                 encounter.getMeta().getSource(),
                 displayDesc);
@@ -384,6 +423,7 @@ public final class XdsUtil {
 
     private static void mapPatientResource(Map<String, Object> ccdStringMap, org.hl7.fhir.r4.model.Patient pat) {
         //					parse patient resource
+        XdsUtil util = new XdsUtil();
         HumanName patientName = pat.getNameFirstRep();
         Date birthDate = pat.getBirthDate();
         String gender = pat.getGender().getDisplay();
@@ -393,27 +433,27 @@ public final class XdsUtil {
         Identifier patientId = pat.getIdentifierFirstRep();
         CodeableConcept maritalStatus = pat.getMaritalStatus();
         ContactPoint telephone = pat.getTelecomFirstRep();
-        putValue(ccdStringMap,"familyName", patientName.getFamily());
-        putValue(ccdStringMap,"givenName", patientName.getGiven().toString().replace("[", "").replace("]", ""));
-        putValue(ccdStringMap,"birthDate", birthDate.toString());
-        putValue(ccdStringMap,"gender", gender);
-        putValue(ccdStringMap,"address", addressFirstRep);
+        putValue(ccdStringMap, "familyName", patientName.getFamily());
+        putValue(ccdStringMap, "givenName", patientName.getGiven().toString().replace("[", "").replace("]", ""));
+        putValue(ccdStringMap, "birthDate",  util.formatDate(birthDate));
+        putValue(ccdStringMap, "gender", gender);
+        putValue(ccdStringMap, "address", addressFirstRep);
 
-        putValue(ccdStringMap,"patientId", patientId.getValue());
-        putValue(ccdStringMap,"maritalStatus", maritalStatus.getText());
-        putValue(ccdStringMap,"telephone", telephone.getValue());
-        putValue(ccdStringMap,"patientGeneralPractitioner", patientGeneralPractitioner.getDisplay());
+        putValue(ccdStringMap, "patientId", patientId.getValue());
+        putValue(ccdStringMap, "maritalStatus", maritalStatus.getText());
+        putValue(ccdStringMap, "telephone", telephone.getValue());
+        putValue(ccdStringMap, "patientGeneralPractitioner", patientGeneralPractitioner.getDisplay());
 //        Not currently returned
-        putValue(ccdStringMap,"race", "");
-        putValue(ccdStringMap,"language", "");
-        putValue(ccdStringMap,"ethnicity", "");
-        putValue(ccdStringMap,"guardian", "");
+        putValue(ccdStringMap, "race", "");
+        putValue(ccdStringMap, "language", "");
+        putValue(ccdStringMap, "ethnicity", "");
+        putValue(ccdStringMap, "guardian", "");
 
     }
 
     private static void putValue(Map<String, Object> ccdStringMap, String key, Object value) {
         try {
-            if(value != null &&
+            if (value != null &&
                     (!ccdStringMap.containsKey(key)
                             || ccdStringMap.get(key) == null
                             || ((String) ccdStringMap.get(key)).isEmpty())) {
@@ -488,6 +528,22 @@ public final class XdsUtil {
         return String.format(config.getPatientRoot(), patient.getId().toString());// use the local identifier as last effort!
     }
 
+    /**
+     * Compare Dates for Sorting
+     */
+    public int compareDates(Date d1, Date d2) {
+        if(d1 == null) {
+            return (d2 == null ? 0 : -1);
+        }
+
+        // d1 can't be null here:
+        if(d2 == null) {
+            return 1;
+        }
+
+        return d1.compareTo(d2);
+    }
+
     private class VitalSign implements Comparable<VitalSign> {
         private String id, name, value, range, interpretationCode, description, location;
         private Date date;
@@ -555,6 +611,10 @@ public final class XdsUtil {
             return date;
         }
 
+        public String getFormattedDate() {
+            return formatDate(date);
+        }
+
         public void setDate(Date date) {
             this.date = date;
         }
@@ -569,14 +629,17 @@ public final class XdsUtil {
 
         @Override
         public int compareTo(VitalSign o) {
-            return getDate().compareTo(o.getDate());
+            return compareDates(getDate(),o.getDate());
         }
+
+
     }
 
     private class CcdEncounter implements Comparable<CcdEncounter> {
-        private String encounter, providers, location, date, indications, dataSource, type;
+        private String encounter, providers, location, indications, dataSource, type;
+        private Date date;
 
-        public CcdEncounter(String encounter, String providers, String location, String date, String indications, String dataSource, String type) {
+        public CcdEncounter(String encounter, String providers, String location, Date date, String indications, String dataSource, String type) {
             this.encounter = encounter;
             this.providers = providers;
             this.location = location;
@@ -595,7 +658,7 @@ public final class XdsUtil {
         }
 
         public String getProviders() {
-            return providers;
+            return providers != null ? providers : "";
         }
 
         public void setProviders(String providers) {
@@ -610,12 +673,16 @@ public final class XdsUtil {
             this.location = location;
         }
 
-        public String getDate() {
+        public Date getDate() {
             return date;
         }
 
-        public void setDate(String date) {
+        public void setDate(Date date) {
             this.date = date;
+        }
+
+        public String getFormattedDate() {
+            return formatDate(this.getDate());
         }
 
         public String getIndications() {
@@ -644,18 +711,27 @@ public final class XdsUtil {
 
         @Override
         public int compareTo(CcdEncounter e) {
-            return getDate().compareTo(e.getDate());
+            int r;
+            try {
+                r = getDate() == null ?
+                        (e.getDate() == null ? 0 : -1)
+                        : getDate().compareTo(e.getDate());
+                return r;
+            } catch (Exception ex) {
+                return 0;
+            }
         }
-
     }
 
-    private class MedicationPrescription {
-        private String identifier, status, intent, category, authoredOn, requester, reasonCode, dosage, location;
+    private class MedicationPrescription implements Comparable<MedicationPrescription> {
+        private String identifier, status, intent, category, requester, reasonCode, dosage, location;
+        private Date authoredOn;
 
         public MedicationPrescription(MedicationRequest medicationRequest) {
         }
 
-        public MedicationPrescription(String identifier, String status, String intent, String category, String authoredOn, String requester, String reasonCode, String dosage, String location) {
+        public MedicationPrescription(String identifier, String status, String intent, String category, Date authoredOn,
+                                      String requester, String reasonCode, String dosage, String location) {
             this.identifier = identifier;
             this.status = status;
             this.intent = intent;
@@ -668,7 +744,14 @@ public final class XdsUtil {
         }
 
         public String getIdentifier() {
-            return identifier;
+            String[] split = identifier.split(",");
+            String filtered = "";
+            for (int i = 0; i < split.length; i++) {
+                if (!(split[i].toLowerCase().contains("human") || split[i].matches(".*\\d.*"))) {
+                    filtered = split[i];
+                }
+            }
+            return filtered;
         }
 
         public void setIdentifier(String identifier) {
@@ -699,16 +782,20 @@ public final class XdsUtil {
             this.category = category;
         }
 
-        public String getAuthoredOn() {
+        public Date getAuthoredOn() {
             return authoredOn;
         }
 
-        public void setAuthoredOn(String authoredOn) {
+        public String getFormattedDate() {
+            return formatDate(this.authoredOn);
+        }
+
+        public void setAuthoredOn(Date authoredOn) {
             this.authoredOn = authoredOn;
         }
 
         public String getRequester() {
-            return requester;
+            return requester != null ? requester : "";
         }
 
         public void setRequester(String requester) {
@@ -731,23 +818,33 @@ public final class XdsUtil {
             this.dosage = dosage;
         }
 
-        public String getLocation() {  return location;    }
+        public String getLocation() {
+            return location;
+        }
 
         public void setLocation(String location) {
             this.location = location;
         }
 
+        @Override
+        public int compareTo(MedicationPrescription o) {
+            return getAuthoredOn().compareTo(o.getAuthoredOn());
+        }
+
     }
 
-    private class Medication {
+    private class Medication implements Comparable<Medication> {
         private String medication, brandName, productForm, dose, route, adminInstructions, pharmInstructions,
                 status, indications, reaction, description, dataSource;
-        private Date startDate;
+        private Date startDate, nextRefill;
+        private int numberOfDays;
 
         public Medication(org.hl7.fhir.r4.model.Medication medication) {
         }
 
-        public Medication(String medication, String brandName, Date startDate, String productForm, String dose, String route, String adminInstructions, String pharmInstructions, String status, String indications, String reaction, String description, String dataSource) {
+        public Medication(String medication, String brandName, Date startDate, String productForm, String dose,
+                          String route, String adminInstructions, String pharmInstructions, String status, String indications,
+                          String reaction, String description, String dataSource, Date nextRefill, int numberOfDays) {
             this.medication = medication;
             this.brandName = brandName;
             this.startDate = startDate;
@@ -761,6 +858,8 @@ public final class XdsUtil {
             this.reaction = reaction;
             this.description = description;
             this.dataSource = dataSource;
+            this.nextRefill = nextRefill;
+            this.numberOfDays = numberOfDays;
         }
 
         public String getMedication() {
@@ -772,7 +871,14 @@ public final class XdsUtil {
         }
 
         public String getBrandName() {
-            return brandName;
+            String[] split = brandName.split(",");
+            String filtered = "";
+            for (int i = 0; i < split.length; i++) {
+                if (!(split[i].toLowerCase().contains("true") || split[i].matches(".*\\d.*"))) {
+                    filtered = split[i];
+                }
+            }
+            return filtered;
         }
 
         public void setBrandName(String brandName) {
@@ -781,6 +887,10 @@ public final class XdsUtil {
 
         public Date getStartDate() {
             return startDate;
+        }
+
+        public String getFormattedDate() {
+            return formatDate(startDate);
         }
 
         public void setStartDate(Date startDate) {
@@ -866,14 +976,36 @@ public final class XdsUtil {
         public void setDataSource(String dataSource) {
             this.dataSource = dataSource;
         }
+
+        public Date getNextRefill() {
+            return nextRefill;
+        }
+
+        public void setNextRefill(Date nextRefill) {
+            this.nextRefill = nextRefill;
+        }
+
+        public int getNumberOfDays() {
+            return numberOfDays;
+        }
+
+        public void setNumberOfDays(int numberOfDays) {
+            this.numberOfDays = numberOfDays;
+        }
+
+        @Override
+        public int compareTo(Medication o) {
+            return getStartDate().compareTo(o.getStartDate());
+        }
     }
 
-    private class AllergyIntolerance {
-        private String type, description, substance, reaction, status, criticality, dataSource, location, date;
+    private class AllergyIntolerance implements Comparable<AllergyIntolerance> {
+        private String type, description, substance, reaction, status, criticality, dataSource, location;
+        private Date date;
 
         public AllergyIntolerance(String type, String description, String substance,
                                   String reaction, String status, String criticality,
-                                  String dataSource, String location, String date) {
+                                  String dataSource, String location, Date date) {
             this.type = type;
             this.description = description;
             this.substance = substance;
@@ -941,11 +1073,11 @@ public final class XdsUtil {
             this.criticality = criticality;
         }
 
-        public String getDate() {
+        public Date getDate() {
             return date;
         }
 
-        public void setDate(String date) {
+        public void setDate(Date date) {
             this.date = date;
         }
 
@@ -956,12 +1088,19 @@ public final class XdsUtil {
         public void setLocation(String location) {
             this.location = location;
         }
+
+        @Override
+        public int compareTo(AllergyIntolerance o) {
+            return getDate().compareTo(o.getDate());
+        }
+
     }
 
-    private class Immunization {
-        private String identifier, vaccineCode, doseQuantity, occurrenceDate, site, route, status, notes;
+    private class Immunization implements Comparable<Immunization> {
+        private String identifier, vaccineCode, doseQuantity, site, route, status, notes;
+        private Date occurrenceDate;
 
-        public Immunization(String identifier, String vaccineCode, String doseQuantity, String occurrenceDate,
+        public Immunization(String identifier, String vaccineCode, String doseQuantity, Date occurrenceDate,
                             String site, String route, String status, String notes) {
             this.identifier = identifier;
             this.vaccineCode = vaccineCode;
@@ -977,7 +1116,7 @@ public final class XdsUtil {
             setIdentifier(immunization.getIdentifierFirstRep().getValue());
             setVaccineCode(immunization.getVaccineCode().getText());
             setDoseQuantity(immunization.getDoseQuantity().getValue().toString());
-            setOccurrenceDate(immunization.getOccurrenceDateTimeType().getValueAsString());
+            setOccurrenceDate(immunization.getOccurrenceDateTimeType().getValue());
             setSite(immunization.getSite().getCodingFirstRep().getDisplay());
             setRoute(immunization.getRoute().getCodingFirstRep().getDisplay());
             setStatus(immunization.getStatus().getDisplay());
@@ -1009,11 +1148,11 @@ public final class XdsUtil {
             this.vaccineCode = vaccineCode;
         }
 
-        public String getOccurrenceDate() {
+        public Date getOccurrenceDate() {
             return occurrenceDate;
         }
 
-        public void setOccurrenceDate(String occurrenceDate) {
+        public void setOccurrenceDate(Date occurrenceDate) {
             this.occurrenceDate = occurrenceDate;
         }
 
@@ -1049,16 +1188,23 @@ public final class XdsUtil {
             this.doseQuantity = doseQuantity;
         }
 
+        @Override
+        public int compareTo(Immunization o) {
+            return getOccurrenceDate().compareTo(o.getOccurrenceDate());
+        }
+
+
     }
 
     private class ProcedureRequest {
 
     }
 
-    private class Procedure {
-        private String code, procedure, description, date, indications, outcome, location;
+    private class Procedure implements Comparable<Procedure> {
+        private String code, procedure, description, indications, outcome, location;
+        private Date date;
 
-        public Procedure(String code, String procedure, String description, String date,
+        public Procedure(String code, String procedure, String description, Date date,
                          String indications, String outcome, String location) {
             this.code = code;
             this.procedure = procedure;
@@ -1073,7 +1219,7 @@ public final class XdsUtil {
             setCode(procedure.getCode().getCodingFirstRep().getCode());
             setProcedure(procedure.getFocalDeviceFirstRep().getAction().getCodingFirstRep().getDisplay());
             setDescription(procedure.getFocalDeviceFirstRep().getManipulated().getDisplay());
-            setDate(procedure.getPerformedDateTimeType().getValueAsString());
+            setDate(procedure.getPerformedDateTimeType().getValue());
             setIndications(procedure.getCategory().getText());
             setOutcome(procedure.getOutcome().getText());
             setLocation(getLocationFromPatient(procedure.getSubject()));
@@ -1103,11 +1249,11 @@ public final class XdsUtil {
             this.description = description;
         }
 
-        public String getDate() {
+        public Date getDate() {
             return date;
         }
 
-        public void setDate(String date) {
+        public void setDate(Date date) {
             this.date = date;
         }
 
@@ -1127,12 +1273,22 @@ public final class XdsUtil {
             this.outcome = outcome;
         }
 
-        public String getLocation() { return location; }
+        public String getLocation() {
+            return location;
+        }
 
-        public void setLocation(String location) { this.location = location; }
+        public void setLocation(String location) {
+            this.location = location;
+        }
+
+        @Override
+        public int compareTo(Procedure o) {
+            return getDate().compareTo(o.getDate());
+        }
+
     }
 
-    private class Condition {
+    private class Condition implements Comparable<Condition> {
         //        A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.
         private String code, displayName, description, type, severity, notes, location;
         private Date effectiveDates;
@@ -1202,6 +1358,10 @@ public final class XdsUtil {
             return effectiveDates;
         }
 
+        public String getFormattedDate() {
+            return formatDate(effectiveDates);
+        }
+
         public void setEffectiveDates(Date effectiveDates) {
             this.effectiveDates = effectiveDates;
         }
@@ -1222,15 +1382,26 @@ public final class XdsUtil {
             this.severity = severity;
         }
 
-        public String getLocation() { return location; }
+        public String getLocation() {
+            return location;
+        }
 
-        public void setLocation(String location) { this.location = location; }
+        public void setLocation(String location) {
+            this.location = location;
+        }
+
+        @Override
+        public int compareTo(Condition o) {
+            return getEffectiveDates().compareTo(o.getEffectiveDates());
+        }
+
     }
 
-    private class DiagnosticReport {
-        private String identifier, category, name, date, result, status, conclusion, presentedForm, location;
+    private class DiagnosticReport implements Comparable<DiagnosticReport> {
+        private String identifier, category, name, result, status, conclusion, presentedForm, location;
+        private Date date;
 
-        public DiagnosticReport(String identifier, String category, String name, String date, String result,
+        public DiagnosticReport(String identifier, String category, String name, Date date, String result,
                                 String status, String conclusion, String presentedForm, String location) {
             this.identifier = identifier;
             this.category = category;
@@ -1248,7 +1419,7 @@ public final class XdsUtil {
             setIdentifier(diagnosticReport.getIdentifierFirstRep().getValue());
             setCategory(diagnosticReport.getCategoryFirstRep().getText());
             setName(diagnosticReport.getCode().getCodingFirstRep().getDisplay());
-            setDate(diagnosticReport.getEffectiveDateTimeType().getValueAsString());
+            setDate(diagnosticReport.getEffectiveDateTimeType().getValue());
             setResult(diagnosticReport.getResultFirstRep().getDisplay());
             setStatus(diagnosticReport.getStatus().getDisplay());
             setConclusion(diagnosticReport.getConclusion());
@@ -1280,11 +1451,15 @@ public final class XdsUtil {
             this.name = name;
         }
 
-        public String getDate() {
+        public Date getDate() {
             return date;
         }
 
-        public void setDate(String date) {
+        public String getFormattedDate() {
+            return formatDate(date);
+        }
+
+        public void setDate(Date date) {
             this.date = date;
         }
 
@@ -1320,9 +1495,19 @@ public final class XdsUtil {
             this.presentedForm = presentedForm;
         }
 
-        public String getLocation() { return location; }
+        public String getLocation() {
+            return location;
+        }
 
-        public void setLocation(String location) { this.location = location; }
+        public void setLocation(String location) {
+            this.location = location;
+        }
+
+        @Override
+        public int compareTo(DiagnosticReport o) {
+            return getDate().compareTo(o.getDate());
+        }
+
     }
 
 
@@ -1398,5 +1583,9 @@ public final class XdsUtil {
         public void setPlanInformation(String planInformation) {
             this.planInformation = planInformation;
         }
+    }
+
+    private String formatDate(Date date) {
+        return date != null ? dateFormat.format(date) : "";
     }
 }
