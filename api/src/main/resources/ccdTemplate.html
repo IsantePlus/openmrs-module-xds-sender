@@ -278,7 +278,9 @@
                 <thead>
                 <tr>
                     <th>Medication</th>
-                    <th>Start Date</th>
+                    <th>Dispense Date</th>
+                    <th>Next Refill Date</th>
+                    <th>Number of Days</th>
                     <th>Location</th>
                 </tr>
                 </thead>
@@ -292,6 +294,9 @@
                 <tr>
                     <td><%= medication.brandName  %></td>
                     <td><%= medication.formattedDate  %></td>
+                    <!--TODO fill in the appropriate next refill date and number of days-->
+                    <td><%= medication.formattedDate  %></td>
+                    <td>0</td>
                     <td><%= medication.dataSource  %></td>
                 </tr>
                 <%}

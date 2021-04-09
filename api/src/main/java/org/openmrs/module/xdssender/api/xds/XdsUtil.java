@@ -243,11 +243,13 @@ public final class XdsUtil {
         return new Medication(
                 obs.getValue().toString(),
                 getMedName(obs),
-                obs.getEffectiveDateTimeType().getValue(),
+                obs.getIssued(),
                 "", "", "", "", "",
                 obs.getStatus().getDisplay(), "", "",
                 obs.getValue().toString(),
-                ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay());
+                ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay(),
+                //                TODO map next refill date and the number of days
+                null,0);
     }
 
     private Immunization mapImmunizationResource(Observation obs) {
@@ -834,12 +836,15 @@ public final class XdsUtil {
     private class Medication implements Comparable<Medication> {
         private String medication, brandName, productForm, dose, route, adminInstructions, pharmInstructions,
                 status, indications, reaction, description, dataSource;
-        private Date startDate;
+        private Date startDate, nextRefill;
+        private int numberOfDays;
 
         public Medication(org.hl7.fhir.r4.model.Medication medication) {
         }
 
-        public Medication(String medication, String brandName, Date startDate, String productForm, String dose, String route, String adminInstructions, String pharmInstructions, String status, String indications, String reaction, String description, String dataSource) {
+        public Medication(String medication, String brandName, Date startDate, String productForm, String dose,
+                          String route, String adminInstructions, String pharmInstructions, String status, String indications,
+                          String reaction, String description, String dataSource, Date nextRefill, int numberOfDays) {
             this.medication = medication;
             this.brandName = brandName;
             this.startDate = startDate;
@@ -853,6 +858,8 @@ public final class XdsUtil {
             this.reaction = reaction;
             this.description = description;
             this.dataSource = dataSource;
+            this.nextRefill = nextRefill;
+            this.numberOfDays = numberOfDays;
         }
 
         public String getMedication() {
@@ -968,6 +975,22 @@ public final class XdsUtil {
 
         public void setDataSource(String dataSource) {
             this.dataSource = dataSource;
+        }
+
+        public Date getNextRefill() {
+            return nextRefill;
+        }
+
+        public void setNextRefill(Date nextRefill) {
+            this.nextRefill = nextRefill;
+        }
+
+        public int getNumberOfDays() {
+            return numberOfDays;
+        }
+
+        public void setNumberOfDays(int numberOfDays) {
+            this.numberOfDays = numberOfDays;
         }
 
         @Override
