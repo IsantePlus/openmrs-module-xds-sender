@@ -75,8 +75,6 @@ public class FhirResourceDocumentBuilderImpl implements FhirResourceDocumentBuil
     public Resource generateFhirResource(Object openmrsEntity) throws ResourceGenerationException {
 		Resource resource = null;
 
-		//patientTranslator = new PatientTranslatorImpl();
-    	
     	if (openmrsEntity instanceof Patient) {
     		resource = patientTranslator.toFhirResource((Patient)openmrsEntity);
     	} else {
