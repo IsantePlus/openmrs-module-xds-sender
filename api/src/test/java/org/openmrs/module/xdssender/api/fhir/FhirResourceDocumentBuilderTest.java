@@ -15,10 +15,12 @@ import static org.junit.Assert.assertNotNull;
 public class FhirResourceDocumentBuilderTest extends BaseModuleContextSensitiveTest {
 
     private static final String DATASET = "lab-dataset.xml";
+    private static final String GLOBAL_CONFIGS = "global-configs.xml";
 
     @Before
     public void setUp() throws Exception {
         executeDataSet(DATASET);
+        executeDataSet(GLOBAL_CONFIGS);
     }
 
     @Test

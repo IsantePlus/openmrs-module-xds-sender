@@ -9,10 +9,8 @@ import org.marc.everest.datatypes.NullFlavor;
 import org.marc.everest.datatypes.TS;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Author;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.ContextControl;
-import org.openmrs.Encounter;
-import org.openmrs.EncounterRole;
-import org.openmrs.Patient;
-import org.openmrs.Provider;
+import org.openmrs.*;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.fhir2.api.translators.PatientTranslator;
 import org.openmrs.module.fhir2.api.translators.impl.PatientTranslatorImpl;
@@ -37,9 +35,14 @@ import java.util.Set;
 @Component("fhirResourceDocumentBuilder")
 @Setter(AccessLevel.PACKAGE)
 public class FhirResourceDocumentBuilderImpl implements FhirResourceDocumentBuilder, ApplicationContextAware {
-    private static final String FORMAT_CODE = "TEXT";
+
+	private static final String FORMAT_CODE = "TEXT";
 
 	private static final String CLASS_CODE = "34133-9";
+
+	public static final String PROP_PID_LOCAL = "mpi-client.pid.local";
+
+	public static final String IDENTIFIER_SYSTEM = "urn:ietf:rfc:3986";
 
 	private final Log log = LogFactory.getLog(this.getClass());
 
@@ -74,10 +77,19 @@ public class FhirResourceDocumentBuilderImpl implements FhirResourceDocumentBuil
      */
     public Resource generateFhirResource(Object openmrsEntity) throws ResourceGenerationException {
 		Resource resource = null;
+	    String localPatientId = "";
 
     	if (openmrsEntity instanceof Patient) {
-    		resource = patientTranslator.toFhirResource((Patient)openmrsEntity);
-    	} else {
+    		Patient patient = (Patient)openmrsEntity;
+    		resource = patientTranslator.toFhirResource(patient);
+    		localPatientId = Context.getAdministrationService().getGlobalProperty(PROP_PID_LOCAL);
+    		if (localPatientId == null) {
+    			throw new ResourceGenerationException("Unable to retrieve the Local PID, ensure that the MPI client module is installed and the \"PID LOCAL\" global property has been set");
+		    }
+		    org.hl7.fhir.r4.model.Patient patientResource = (org.hl7.fhir.r4.model.Patient) resource;
+		    patientResource.addIdentifier().setSystem(IDENTIFIER_SYSTEM).setValue(localPatientId + patient.getUuid());
+			resource = patientResource;
+	    } else {
     		log.error(String.format("Entity %s not yet implemented", openmrsEntity.getClass().getName()));
     		throw new ResourceGenerationException("Entity not implemented");
     	}
