@@ -86,11 +86,6 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 				additionalData.add(patientFhirResourceDoc);
 			}			
 			
-			// TODO: Replace the ECID with the Golden Record in a configurable fashion (Using global configs)
-			if (!messageUtil.getPatientIdentifier(clinicalDocInfo).getIdentifierType().getName().equals("ECID")) {
-				throw new Exception("Patient doesn't have ECID Identifier.");
-			}
-
 			ProvideAndRegisterDocumentSetRequestType request = messageUtil.createProvideAndRegisterDocument(clinicalDoc,
 					additionalData, encounter);
 
