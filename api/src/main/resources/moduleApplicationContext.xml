@@ -7,12 +7,21 @@
 
 <context:component-scan base-package="org.openmrs.module.xdssender"/>
 
-<bean parent="serviceContext">
-    <property name="moduleService">
-        <list>
-            <value>org.openmrs.module.xdssender.api.service.XdsExportService</value>
-            <ref bean="xdsSender.XdsExportService" />
-        </list>
-    </property>
-</bean>
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list>
+                <value>org.openmrs.module.xdssender.api.service.XdsExportService</value>
+                <ref bean="xdsSender.XdsExportService" />
+            </list>
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list>
+                <value>org.openmrs.module.xdssender.api.fhir.FhirResourceDocumentBuilder</value>
+                <ref bean="fhirResourceDocumentBuilder"/>
+            </list>
+        </property>
+    </bean>
 </beans>

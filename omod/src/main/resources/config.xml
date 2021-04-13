@@ -153,6 +153,12 @@
 		<description>Endpoint for requests to the OpenCR MPI</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>xdssender.encounterTypesToProcess</property>
+		<description>Specifies comma separated UUIDs of encounter types that should be sent to the XDS Repository. Default value "f037e97b-471e-4898-a07c-b8e169e0ddc4" (Analyses de Lab encounter type)&lt;/BR&gt; Use 'ALL' or leave blank to match all encounter types" </description>
+		<defaultValue>f037e97b-471e-4898-a07c-b8e169e0ddc4</defaultValue>
+	</globalProperty>
+
 	<!-- AOP
 	<advice>
 		<point>org.openmrs.api.FormService</point>
@@ -226,4 +232,3 @@
 	<!-- /Internationalization -->
 	
 </module>
-
