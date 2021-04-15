@@ -1,6 +1,7 @@
 package org.openmrs.module.xdssender.api.xds;
 
 import groovy.text.GStringTemplateEngine;
+import org.dcm4chee.xds2.common.XDSConstants;
 import org.dcm4chee.xds2.infoset.rim.ClassificationType;
 import org.dcm4chee.xds2.infoset.rim.ExternalIdentifierType;
 import org.dcm4chee.xds2.infoset.rim.InternationalStringType;
@@ -10,7 +11,11 @@ import org.dcm4chee.xds2.infoset.util.InfosetUtil;
 import org.hl7.fhir.r4.model.*;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.xdssender.XdsSenderConfig;
+import org.openmrs.module.xdssender.XdsSenderConstants;
+import org.openmrs.module.xdssender.api.fhir.exceptions.ResourceGenerationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +29,22 @@ public final class XdsUtil {
 
     @Autowired
     private XdsSenderConfig config;
+
+    public static PatientIdentifier getPlaceholderSystemIdentifier(Patient patient) throws Exception {
+        PatientIdentifierType systemIdentifierType = new PatientIdentifierType();
+        systemIdentifierType.setName(XdsSenderConstants.SYSTEM_IDENTIFIER_TYPE_NAME);
+        systemIdentifierType.setUuid(UUID.randomUUID().toString());
+
+        PatientIdentifier systemIdentifier = new PatientIdentifier();
+        systemIdentifier.setIdentifierType(systemIdentifierType);
+        String localPatientId = Context.getAdministrationService().getGlobalProperty(XdsSenderConstants.PROP_PID_LOCAL);
+        if (localPatientId == null) {
+            throw new Exception("Unable to retrieve the Local PID, ensure that the MPI client module is installed and the \"PID LOCAL\" global property has been set");
+        }
+        systemIdentifier.setIdentifier(localPatientId + patient.getUuid());
+
+        return systemIdentifier;
+    }
 
     public String parseCcdToHtml(Bundle resource, File ccdTemplate) throws IOException, ClassNotFoundException {
 //        TODO Find a better way to filter the obs of interest
