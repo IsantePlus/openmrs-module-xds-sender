@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
 @Component("xdssender.MessageUtil")
 public class MessageUtil {
 	
-	private static final String ECID_NAME = "ECID";
+	private static final String ECID_NAME = "SYSTEM";
 	
 	private static final String CODE_NATIONAL_NAME = "Code National";
 	
@@ -333,7 +333,7 @@ public class MessageUtil {
 		PatientIdentifier result = info.getPatient().getPatientIdentifier();
 		
 		for (PatientIdentifier pid : info.getPatient().getIdentifiers()) {
-			if (pid.getIdentifierType().getName().equals(ECID_NAME)) {
+			if (pid.getIdentifierType().getName().equals(XdsSenderConstants.SYSTEM_IDENTIFIER_TYPE_NAME)) {
 				result = pid;
 			}
 		}
