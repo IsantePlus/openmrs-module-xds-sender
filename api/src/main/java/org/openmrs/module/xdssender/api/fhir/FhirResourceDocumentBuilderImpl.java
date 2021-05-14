@@ -100,9 +100,11 @@ public class FhirResourceDocumentBuilderImpl implements FhirResourceDocumentBuil
 			throws ResourceGenerationException {
 		Boolean isSystemIdentifierDefined = false;
 		for (Identifier identifer: patientResource.getIdentifier()) {
-			if (identifer.getSystem().equals(XdsSenderConstants.IDENTIFIER_SYSTEM)) {
-				isSystemIdentifierDefined = true;
-				break;
+			if(identifer.getSystem() != null) {
+				if (identifer.getSystem().equals(XdsSenderConstants.IDENTIFIER_SYSTEM)) {
+					isSystemIdentifierDefined = true;
+					break;
+				}
 			}
 		}
 

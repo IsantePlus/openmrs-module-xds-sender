@@ -492,6 +492,8 @@ public final class XdsSenderConstants {
 
 	public static final String IDENTIFIER_SYSTEM = "urn:ietf:rfc:3986";
 
+	public static final String SYSTEM_IDENTIFIER_TYPE_UUID = "99F5A4C3-CEEA-4F5F-ABE6-399CD4C9FE24";
+
 	private XdsSenderConstants() {
 	}
 }

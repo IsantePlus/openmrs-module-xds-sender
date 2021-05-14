@@ -57,8 +57,6 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 	@Override
 	public DocumentInfo exportProvideAndRegister(Encounter encounter, Patient patient) {
 		try {
-			// Assign a placeholder System Identifier to be used for validating against the MPI
-			patient.addIdentifier(XdsUtil.getPlaceholderSystemIdentifier(patient));
 
 			DocumentModel clinicalDocModel = clinicalDocBuilder.buildDocument(patient, encounter);
 			DocumentInfo clinicalDocInfo = new DocumentInfo(encounter, patient, clinicalDocModel,
@@ -76,6 +74,8 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 				additionalData.add(labOrderDoc);
 			}
 
+			// Assign a placeholder System Identifier to be used for validating against the MPI
+			// patient.addIdentifier(XdsUtil.getPlaceholderSystemIdentifier(patient));
 			DocumentData patientFhirResourceDoc = null;
 			DocumentModel patientFhirResourceDocModel = fhirResourceBuilder.buildDocument(patient, encounter);
 			if (patientFhirResourceDocModel != null) {

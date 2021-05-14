@@ -33,7 +33,7 @@ public final class XdsUtil {
     public static PatientIdentifier getPlaceholderSystemIdentifier(Patient patient) throws Exception {
         PatientIdentifierType systemIdentifierType = new PatientIdentifierType();
         systemIdentifierType.setName(XdsSenderConstants.SYSTEM_IDENTIFIER_TYPE_NAME);
-        systemIdentifierType.setUuid(UUID.randomUUID().toString());
+        systemIdentifierType.setUuid(XdsSenderConstants.SYSTEM_IDENTIFIER_TYPE_UUID);
 
         PatientIdentifier systemIdentifier = new PatientIdentifier();
         systemIdentifier.setIdentifierType(systemIdentifierType);
@@ -41,7 +41,8 @@ public final class XdsUtil {
         if (localPatientId == null) {
             throw new Exception("Unable to retrieve the Local PID, ensure that the MPI client module is installed and the \"PID LOCAL\" global property has been set");
         }
-        systemIdentifier.setIdentifier(localPatientId + patient.getUuid());
+        // systemIdentifier.setIdentifier(localPatientId + patient.getUuid());
+        systemIdentifier.setIdentifier(patient.getUuid());
 
         return systemIdentifier;
     }
