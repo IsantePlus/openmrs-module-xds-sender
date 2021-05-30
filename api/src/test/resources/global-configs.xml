@@ -2,7 +2,11 @@
 <dataset>
     <!-- Global configurations-->
     <global_property property="mpi-client.pid.local"
-                     property_value="http://test-local"
+                     property_value="http://isanteplus-test.sedish-haiti.org/ws/fhir2/pid/openmrsid/"
                      description="PID Local"
                      uuid="EF15944A-D73C-4D9C-9D86-E06FC076CA70"/>
+    <global_property property="xdssender.ecidRoot"
+                     property_value="2.16.840.1.113883.4.56"
+                     description="ECID Root/Identifier Assigning Authotity"
+                     uuid="8998B26D-2B53-4AC9-BF03-0F442A43062B"/>
 </dataset>

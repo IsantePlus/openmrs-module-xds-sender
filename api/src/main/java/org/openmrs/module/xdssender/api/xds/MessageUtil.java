@@ -123,7 +123,14 @@ public class MessageUtil {
 																							 final DocumentInfo info,
 																							 Encounter encounter)
 			throws JAXBException {
-		String patientId = getPatientIdentifier(info).getIdentifier();
+		String patientId = null;
+		try {
+			patientId = XdsUtil.getPlaceholderSystemIdentifier(info.getPatient()).getIdentifier();
+		}
+		catch (Exception e) {
+			patientId = getPatientIdentifier(info).getIdentifier();
+			e.printStackTrace();
+		}
 		String location = getPatientLocation(info).getName();
 		
 		ProvideAndRegisterDocumentSetRequestType retVal = new ProvideAndRegisterDocumentSetRequestType();
@@ -350,7 +357,7 @@ public class MessageUtil {
 		}
 		return result;
 	}
-	
+
 	public PatientIdentifier getSitePatientIdentifier(DocumentInfo info) {
 		PatientIdentifier result = info.getPatient().getPatientIdentifier();
 		
@@ -396,7 +403,14 @@ public class MessageUtil {
 	}
 
 	private ExtrinsicObjectType createExtrinsicObjectType(DocumentInfo info, Encounter encounter) throws JAXBException {
-		String patientId = getPatientIdentifier(info).getIdentifier();
+		String patientId = null;
+		try {
+			patientId = XdsUtil.getPlaceholderSystemIdentifier(info.getPatient()).getIdentifier();
+		}
+		catch (Exception e) {
+			patientId = getPatientIdentifier(info).getIdentifier();
+			e.printStackTrace();
+		}
 		String location = getPatientLocation(info).getName();
 
 		ExtrinsicObject extrinsicObject = new ExtrinsicObject(patientId, location);
@@ -442,6 +456,7 @@ public class MessageUtil {
 				"XDSDocumentEntry.uniqueId");
 		xdsUtil.addExtenalIdentifier(extrinsicObject, XDSConstants.UUID_XDSDocumentEntry_patientId,
 				String.format("%s^^^%s&%s&NI", patientId, config.getEcidRoot(), config.getEcidRoot()),
+				// String.format("%s", patientId),
 				"XDSDocumentEntry.patientId");
 	}
 

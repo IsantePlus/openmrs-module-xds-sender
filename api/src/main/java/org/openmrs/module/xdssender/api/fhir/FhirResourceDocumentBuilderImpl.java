@@ -15,6 +15,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.fhir2.api.translators.PatientTranslator;
 import org.openmrs.module.fhir2.api.translators.impl.PatientTranslatorImpl;
+import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.cda.CdaDataUtil;
 import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
@@ -117,7 +118,7 @@ public class FhirResourceDocumentBuilderImpl implements FhirResourceDocumentBuil
 				throw new ResourceGenerationException("Unable to retrieve the Local PID, ensure that the \"PID LOCAL\" global property has been set");
 			}
 
-			patientResource.addIdentifier().setSystem(XdsSenderConstants.IDENTIFIER_SYSTEM).setValue(systemPatientIdentifier.getIdentifier());
+			patientResource.addIdentifier().setSystem(XdsSenderConfig.getInstance().getEcidRoot()).setValue(systemPatientIdentifier.getIdentifier());
 		}
 
 		return patientResource;

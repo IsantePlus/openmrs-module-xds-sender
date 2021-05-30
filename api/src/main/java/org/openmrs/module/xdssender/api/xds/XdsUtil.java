@@ -41,8 +41,8 @@ public final class XdsUtil {
         if (localPatientId == null) {
             throw new Exception("Unable to retrieve the Local PID, ensure that the MPI client module is installed and the \"PID LOCAL\" global property has been set");
         }
-        // systemIdentifier.setIdentifier(localPatientId + patient.getUuid());
-        systemIdentifier.setIdentifier(patient.getUuid());
+        systemIdentifier.setIdentifier(localPatientId + patient.getUuid());
+        // systemIdentifier.setIdentifier(patient.getUuid());
 
         return systemIdentifier;
     }

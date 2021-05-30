@@ -67,6 +67,7 @@ import org.openmrs.Relationship;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.XdsSenderConstants;
+import org.openmrs.module.xdssender.api.xds.XdsUtil;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -468,7 +469,17 @@ public class CdaDataUtil {
 			if (!patientRole.getId().contains(ii))
 				patientRole.getId().add(ii);
 		}
-		
+
+		// Add system identifier
+		II ii = null;
+		try {
+			ii = new II(XdsSenderConstants.SYSTEM_IDENTIFIER_TYPE_NAME, XdsUtil.getPlaceholderSystemIdentifier(patient).getIdentifier());
+			patientRole.getId().add(ii);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		// Address?
 		patientRole.setAddr(createAddressSet(patient));
 		
@@ -476,10 +487,14 @@ public class CdaDataUtil {
 		patientRole.setTelecom(createTelecomSet(patient));
 		
 		// Marital status?
-		PersonAttribute civilStatusCode = patient.getAttribute(XdsSenderConstants.ATTRIBUTE_NAME_CIVIL_STATUS);
-		if (civilStatusCode != null)
-			hl7Patient.setMaritalStatusCode(metadataUtil.getStandardizedCode((Concept) civilStatusCode.getHydratedObject(),
-			    XdsSenderConstants.CODE_SYSTEM_MARITAL_STATUS, CE.class));
+		try {
+			PersonAttribute civilStatusCode = patient.getAttribute(XdsSenderConstants.ATTRIBUTE_NAME_CIVIL_STATUS);
+			if (civilStatusCode != null)
+				hl7Patient.setMaritalStatusCode(metadataUtil.getStandardizedCode((Concept) civilStatusCode.getHydratedObject(),
+						XdsSenderConstants.CODE_SYSTEM_MARITAL_STATUS, CE.class));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		// Names
 		hl7Patient.setName(createNameSet(patient));

@@ -109,8 +109,8 @@
     <location location_id="2" name="Bayonnais" creator="1" date_created="2005-01-06 00:00:00"/>
 
     <!-- Patient -->
-    <person person_id="10" gender="M" birthdate="1987-02-11 10:15:00" dead="0"
-            creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
+    <person person_id="10" gender="M" birthdate_estimated="false" birthdate="1987-02-11 10:15:00" dead="0"
+            creator="1" date_created="2005-01-06 00:00:00" voided="0" uuid="c87e4b15-9ebd-4a69-a0dc-c1b3a7b2576a"/>
     <patient patient_id="10" creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
 
     <patient_identifier patient_identifier_id="20" patient_id="10" identifier="1004X"
@@ -140,7 +140,7 @@
                       creator="1" date_created="2005-01-06 00:00:00" voided="0" value="765432101"/>
 
     <!-- Provider -->
-    <person person_id="11" gender="M" birthdate="1982-02-11 10:15:00" dead="0"
+    <person person_id="11" gender="M" birthdate_estimated="false" birthdate="1982-02-11 10:15:00" dead="0"
             creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
     <provider provider_id="11" person_id="11" creator="1" date_created="2005-01-06 00:00:00" identifier="PROVIDER_ID" retired="0"/>
 
@@ -148,10 +148,12 @@
                  middle_name="Ider" family_name="Fami" family_name_prefix="von" creator="1" degree="dr" prefix="a"
                  date_created="2005-01-06 00:00:00" voided="0"/>
 
+    <form form_id="1" uuid="02640A2A-EE55-4362-A086-86F0480BA327" name="test-form" version="1.0" published="1"/>
+
     <!-- Registration Encounter -->
     <encounter encounter_id="20" patient_id="10" encounter_type="28"
                encounter_datetime="2018-03-28 10:13:23"
-               creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
+               creator="1" date_created="2005-01-06 00:00:00" voided="0" form_id="1"/>
 
     <obs obs_id="15" person_id="10" encounter_id="20" concept_id="1054"
          creator="1" date_created="2005-01-06 00:00:00" voided="0"
@@ -171,7 +173,9 @@
                patient_id="10" encounter_type="22"
                encounter_datetime="2018-03-28 17:16:07"
                creator="1" date_created="2005-01-06 00:00:00" voided="0"
-               uuid="549c78dc-31da-11e8-acac-c3add5b19973"/>
+               uuid="549c78dc-31da-11e8-acac-c3add5b19973"
+               form_id="1"
+               location_id="2"/>
 
 
 </dataset>
