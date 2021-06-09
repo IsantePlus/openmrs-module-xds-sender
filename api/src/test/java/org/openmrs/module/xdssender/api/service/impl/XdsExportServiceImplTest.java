@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Encounter;
 import org.openmrs.Patient;
+import org.openmrs.Visit;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
 import org.openmrs.module.xdssender.api.fhir.FhirResourceDocumentBuilder;
@@ -12,6 +13,7 @@ import org.openmrs.module.xdssender.api.model.DocumentInfo;
 import org.openmrs.module.xdssender.api.service.XdsExportService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.test.context.ContextConfiguration;
+import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 
