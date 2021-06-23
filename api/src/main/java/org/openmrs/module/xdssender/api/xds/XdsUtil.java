@@ -7,10 +7,13 @@ import org.dcm4chee.xds2.infoset.rim.InternationalStringType;
 import org.dcm4chee.xds2.infoset.rim.LocalizedStringType;
 import org.dcm4chee.xds2.infoset.rim.RegistryObjectType;
 import org.dcm4chee.xds2.infoset.util.InfosetUtil;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.module.xdssender.XdsSenderConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +31,8 @@ public final class XdsUtil {
     private XdsSenderConfig config;
 
     private DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+
+    private static final Logger logger = LoggerFactory.getLogger(XdsUtil.class);
 
     public String parseCcdToHtml(Bundle resource, File ccdTemplate) throws IOException, ClassNotFoundException {
 //        TODO Find a better way to filter the obs of interest
@@ -238,9 +243,7 @@ public final class XdsUtil {
     }
 
     private Medication mapMedicationList(Observation obs) {
-        //        medication, brandName, startDate, productForm, dose, route, adminInstructions, pharmInstructions,
-        //                status, indications, reaction, description, dataSource
-        return new Medication(
+        Medication medication = new Medication(
                 obs.getValue().toString(),
                 getMedName(obs),
                 obs.getIssued(),
@@ -248,8 +251,63 @@ public final class XdsUtil {
                 obs.getStatus().getDisplay(), "", "",
                 obs.getValue().toString(),
                 ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay(),
-                //                TODO map next refill date and the number of days
-                null,0);
+                null, 0, "",0);
+//        TODO - Should we use current
+        if(obs.hasHasMember()){
+            List<Reference> members = obs.getHasMember();
+            for(Reference member: members){
+//                Process the members
+//Medication orders  1282AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+//Current medication dispensed construct  163711AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+//Medication Duration 159368AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+//Medication strength  1444AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+//Medication dispensed 1443AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (Number Dispensed)
+//Indication for medication  160742AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (Disease)
+//MEDICATION RECEIVED AT VISIT  1276AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+//Date medication refills due  162549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                Observation memberResource = (Observation) member.getResource();
+                logger.error(memberResource.getId());
+                logger.error(memberResource.getCode().getCodingFirstRep().getDisplay());
+                logger.error(memberResource.getCode().getCodingFirstRep().getCode());
+                switch(memberResource.getCode().getCodingFirstRep().getCode()){
+                    case "1282AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
+//                        process medication order
+                        medication.setMedication(memberResource.getValueCodeableConcept().getCodingFirstRep().getDisplay());
+                        break;
+                    }
+                    case "159368AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
+//                        process Medication duration
+                        medication.setNumberOfDays(memberResource.getValueQuantity().getValue().intValue());
+                        break;
+                    }
+                    case "1444AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
+//                        process Medication strength
+                        medication.setStrength(memberResource.getValue().toString());
+                        break;
+                    }
+                    case "1443AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
+//                        process Medication dispensed(number dispensed)
+                        medication.setNumberDispensed(memberResource.getValueQuantity().getValue().intValue());
+                        break;
+                    }
+                    case "160742AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
+//                        process Indication for medication
+                        medication.setIndications(memberResource.getValueCodeableConcept().getCodingFirstRep().getDisplay());
+                        break;
+                    }
+                    case "162549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
+//                        process Date medication refills due
+                        medication.setNextRefill(memberResource.getValueDateTimeType().getValue());
+                        break;
+                    }
+                }
+
+
+            }
+        }
+
+
+        return medication;
     }
 
     private Immunization mapImmunizationResource(Observation obs) {
@@ -835,16 +893,18 @@ public final class XdsUtil {
 
     private class Medication implements Comparable<Medication> {
         private String medication, brandName, productForm, dose, route, adminInstructions, pharmInstructions,
-                status, indications, reaction, description, dataSource;
-        private Date startDate, nextRefill;
-        private int numberOfDays;
+                status, indications, reaction, description, dataSource,strength;
+//        Indication for medication  160742AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (Disease)
+        private Date startDate, nextRefill; //Date medication refills due  162549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        private int numberOfDays,numberDispensed; //Medication dispensed 1443AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (Number Dispensed)
 
         public Medication(org.hl7.fhir.r4.model.Medication medication) {
         }
 
         public Medication(String medication, String brandName, Date startDate, String productForm, String dose,
                           String route, String adminInstructions, String pharmInstructions, String status, String indications,
-                          String reaction, String description, String dataSource, Date nextRefill, int numberOfDays) {
+                          String reaction, String description, String dataSource, Date nextRefill, int numberOfDays,
+                          String strength, int numberDispensed) {
             this.medication = medication;
             this.brandName = brandName;
             this.startDate = startDate;
@@ -860,6 +920,16 @@ public final class XdsUtil {
             this.dataSource = dataSource;
             this.nextRefill = nextRefill;
             this.numberOfDays = numberOfDays;
+            this.strength = strength;
+            this.numberDispensed = numberDispensed;
+        }
+
+        public int getNumberDispensed() {
+            return numberDispensed;
+        }
+
+        public void setNumberDispensed(int numberDispensed) {
+            this.numberDispensed = numberDispensed;
         }
 
         public String getMedication() {
@@ -996,6 +1066,14 @@ public final class XdsUtil {
         @Override
         public int compareTo(Medication o) {
             return getStartDate().compareTo(o.getStartDate());
+        }
+
+        public String getStrength() {
+            return strength;
+        }
+
+        public void setStrength(String strength) {
+            this.strength = strength;
         }
     }
 
