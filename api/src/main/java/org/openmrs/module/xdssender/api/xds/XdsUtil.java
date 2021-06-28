@@ -251,11 +251,11 @@ public final class XdsUtil {
                 obs.getStatus().getDisplay(), "", "",
                 obs.getValue().toString(),
                 ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay(),
-                null, 0, "",0);
+                null, 0, "", 0);
 //        TODO - Should we use current
-        if(obs.hasHasMember()){
+        if (obs.hasHasMember()) {
             List<Reference> members = obs.getHasMember();
-            for(Reference member: members){
+            for (Reference member : members) {
 //                Process the members
 //Medication orders  1282AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 //Current medication dispensed construct  163711AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -269,7 +269,7 @@ public final class XdsUtil {
                 logger.error(memberResource.getId());
                 logger.error(memberResource.getCode().getCodingFirstRep().getDisplay());
                 logger.error(memberResource.getCode().getCodingFirstRep().getCode());
-                switch(memberResource.getCode().getCodingFirstRep().getCode()){
+                switch (memberResource.getCode().getCodingFirstRep().getCode()) {
                     case "1282AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
 //                        process medication order
                         medication.setMedication(memberResource.getValueCodeableConcept().getCodingFirstRep().getDisplay());
@@ -305,8 +305,6 @@ public final class XdsUtil {
 
             }
         }
-
-
         return medication;
     }
 
@@ -493,7 +491,7 @@ public final class XdsUtil {
         ContactPoint telephone = pat.getTelecomFirstRep();
         putValue(ccdStringMap, "familyName", patientName.getFamily());
         putValue(ccdStringMap, "givenName", patientName.getGiven().toString().replace("[", "").replace("]", ""));
-        putValue(ccdStringMap, "birthDate",  util.formatDate(birthDate));
+        putValue(ccdStringMap, "birthDate", util.formatDate(birthDate));
         putValue(ccdStringMap, "gender", gender);
         putValue(ccdStringMap, "address", addressFirstRep);
 
@@ -590,12 +588,12 @@ public final class XdsUtil {
      * Compare Dates for Sorting
      */
     public int compareDates(Date d1, Date d2) {
-        if(d1 == null) {
+        if (d1 == null) {
             return (d2 == null ? 0 : -1);
         }
 
         // d1 can't be null here:
-        if(d2 == null) {
+        if (d2 == null) {
             return 1;
         }
 
@@ -687,7 +685,7 @@ public final class XdsUtil {
 
         @Override
         public int compareTo(VitalSign o) {
-            return compareDates(getDate(),o.getDate());
+            return compareDates(getDate(), o.getDate());
         }
 
 
@@ -893,10 +891,10 @@ public final class XdsUtil {
 
     private class Medication implements Comparable<Medication> {
         private String medication, brandName, productForm, dose, route, adminInstructions, pharmInstructions,
-                status, indications, reaction, description, dataSource,strength;
-//        Indication for medication  160742AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (Disease)
+                status, indications, reaction, description, dataSource, strength;
+        //        Indication for medication  160742AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (Disease)
         private Date startDate, nextRefill; //Date medication refills due  162549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        private int numberOfDays,numberDispensed; //Medication dispensed 1443AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (Number Dispensed)
+        private int numberOfDays, numberDispensed; //Medication dispensed 1443AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (Number Dispensed)
 
         public Medication(org.hl7.fhir.r4.model.Medication medication) {
         }
