@@ -472,9 +472,13 @@ public class CdaDataUtil {
 
 		// Add system identifier
 		II ii = null;
+		II iii = null;
 		try {
 			ii = new II(XdsSenderConstants.SYSTEM_IDENTIFIER_TYPE_NAME, XdsUtil.getPlaceholderSystemIdentifier(patient).getIdentifier());
 			patientRole.getId().add(ii);
+			// Adding an ECID to allow for processing by xds-b-repository in the SHR
+			iii = new II("ECID", XdsUtil.getPlaceholderSystemIdentifier(patient).getIdentifier());
+			patientRole.getId().add(iii);
 		}
 		catch (Exception e) {
 			e.printStackTrace();

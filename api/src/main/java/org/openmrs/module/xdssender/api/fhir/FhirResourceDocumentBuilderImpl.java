@@ -119,6 +119,7 @@ public class FhirResourceDocumentBuilderImpl implements FhirResourceDocumentBuil
 			}
 
 			patientResource.addIdentifier().setSystem(XdsSenderConfig.getInstance().getEcidRoot()).setValue(systemPatientIdentifier.getIdentifier());
+			// qpatientResource.addIdentifier().setSystem(XdsSenderConstants.IDENTIFIER_SYSTEM).setValue(systemPatientIdentifier.getIdentifier());
 		}
 
 		return patientResource;

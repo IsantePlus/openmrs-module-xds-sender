@@ -64,6 +64,10 @@ public class MessageUtil {
 	@Autowired
 	private XdsSenderConfig config;
 
+	private String identifierAssigningAuthority;
+
+	private String identifierAssigningAuthorityId;
+
 	public ProvideAndRegisterDocumentSetRequestType createProvideAndRegisterDocument(DocumentData clinicalData,
 																					 DocumentData msgData,
 																					 Encounter encounter)
@@ -96,7 +100,7 @@ public class MessageUtil {
 		// createProvideAndRegisterClinicalDocument can be replaced by methods used to generate the ORM_O01 message
 		ProvideAndRegisterDocumentSetRequestType result = createProvideAndRegisterClinicalDocument(
 		    clinicalData.getDocumentContent(), clinicalData.getDocumentInfo(), encounter);
-		
+
 		if (additionalData != null && additionalData.size() > 0) {
 			Integer setid = 2;
 			
@@ -131,6 +135,7 @@ public class MessageUtil {
 			patientId = getPatientIdentifier(info).getIdentifier();
 			e.printStackTrace();
 		}
+
 		String location = getPatientLocation(info).getName();
 		
 		ProvideAndRegisterDocumentSetRequestType retVal = new ProvideAndRegisterDocumentSetRequestType();
@@ -202,13 +207,17 @@ public class MessageUtil {
 		        .toString());
 		InfosetUtil.addOrOverwriteSlot(oddRegistryObject, XDSConstants.SLOT_NAME_CREATION_TIME, new SimpleDateFormat(
 		        "yyyyMMddHHmmss").format(new Date()));
-		
+
+		identifierAssigningAuthority = XdsSenderConstants.IDENTIFIER_SYSTEM;
+
+		identifierAssigningAuthorityId = Context.getAdministrationService().getGlobalProperty(XdsSenderConstants.PROP_PID_LOCAL, "http://openmrs.org");
+
 		// Unique identifier
 		xdsUtil.addExtenalIdentifier(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_uniqueId,
 		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
 		    "XDSDocumentEntry.uniqueId");
 		xdsUtil.addExtenalIdentifier(oddRegistryObject, XDSConstants.UUID_XDSDocumentEntry_patientId,
-		    String.format("%s^^^%s&%s&NI", patientId, config.getEcidRoot(), config.getEcidRoot()),
+		    String.format("%s^^^%s&%s&%s&NI", patientId, identifierAssigningAuthority, identifierAssigningAuthorityId, config.getEcidRoot()),
 		    "XDSDocumentEntry.patientId");
 		
 		// Set classifications
@@ -235,7 +244,11 @@ public class MessageUtil {
 		InfosetUtil.addOrOverwriteSlot(regPackage, XDSConstants.SLOT_NAME_SUBMISSION_TIME, now.getValue());
 		xdsUtil.addCodedValueClassification(regPackage, XDSConstants.UUID_XDSSubmissionSet_contentTypeCode,
 		    info.getClassCode(), "LOINC", "XDSSubmissionSet.contentTypeCode");
-		
+
+		identifierAssigningAuthority = XdsSenderConstants.IDENTIFIER_SYSTEM;
+
+		identifierAssigningAuthorityId = Context.getAdministrationService().getGlobalProperty(XdsSenderConstants.PROP_PID_LOCAL, "http://openmrs.org");
+
 		// Submission set external identifiers
 		xdsUtil.addExtenalIdentifier(regPackage, XDSConstants.UUID_XDSSubmissionSet_uniqueId,
 		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
@@ -244,7 +257,8 @@ public class MessageUtil {
 		    String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
 		    "XDSSubmissionSet.sourceId");
 		xdsUtil.addExtenalIdentifier(regPackage, XDSConstants.UUID_XDSSubmissionSet_patientId,
-		    String.format("%s^^^%s&%s&NI", patientId, config.getEcidRoot(), config.getEcidRoot()),
+				String.format("%s^^^%s&%s&%s&NI", patientId, identifierAssigningAuthority, identifierAssigningAuthorityId, config.getEcidRoot()),
+		   // String.format("%s^^^%s&%s&NI", patientId, config.getEcidRoot(), config.getEcidRoot()),
 		    "XDSSubmissionSet.patientId");
 		
 		// Add the eo to the submission
@@ -451,11 +465,16 @@ public class MessageUtil {
 	}
 
 	private void addUniqueIdentifier(ExtrinsicObjectType extrinsicObject, String patientId) throws JAXBException {
+		identifierAssigningAuthority = XdsSenderConstants.IDENTIFIER_SYSTEM;
+
+		identifierAssigningAuthorityId = Context.getAdministrationService().getGlobalProperty(XdsSenderConstants.PROP_PID_LOCAL, "http://openmrs.org");
+
 		xdsUtil.addExtenalIdentifier(extrinsicObject, XDSConstants.UUID_XDSDocumentEntry_uniqueId,
 				String.format("2.25.%s", UUID.randomUUID().getLeastSignificantBits()).replaceAll("-", ""),
 				"XDSDocumentEntry.uniqueId");
 		xdsUtil.addExtenalIdentifier(extrinsicObject, XDSConstants.UUID_XDSDocumentEntry_patientId,
-				String.format("%s^^^%s&%s&NI", patientId, config.getEcidRoot(), config.getEcidRoot()),
+				String.format("%s^^^%s&%s&%s&NI", patientId, identifierAssigningAuthority, identifierAssigningAuthorityId, config.getEcidRoot()),
+				// String.format("%s^^^%s&%s&NI", patientId, config.getEcidRoot(), config.getEcidRoot()),
 				// String.format("%s", patientId),
 				"XDSDocumentEntry.patientId");
 	}

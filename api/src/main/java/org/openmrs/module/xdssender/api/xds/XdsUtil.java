@@ -37,12 +37,12 @@ public final class XdsUtil {
 
         PatientIdentifier systemIdentifier = new PatientIdentifier();
         systemIdentifier.setIdentifierType(systemIdentifierType);
-        String localPatientId = Context.getAdministrationService().getGlobalProperty(XdsSenderConstants.PROP_PID_LOCAL);
+        String localPatientId = Context.getAdministrationService().getGlobalProperty(XdsSenderConstants.PROP_PID_LOCAL, "http://openmrs.org");
         if (localPatientId == null) {
             throw new Exception("Unable to retrieve the Local PID, ensure that the MPI client module is installed and the \"PID LOCAL\" global property has been set");
         }
-        systemIdentifier.setIdentifier(localPatientId + patient.getUuid());
-        // systemIdentifier.setIdentifier(patient.getUuid());
+        // systemIdentifier.setIdentifier(localPatientId + "/" + patient.getUuid());
+        systemIdentifier.setIdentifier(patient.getUuid());
 
         return systemIdentifier;
     }

@@ -80,17 +80,17 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 			DocumentModel patientFhirResourceDocModel = fhirResourceBuilder.buildDocument(patient, encounter);
 			if (patientFhirResourceDocModel != null) {
 				DocumentInfo patientFhirResourceDocInfo = new DocumentInfo(encounter, patient, patientFhirResourceDocModel,
-						"text/plain", config.getProviderRoot());
+						"text/fhir", config.getProviderRoot());
 				patientFhirResourceDoc = new DocumentData(patientFhirResourceDocInfo, patientFhirResourceDocModel.getData());
 				
 				additionalData.add(patientFhirResourceDoc);
-			}			
+			}
 			
 			ProvideAndRegisterDocumentSetRequestType request = messageUtil.createProvideAndRegisterDocument(clinicalDoc,
 					additionalData, encounter);
 
 			logRequest(request);
-			
+
 			RegistryResponseType response = xdsSender.sendProvideAndRegister(request);
 
 			if (!response.getStatus().contains("Success"))

@@ -488,7 +488,7 @@ public final class XdsSenderConstants {
 
 	public static final String SYSTEM_IDENTIFIER_TYPE_NAME = "SYSTEM";
 
-	public static final String PROP_PID_LOCAL = "mpi-client.pid.local";
+	public static final String PROP_PID_LOCAL = "fhir2.uriPrefix";
 
 	public static final String IDENTIFIER_SYSTEM = "http://openclientregistry.org/fhir/sourceid";
 
