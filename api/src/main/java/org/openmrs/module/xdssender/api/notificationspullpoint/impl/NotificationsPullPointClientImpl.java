@@ -50,12 +50,14 @@ import okhttp3.Response;
 
 @Component("xdssender.NotificationsPullPointClientImpl")
 public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport implements NotificationsPullPointClient {
-	
+
 	// TODO: Move this parameter to the Global Properties section and allow for multiple location tags
 	private static final String LOCATION_TAG_NAME = "Login Location";
 	
 	private static final Logger log = LoggerFactory.getLogger(NotificationsPullPointClientImpl.class);
-	
+
+	public static final String FACILITY_QNAME = "facility";
+
 	private BigInteger MAX_MESSAGES_PER_REQUEST = BigInteger.valueOf(100);
 	
 	@Autowired
@@ -93,14 +95,14 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		
 		log.debug("Location SiteCode, Name: ID: SiteCode {}",
 		    currentLocation.getName() + ": " + currentLocation.getId() + ": " + siteCode);
-		request.getOtherAttributes().put(new QName("facility"), siteCode);
-		
+		request.getOtherAttributes().put(new QName(FACILITY_QNAME), siteCode);
+
+		List<Message> result = new ArrayList<>();
 		GetMessagesResponse response;
 		try {
 			// response = (GetMessagesResponse) getResponse(request);
 			response = (GetMessagesResponse) getResponseHttpClient(request);
-			List<Message> result = new ArrayList<>();
-			
+
 			HL7Service hl7Service = Context.getHL7Service();
 			for (NotificationMessageHolderType notification : response.getNotificationMessage()) {
 				// TODO: Ensure that this casting is working properly
@@ -115,17 +117,13 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 				
 				result.add(message);
 			}
-			
-			return result;
-			
 		}
 		catch (Exception e) {
 			log.debug("Error getting response in NotificationsPullPointClientImpl: ", e);
 			e.printStackTrace();
+		} finally {
+			return result;
 		}
-		
-		return null;
-		
 	}
 	
 	private Object getResponse(Object requestPayload) throws Exception {
@@ -158,10 +156,26 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("text/xml; charset=utf-8");
+		String facilitySiteCode = requestPayload.getOtherAttributes().get(new QName(FACILITY_QNAME));
+		String getMessagesPayload = String.format(""
+				+ "<SOAP-ENV:Envelope\r\n  "
+				+ "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n"
+				+ "  <SOAP-ENV:Header/>\r\n"
+				+ "  <SOAP-ENV:Body>\r\n"
+				+ "    <ns2:GetMessages\r\n"
+				+ "      xmlns:ns2=\"http://docs.oasis-open.org/wsn/b-2\"\r\n"
+				+ "      xmlns:ns3=\"http://www.w3.org/2005/08/addressing\"\r\n"
+				+ "      xmlns:ns4=\"http://docs.oasis-open.org/wsrf/bf-2\"\r\n"
+				+ "      xmlns:ns5=\"http://docs.oasis-open.org/wsn/t-1\"\r\n"
+				+ "      xmlns:ns6=\"http://docs.oasis-open.org/wsn/br-2\"\r\n"
+				+ "      facility=\"%s\">\r\n"
+				+ "      <ns2:MaximumNumber>100</ns2:MaximumNumber>\r\n"
+				+ "    </ns2:GetMessages>\r\n"
+				+ "  </SOAP-ENV:Body>\r\n"
+				+ "</SOAP-ENV:Envelope>", facilitySiteCode);
 		RequestBody body = RequestBody.create(
-		    "<SOAP-ENV:Envelope\r\n  xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n  <SOAP-ENV:Header/>\r\n  <SOAP-ENV:Body>\r\n    <ns2:GetMessages\r\n      xmlns:ns2=\"http://docs.oasis-open.org/wsn/b-2\"\r\n      xmlns:ns3=\"http://www.w3.org/2005/08/addressing\"\r\n      xmlns:ns4=\"http://docs.oasis-open.org/wsrf/bf-2\"\r\n      xmlns:ns5=\"http://docs.oasis-open.org/wsn/t-1\"\r\n      xmlns:ns6=\"http://docs.oasis-open.org/wsn/br-2\">\r\n      <ns2:MaximumNumber>100</ns2:MaximumNumber>\r\n    </ns2:GetMessages>\r\n  </SOAP-ENV:Body>\r\n</SOAP-ENV:Envelope>",
+				getMessagesPayload,
 		    mediaType);
-		// RequestBody body = RequestBody.create(result.toString(), mediaType);
 		Request request = new Request.Builder().url(config.getNotificationsPullPointEndpoint()).method("POST", body)
 		        .addHeader("Content-Type", "text/xml; charset=utf-8")
 		        .addHeader("Accept", "text/xml, text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2")
