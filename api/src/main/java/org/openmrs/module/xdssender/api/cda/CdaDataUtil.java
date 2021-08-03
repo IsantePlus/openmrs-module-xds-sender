@@ -89,7 +89,7 @@ import java.util.regex.Pattern;
  */
 @Component("xdssender.CdaDataUtil")
 public class CdaDataUtil {
-	
+
 	// NOK codes
 	private static final List<String> nextOfKinRelations = Arrays.asList("MTH", "FTH", "GRMTH", "GRFTH", "SIB", "CHILD",
 	    "AUNT", "UNCLE", "PGRMTH", "MGRMTH", "PGRFTH", "MGRFTH", "SON", "DAU", "BRO", "SIS", "DOMPART", "FAMMEMB");
@@ -465,9 +465,13 @@ public class CdaDataUtil {
 		// Identifiers
 		patientRole.setId(new SET<II>());
 		for (PatientIdentifier pid : patient.getActiveIdentifiers()) {
-			II ii = new II(pid.getIdentifierType().getName(), pid.getIdentifier());
-			if (!patientRole.getId().contains(ii))
-				patientRole.getId().add(ii);
+			// To cater for old records assigned ECID by OpenEMPI, we will Skip adding the ECID identifier type
+			// if it already exists
+			if (!pid.getIdentifierType().getName().equals(XdsSenderConstants.ECID_IDENTIFIER_TYPE_NAME) ) {
+				II ii = new II(pid.getIdentifierType().getName(), pid.getIdentifier());
+				if (!patientRole.getId().contains(ii))
+					patientRole.getId().add(ii);
+			}
 		}
 
 		// Add system identifier
@@ -477,7 +481,7 @@ public class CdaDataUtil {
 			ii = new II(XdsSenderConstants.SYSTEM_IDENTIFIER_TYPE_NAME, XdsUtil.getPlaceholderSystemIdentifier(patient).getIdentifier());
 			patientRole.getId().add(ii);
 			// Adding an ECID to allow for processing by xds-b-repository in the SHR
-			iii = new II("ECID", XdsUtil.getPlaceholderSystemIdentifier(patient).getIdentifier());
+			iii = new II(XdsSenderConstants.ECID_IDENTIFIER_TYPE_NAME, XdsUtil.getPlaceholderSystemIdentifier(patient).getIdentifier());
 			patientRole.getId().add(iii);
 		}
 		catch (Exception e) {
