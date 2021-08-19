@@ -40,7 +40,7 @@
 		<springWsVersion>2.4.7.RELEASE</springWsVersion>
 		<hapiFhirVersion>5.0.2</hapiFhirVersion>
 		<fhirModuleVersion>1.2.2</fhirModuleVersion>
-		<labintegrationVersion>2.0.10</labintegrationVersion>
+		<labintegrationVersion>2.1.0-SNAPSHOT</labintegrationVersion>
 	</properties>
 
 	<dependencyManagement>
@@ -216,15 +216,15 @@
 		</repository>
 		<repository>
 			<id>dcm4che</id>
-			<url>http://dcm4che.org/maven2</url>
+			<url>https://dcm4che.org/maven2</url>
 		</repository>
 		<repository>
 			<id>marc-te-main</id>
-			<url>http://te.marc-hi.ca/mvn</url>
+			<url>https://te.marc-hi.ca/mvn</url>
 		</repository>
 		<repository>
 			<id>santesute-main</id>
-			<url>http://santesuite.org/mvn</url>
+			<url>https://santesuite.org/mvn</url>
 			<name>SanteSuite</name>
 		</repository>
 	</repositories>
