@@ -3,7 +3,7 @@
 
     <!-- Metadata -->
 
-    <location location_id="2" name="Bayonnais" creator="1" date_created="2005-01-06 00:00:00"/>
+    <location location_id="2" name="Bayonnais" creator="1" date_created="2005-01-06 00:00:00" retired="0"/>
 
     <patient_identifier_type patient_identifier_type_id="1" name="OpenMRS Identification Number"
                              retired="0" required="0" creator="1" date_created="2005-01-06 00:00:00"

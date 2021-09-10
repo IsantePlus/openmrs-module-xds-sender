@@ -103,8 +103,9 @@ public class EncounterEventListener implements EventListener {
 			LOGGER.warn("Skipped sending Encounter %s (formId is NULL " + "-> probably it's the creating encounter)");
 		} else {
 			Patient patient = Context.getPatientService().getPatient(encounter.getPatient().getPatientId());
-			
-			ecidUpdater.fetchEcidIfRequired(patient);
+
+			// TODO: Replace this with a method that queries OpenCR and fetches/updates the patient data
+			// ecidUpdater.fetchEcidIfRequired(patient);
 			
 			XdsExportService service = Context.getService(XdsExportService.class);
 			
