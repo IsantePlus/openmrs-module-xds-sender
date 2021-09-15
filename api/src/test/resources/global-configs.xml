@@ -14,4 +14,8 @@
                      description="ECID Root/Identifier Assigning Authotity"
                      uuid="8998B26D-2B53-4AC9-BF03-0F442A43062B"/>
     <!--                 property_value="2.16.840.1.113883.4.56"-->
+    <global_property property="mpi-client.pid.local"
+                     property_value="http://test-local"
+                     description="PID Local"
+                     uuid="FAB088A2-7A9E-404A-A487-06258B65FF5C"/>
 </dataset>
