@@ -21,3 +21,7 @@ target
 # test files
 api/null/*
 null/*
+
+#vs Code
+.vscode/*
+api/id_file
