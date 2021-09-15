@@ -137,8 +137,6 @@
 
     <person_attribute person_attribute_id="1" person_id="10" person_attribute_type_id="4"
                       creator="1" date_created="2005-01-06 00:00:00" voided="0" value="Janine"/>
-    <person_attribute person_attribute_id="2" person_id="10" person_attribute_type_id="8"
-                      creator="1" date_created="2005-01-06 00:00:00" voided="0" value="765432101"/>
 
     <!-- Provider -->
     <person person_id="11" gender="M" birthdate_estimated="false" birthdate="1982-02-11 10:15:00" dead="0"
