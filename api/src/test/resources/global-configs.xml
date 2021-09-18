@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <!-- Global configurations-->
+    <global_property property="mpi-client.pid.local"
+                     property_value="http://test-local"
+                     description="PID Local"
+                     uuid="EF15944A-D73C-4D9C-9D86-E06FC076CA70"/>
+</dataset>

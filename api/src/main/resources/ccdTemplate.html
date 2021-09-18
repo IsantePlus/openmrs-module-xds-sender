@@ -22,8 +22,8 @@
         padding: 8px;
         text-align: left;
         overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+        /*white-space: nowrap;*/
+        /*text-overflow: ellipsis;*/
         word-break: break-all;
 
     &:first-child {
@@ -118,13 +118,13 @@
                 </tr>
                 <tr>
                     <td></td>
-                    <td>${address.city}</td>
+                    <td>${address.city ?: ""}</td>
                     <td>Gender:</td>
                     <td>${gender}</td>
                 </tr>
                 <tr>
                     <td></td>
-                    <td>${address.state}, ${address.country}</td>
+                    <td>${address.state ?: ""} ${address.country ?: ""}</td>
                     <td>Birth Date:</td>
                     <td>${birthDate}</td>
                 </tr>
@@ -165,6 +165,8 @@
                     <th>Reaction</th>
                     <th>Status</th>
                     <th>Severity</th>
+                    <th>Location</th>
+                    <th>Date</th>
                 </tr>
                 </thead>
             </table>
@@ -181,6 +183,8 @@
                     <td><%= intolerance.reaction  %></td>
                     <td><%= intolerance.status  %></td>
                     <td><%= intolerance.criticality  %></td>
+                    <td><%= intolerance.location %></td>
+                    <td><%= intolerance.date %></td>
                 </tr>
                 <%}
                 }else{ %>
@@ -217,7 +221,7 @@
                     <td><%= encounter.type  %></td>
                     <td><%= encounter.providers  %></td>
                     <td><%= encounter.location  %></td>
-                    <td><%= encounter.date  %></td>
+                    <td><%= encounter.formattedDate  %></td>
                 </tr>
                 <%}
                 }else{ %>
@@ -251,7 +255,7 @@
                 <% medicationPrescriptions.each{ medicationPrescription -> %>
                 <tr>
                     <td><%= medicationPrescription.identifier  %></td>
-                    <td><%= medicationPrescription.authoredOn  %></td>
+                    <td><%= medicationPrescription.formattedDate  %></td>
                     <td><%= medicationPrescription.requester  %></td>
                     <td><%= medicationPrescription.category  %></td>
                     <td><%= medicationPrescription.location %></td>
@@ -271,10 +275,12 @@
     <div>
         <div class="head">
             <table>
-                <thead>
+                <thead>medications
                 <tr>
                     <th>Medication</th>
-                    <th>Start Date</th>
+                    <th>Dispense Date</th>
+                    <th>Next Refill Date</th>
+                    <th>Number of Days</th>
                     <th>Location</th>
                 </tr>
                 </thead>
@@ -286,8 +292,11 @@
                 <% if(medications){ %>
                 <% medications.each{ medication -> %>
                 <tr>
-                    <td><%= medication.description  %></td>
-                    <td><%= medication.startDate  %></td>
+                    <td><%= medication.brandName  %></td>
+                    <td><%= medication.formattedDate  %></td>
+                    <!--TODO fill in the appropriate next refill date and number of days-->
+                    <td><%= medication.nextRefill  %></td>
+                    <td><%= medication.numberOfDays  %></td>
                     <td><%= medication.dataSource  %></td>
                 </tr>
                 <%}
@@ -310,6 +319,7 @@
                     <th>Name</th>
                     <th>Problem Type</th>
                     <th>Effective Dates</th>
+                    <th>Location</th>
                     <th>Code</th>
                 </tr>
                 </thead>
@@ -323,7 +333,8 @@
                 <tr>
                     <td><%= condition.displayName %></td>
                     <td><%= condition.type %></td>
-                    <td><%= condition.effectiveDates %></td>
+                    <td><%= condition.formattedDate %></td>
+                    <td><%= condition.location %></td>
                     <td><%= condition.code %></td>
                 </tr>
                 <%}
@@ -347,6 +358,7 @@
                     <th>Date</th>
                     <th>Indications</th>
                     <th>Outcome</th>
+                    <th>Location</th>
                     <th>Code</th>
                 </tr>
                 </thead>
@@ -360,9 +372,10 @@
                 <tr>
                     <td><%= procedure.procedure %></td>
                     <td><%= procedure.description %></td>
-                    <td><%= procedure.date %></td>
+                    <td><%= procedure.formattedDate %></td>
                     <td><%= procedure.indications %></td>
                     <td><%= procedure.outcome %></td>
+                    <td><%= procedure.location %></td>
                     <td><%= procedure.code %></td>
                 </tr>
                 <%}
@@ -387,6 +400,7 @@
                     <th>Date</th>
                     <th>Result</th>
                     <th>Code</th>
+                    <th>Location</th>
                 </tr>
                 </thead>
             </table>
@@ -399,9 +413,10 @@
                 <tr>
                     <td><%= diagnosticReport.name %></td>
                     <td><%= diagnosticReport.category %></td>
-                    <td><%= diagnosticReport.date %></td>
+                    <td><%= diagnosticReport.formattedDate %></td>
                     <td><%= diagnosticReport.result %></td>
                     <td><%= diagnosticReport.identifier %></td>
+                    <td><%= diagnosticReport.location %></td>
                 </tr>
                 <%}
                 }else{ %>
@@ -470,7 +485,7 @@
                 <tr>
                     <td><%= vitalSign.name  %></td>
                     <td><%= vitalSign.value  %></td>
-                    <td><%= vitalSign.date  %></td>
+                    <td><%= vitalSign.formattedDate  %></td>
                     <td><%= vitalSign.location  %></td>
                     <td><%= vitalSign.id  %></td>
                 </tr>

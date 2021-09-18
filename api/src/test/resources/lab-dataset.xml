@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <!-- CIEL -->
+    <concept_reference_source concept_source_id="21" name="CIEL" retired="0"
+                              date_created="2005-01-06 00:00:00" creator="1"/>
+
+    <!-- PIH -->
+    <concept_reference_source concept_source_id="11" name="PIH" retired="0"
+                              date_created="2005-01-06 00:00:00" creator="1"/>
+
+    <!-- LOINC -->
+    <concept concept_id="678" retired="0" date_created="2004-01-01 00:00:00" is_set="0"
+             datatype_id="1"/>
+
+
+    <concept concept_id="1271" retired="0" date_created="2004-01-01 00:00:00" is_set="0"
+             datatype_id="1"/>
+
+
+    <concept_numeric concept_id="678" precise="2"/>
+
+    <concept_reference_source concept_source_id="6" name="LOINC" retired="0"
+                              date_created="2010-04-25 11:14:13" creator="1"/>
+    <concept_reference_term concept_reference_term_id="138097" creator="1" date_created="2011-01-22 00:00:00"
+                            concept_source_id="6" code="14682-9" uuid="957a10b2-9e69-3561-83eb-60aebbf90b13"
+                            retired="0"/>
+    <concept_reference_map concept_reference_term_id="138097" concept_map_id="138097"
+                           concept_id="678" concept_map_type_id="2" uuid="138097ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+                           creator="1" date_created="2011-01-22 17:12:55"/>
+
+    <!-- Civil Status -->
+    <concept concept_id="1054" retired="0" date_created="2005-01-06 00:00:00" is_set="0"/>
+
+    <concept concept_id="1056" retired="0" date_created="2005-01-06 00:00:00" is_set="0"/>
+    <concept_name concept_name_id="25" concept_id="1056" name="Separe" locale_preferred="1"
+                  creator="1" voided="0" date_created="2005-01-06 00:00:00" locale="ht"/>
+
+    <concept_reference_term concept_reference_term_id="171317" creator="1" date_created="2005-01-06 00:00:00"
+                            concept_source_id="21" code="1054" uuid="6742d33a-a8f0-33c1-971a-26f69d99c20a"
+                            retired="0"/>
+
+    <concept_reference_map concept_reference_term_id="171317" concept_map_id="171317"
+                           concept_id="1054" uuid="171317ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB" concept_map_type_id="1"
+                           creator="1" date_created="2005-01-06 00:00:00"/>
+
+    <!-- Religion -->
+    <concept concept_id="162929" retired="0" date_created="2005-01-06 00:00:00" is_set="0"/>
+
+    <concept concept_id="162930" retired="0" date_created="2005-01-06 00:00:00" is_set="0"/>
+    <concept_name concept_name_id="26" concept_id="162930" name="Vaudou" date_created="2005-01-06 00:00:00"
+                  creator="1" voided="0" locale="ht" locale_preferred="1"/>
+
+    <concept_reference_term concept_reference_term_id="278665" creator="1" date_created="2005-01-06 00:00:00"
+                            concept_source_id="21" code="162929" uuid="22b55ba8-274c-34d1-8a3e-30e33a783ea4"
+                            retired="0"/>
+
+    <concept_reference_map concept_reference_term_id="278665" concept_map_id="278665"
+                           concept_id="162929" uuid="278664ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB" concept_map_type_id="1"
+                           creator="1" date_created="2005-01-06 00:00:00"/>
+
+    <!-- Birth Place -->
+    <concept concept_id="21399" retired="0" date_created="2005-01-06 00:00:00" is_set="1"/>
+    <concept concept_id="21400" retired="0" date_created="2005-01-06 00:00:00" is_set="0"/>
+
+    <concept_reference_term concept_reference_term_id="10000" creator="1" date_created="2005-01-06 00:00:00"
+                            concept_source_id="11" code="birthplace address construct" uuid="0e80e452-33fe-11e8-9790-23d320d437d2"
+                            retired="0"/>
+    <concept_reference_term concept_reference_term_id="10001" creator="1" date_created="2005-01-06 00:00:00"
+                            concept_source_id="11" code="Country" uuid="1578665e-33fe-11e8-bc6a-370634a8e2cc"
+                            retired="0"/>
+
+    <concept_reference_map concept_reference_term_id="10000" concept_map_id="10000"
+                           concept_id="21399" concept_map_type_id="1" uuid="171417ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+                           creator="1" date_created="2005-01-06 00:00:00"/>
+    <concept_reference_map concept_reference_term_id="10001" concept_map_id="10001"
+                           concept_id="21400" concept_map_type_id="1" uuid="171517ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+                           creator="1" date_created="2005-01-06 00:00:00"/>
+
+    <!-- Identifiers -->
+    <patient_identifier_type patient_identifier_type_id="1" name="OpenMRS Identification Number"
+                             retired="0" required="0" creator="1" date_created="2005-01-06 00:00:00"
+                             uuid="05a29f94-c0ed-11e2-94be-8c13b969e334"/>
+    <patient_identifier_type patient_identifier_type_id="2" name="Patient Billing Number"
+                             retired="0" required="0" creator="1" date_created="2005-01-06 00:00:00"
+                             uuid="a41eb133-8c9c-4359-889f-50046cc13b0d"/>
+    <patient_identifier_type patient_identifier_type_id="3" name="Code ST" required="0"
+                             retired="0" creator="1" date_created="2005-01-06 00:00:00"
+                             uuid="2a6f831e-3334-11e8-a2a9-4f6d51e0f490"/>
+    <patient_identifier_type patient_identifier_type_id="4" name="Isante Id" required="0"
+                             retired="0" creator="1" date_created="2005-01-06 00:00:00"
+                             uuid="0e0c7cc2-3491-4675-b705-746e372ff346"/>
+
+    <!-- Attribute types -->
+    <person_attribute_type person_attribute_type_id="4" name="First Name of Mother"
+                           format="java.lang.String" retired="0" creator="1" date_created="2005-01-06 00:00:00"
+                           sort_weight="17" searchable="0"/>
+    <person_attribute_type person_attribute_type_id="8" name="Civil Status"
+                           format="java.lang.String" retired="0" creator="1" date_created="2005-01-06 00:00:00"
+                           sort_weight="8" searchable="0"/>
+
+    <!-- Registration encounter type -->
+    <encounter_type encounter_type_id="28" name="Enregistrement de patient" retired="0"
+                    creator="1" date_created="2005-01-06 00:00:00" uuid="873f968a-73a8-4f9c-ac78-9f4778b751b6"/>
+
+    <encounter_type encounter_type_id="22" name="Vitals" retired="0"
+                    creator="1" date_created="2013-08-12 14:08:05" uuid="67a71486-1a54-468f-ac3e-7091a9a79584"/>
+
+    <!-- Location -->
+    <location location_id="2" name="Bayonnais" creator="1" date_created="2005-01-06 00:00:00"/>
+
+    <!-- Patient -->
+    <person person_id="10" gender="M" birthdate="1987-02-11 10:15:00" dead="0"
+            creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
+    <patient patient_id="10" creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
+
+    <patient_identifier patient_identifier_id="20" patient_id="10" identifier="1004X"
+                        identifier_type="1" creator="1" date_created="2005-01-06 00:00:00" voided="0"
+                        preferred="1" location_id="2"/>
+    <patient_identifier patient_identifier_id="21" patient_id="10" identifier="NOT_IN_HL7"
+                        identifier_type="3" creator="1" date_created="2005-01-06 00:00:00" voided="0"
+                        preferred="0" location_id="2"/>
+    <patient_identifier patient_identifier_id="22" patient_id="10" identifier="5234A"
+                        identifier_type="2" creator="1" date_created="2005-01-06 00:00:00" voided="0"
+                        preferred="1" location_id="2"/>
+    <patient_identifier patient_identifier_id="23" patient_id="10" identifier="342342"
+                        identifier_type="4" creator="1" date_created="2005-01-06 00:00:00" voided="0"
+                        preferred="0" location_id="2"/>
+
+    <person_address person_address_id="4" person_id="10" country="Haiti" city_village="Anse Rouge"
+                    address1="Anba Morne Porte" address2="Trou coucou" address3="1ère L'Arbre"
+                    creator="1" date_created="2005-01-06 00:00:00" voided="0" state_province="Artibonite"
+                    preferred="0"/>
+    <person_name person_name_id="4" preferred="1" person_id="10" given_name="Joe"
+                 middle_name="Terry" family_name="Doe" creator="1"
+                 date_created="2005-01-06 00:00:00" voided="0"/>
+
+    <person_attribute person_attribute_id="1" person_id="10" person_attribute_type_id="4"
+                      creator="1" date_created="2005-01-06 00:00:00" voided="0" value="Janine"/>
+    <person_attribute person_attribute_id="2" person_id="10" person_attribute_type_id="8"
+                      creator="1" date_created="2005-01-06 00:00:00" voided="0" value="765432101"/>
+
+    <!-- Provider -->
+    <person person_id="11" gender="M" birthdate="1982-02-11 10:15:00" dead="0"
+            creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
+    <provider provider_id="11" person_id="11" creator="1" date_created="2005-01-06 00:00:00" identifier="PROVIDER_ID" retired="0"/>
+
+    <person_name person_name_id="5" preferred="1" person_id="11" given_name="Prov"
+                 middle_name="Ider" family_name="Fami" family_name_prefix="von" creator="1" degree="dr" prefix="a"
+                 date_created="2005-01-06 00:00:00" voided="0"/>
+
+    <!-- Registration Encounter -->
+    <encounter encounter_id="20" patient_id="10" encounter_type="28"
+               encounter_datetime="2018-03-28 10:13:23"
+               creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
+
+    <obs obs_id="15" person_id="10" encounter_id="20" concept_id="1054"
+         creator="1" date_created="2005-01-06 00:00:00" voided="0"
+         value_coded="1056" obs_datetime="2005-01-06 00:00:00"/>
+    <obs obs_id="16" person_id="10" encounter_id="20" concept_id="162929"
+         creator="1" date_created="2005-01-06 00:00:00" voided="0"
+         value_coded="162930" obs_datetime="2005-01-06 00:00:00"/>
+    <obs obs_id="17" person_id="10" encounter_id="20" concept_id="21399"
+         creator="1" date_created="2005-01-06 00:00:00" voided="0"
+         obs_datetime="2005-01-06 00:00:00"/>
+    <obs obs_id="18" person_id="10" encounter_id="20" concept_id="21400"
+         creator="1" date_created="2005-01-06 00:00:00" voided="0"
+         obs_group_id="17" value_text="Birth City" obs_datetime="2005-01-06 00:00:00"/>
+
+    <!-- Encounter for Oru Receiver Test-->
+    <encounter encounter_id="21"
+               patient_id="10" encounter_type="22"
+               encounter_datetime="2018-03-28 17:16:07"
+               creator="1" date_created="2005-01-06 00:00:00" voided="0"
+               uuid="549c78dc-31da-11e8-acac-c3add5b19973"/>
+
+
+</dataset>
