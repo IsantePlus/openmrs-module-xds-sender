@@ -89,6 +89,7 @@ public class CcdServiceImplTest {
 	}
 
 	@Test
+	@Ignore("See https://github.com/IsantePlus/openmrs-module-xds-sender/issues/64")
 	public void getHtmlParsedLocallyStoredCcd_shouldRenderPatientCcd() {
 		when(ccdDao.find(patient)).thenReturn(ccd);
 
@@ -102,6 +103,7 @@ public class CcdServiceImplTest {
 	}
 
 	@Test
+	@Ignore("See https://github.com/IsantePlus/openmrs-module-xds-sender/issues/64")
 	public void getHtmlParsedLocallyStoredCcd_shouldRenderCcd() {
 		String jsonBundle = getSamplePatientBundle();
 

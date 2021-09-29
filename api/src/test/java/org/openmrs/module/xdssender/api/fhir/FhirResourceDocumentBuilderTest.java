@@ -1,6 +1,7 @@
 package org.openmrs.module.xdssender.api.fhir;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Encounter;
 import org.openmrs.Patient;
@@ -24,6 +25,7 @@ public class FhirResourceDocumentBuilderTest extends BaseModuleContextSensitiveT
     }
 
     @Test
+    @Ignore("See https://github.com/IsantePlus/openmrs-module-xds-sender/issues/64")
     public void testBuildDocument() {
         Patient patient = Context.getPatientService().getPatient(10);
         Encounter encounter = Context.getEncounterService().getEncounter(21);
