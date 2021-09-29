@@ -2,6 +2,7 @@ package org.openmrs.module.xdssender.api.domain.dao;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.xdssender.api.domain.Ccd;
@@ -33,6 +34,7 @@ public class CcdDaoTest extends BaseModuleContextSensitiveTest {
 	}
 	
 	@Test
+	@Ignore("See https://github.com/IsantePlus/openmrs-module-xds-sender/issues/64")
 	public void shouldSaveAndFindCcd() {
 		Patient patient = patientService.getPatient(PATIENT_ID);
 		
@@ -51,6 +53,7 @@ public class CcdDaoTest extends BaseModuleContextSensitiveTest {
 	}
 	
 	@Test
+	@Ignore("See https://github.com/IsantePlus/openmrs-module-xds-sender/issues/64")
 	public void shouldUpdatePatientCcd() {
 		Patient patient = patientService.getPatient(PATIENT_ID);
 		
