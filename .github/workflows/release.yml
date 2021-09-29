@@ -19,12 +19,12 @@ jobs:
         uses: stCarolas/setup-maven@v4
         with:
           maven-version: 3.6.3
-      - name: Cache Maven packages
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+#      - name: Cache Maven packages
+#        uses: actions/cache@v2
+#        with:
+#          path: ~/.m2
+#          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+#          restore-keys: ${{ runner.os }}-m2
       - uses: s4u/maven-settings-action@v2.2.0
         with:
           servers: |
@@ -33,6 +33,12 @@ jobs:
                 "username": "${{ secrets.RELEASE_USERNAME }}",
                 "password": "${{ secrets.RELEASE_TOKEN }}"
             }]
+          properties: |
+            [
+              { "maven.wagon.http.ssl.insecure": "true" },
+              { "maven.wagon.http.ssl.allowall": "true" },
+              { "maven.wagon.http.ssl.ignore.validity.dates": "true"}
+            ]
           githubServer: false
       - name: Build
         run: mvn -P github-packages -DskipTests -B package

@@ -220,10 +220,10 @@
 		</repository>
 		<repository>
 			<id>marc-te-main</id>
-			<url>http://te.marc-hi.ca/mvn</url>
+			<url>https://te.marc-hi.ca/mvn</url>
 		</repository>
 		<repository>
-			<id>santesute-main</id>
+			<id>santesuite-main</id>
 			<url>https://santesuite.org/mvn</url>
 			<name>SanteSuite</name>
 		</repository>
