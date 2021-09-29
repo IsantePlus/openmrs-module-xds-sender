@@ -4,6 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Resource;
 import org.marc.everest.datatypes.NullFlavor;
 import org.marc.everest.datatypes.TS;
@@ -14,10 +15,12 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.fhir2.api.translators.PatientTranslator;
 import org.openmrs.module.fhir2.api.translators.impl.PatientTranslatorImpl;
+import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.cda.CdaDataUtil;
 import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
 import org.openmrs.module.xdssender.api.fhir.exceptions.ResourceGenerationException;
+import org.openmrs.module.xdssender.api.xds.XdsUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -82,13 +85,10 @@ public class FhirResourceDocumentBuilderImpl implements FhirResourceDocumentBuil
     	if (openmrsEntity instanceof Patient) {
     		Patient patient = (Patient)openmrsEntity;
     		resource = patientTranslator.toFhirResource(patient);
-    		localPatientId = Context.getAdministrationService().getGlobalProperty(PROP_PID_LOCAL);
-    		if (localPatientId == null) {
-    			throw new ResourceGenerationException("Unable to retrieve the Local PID, ensure that the MPI client module is installed and the \"PID LOCAL\" global property has been set");
-		    }
-		    org.hl7.fhir.r4.model.Patient patientResource = (org.hl7.fhir.r4.model.Patient) resource;
-		    patientResource.addIdentifier().setSystem(IDENTIFIER_SYSTEM).setValue(localPatientId + patient.getUuid());
-			resource = patientResource;
+		    org.hl7.fhir.r4.model.Patient patientResource;
+		    patientResource = checkAndSetSystemIdentifier(patient, (org.hl7.fhir.r4.model.Patient) resource);
+
+		    resource = patientResource;
 	    } else {
     		log.error(String.format("Entity %s not yet implemented", openmrsEntity.getClass().getName()));
     		throw new ResourceGenerationException("Entity not implemented");
@@ -97,7 +97,35 @@ public class FhirResourceDocumentBuilderImpl implements FhirResourceDocumentBuil
 		return resource;
     }
 
-    /**
+	private org.hl7.fhir.r4.model.Patient checkAndSetSystemIdentifier(Patient patient, org.hl7.fhir.r4.model.Patient patientResource)
+			throws ResourceGenerationException {
+		Boolean isSystemIdentifierDefined = false;
+		for (Identifier identifer: patientResource.getIdentifier()) {
+			if(identifer.getSystem() != null) {
+				if (identifer.getSystem().equals(XdsSenderConstants.IDENTIFIER_SYSTEM)) {
+					isSystemIdentifierDefined = true;
+					break;
+				}
+			}
+		}
+
+		if (!isSystemIdentifierDefined) {
+			PatientIdentifier systemPatientIdentifier = null;
+			try {
+				systemPatientIdentifier = XdsUtil.getPlaceholderSystemIdentifier(patient);
+			}
+			catch (Exception e) {
+				throw new ResourceGenerationException("Unable to retrieve the Local PID, ensure that the \"PID LOCAL\" global property has been set");
+			}
+
+			patientResource.addIdentifier().setSystem(XdsSenderConfig.getInstance().getEcidRoot()).setValue(systemPatientIdentifier.getIdentifier());
+			// qpatientResource.addIdentifier().setSystem(XdsSenderConstants.IDENTIFIER_SYSTEM).setValue(systemPatientIdentifier.getIdentifier());
+		}
+
+		return patientResource;
+	}
+
+	/**
      * @should return valid document
      */
     @Override

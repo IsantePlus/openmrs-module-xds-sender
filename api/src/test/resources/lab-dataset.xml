@@ -47,6 +47,10 @@
     <concept concept_id="162929" retired="0" date_created="2005-01-06 00:00:00" is_set="0"/>
 
     <concept concept_id="162930" retired="0" date_created="2005-01-06 00:00:00" is_set="0"/>
+
+    <!-- Lab destination -->
+    <concept concept_id="160632" retired="0" date_created="2005-01-06 00:00:00" is_set="0" uuid="160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+
     <concept_name concept_name_id="26" concept_id="162930" name="Vaudou" date_created="2005-01-06 00:00:00"
                   creator="1" voided="0" locale="ht" locale_preferred="1"/>
 
@@ -61,6 +65,11 @@
     <!-- Birth Place -->
     <concept concept_id="21399" retired="0" date_created="2005-01-06 00:00:00" is_set="1"/>
     <concept concept_id="21400" retired="0" date_created="2005-01-06 00:00:00" is_set="0"/>
+
+    <concept concept_id="1271"  retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:43:57" uuid="1271AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+    <concept concept_id="5096"  retired="0" datatype_id="6" class_id="11" is_set="0" creator="1" date_created="2004-08-12 00:00:00" uuid="5096AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+    <concept concept_id="5454"  retired="0" datatype_id="1" class_id="1" is_set="0" creator="1" date_created="2004-08-12 00:00:00" uuid="5454AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+    <concept concept_id="844" retired="0"  datatype_id="2" class_id="1" is_set="0" creator="1" date_created="2004-05-05 00:00:00" version="0.1" changed_by="1" date_changed="2016-07-29 01:24:39" retired_by="1" uuid="844AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
 
     <concept_reference_term concept_reference_term_id="10000" creator="1" date_created="2005-01-06 00:00:00"
                             concept_source_id="11" code="birthplace address construct" uuid="0e80e452-33fe-11e8-9790-23d320d437d2"
@@ -77,18 +86,11 @@
                            creator="1" date_created="2005-01-06 00:00:00"/>
 
     <!-- Identifiers -->
-    <patient_identifier_type patient_identifier_type_id="1" name="OpenMRS Identification Number"
-                             retired="0" required="0" creator="1" date_created="2005-01-06 00:00:00"
-                             uuid="05a29f94-c0ed-11e2-94be-8c13b969e334"/>
-    <patient_identifier_type patient_identifier_type_id="2" name="Patient Billing Number"
-                             retired="0" required="0" creator="1" date_created="2005-01-06 00:00:00"
-                             uuid="a41eb133-8c9c-4359-889f-50046cc13b0d"/>
-    <patient_identifier_type patient_identifier_type_id="3" name="Code ST" required="0"
-                             retired="0" creator="1" date_created="2005-01-06 00:00:00"
-                             uuid="2a6f831e-3334-11e8-a2a9-4f6d51e0f490"/>
-    <patient_identifier_type patient_identifier_type_id="4" name="Isante Id" required="0"
-                             retired="0" creator="1" date_created="2005-01-06 00:00:00"
-                             uuid="0e0c7cc2-3491-4675-b705-746e372ff346"/>
+    <patient_identifier_type patient_identifier_type_id="1" name="OpenMRS Identification Number" description="Unique number used in OpenMRS" format="" creator="1" date_created="2005-09-22 00:00:00" required="0" validator="org.openmrs.patient.impl.LuhnIdentifierValidator" retired="0" uuid="8d793bee-c2cc-11de-8d13-0010c6dffd0f"/>
+    <patient_identifier_type patient_identifier_type_id="2" name="Old Identification Number" description="Number given out prior to the OpenMRS system (No check digit)" format="" creator="1" date_created="2005-09-22 00:00:00" required="0" retired="0" uuid="8d79403a-c2cc-11de-8d13-0010c6dffd0f"/>
+    <patient_identifier_type patient_identifier_type_id="3" name="Code ST" description="Code ST du patient" creator="1" date_created="2016-10-06 00:00:00" required="0" location_behavior="NOT_USED" retired="0" uuid="d059f6d0-9e42-4760-8de1-8316b48bc5f1" uniqueness_behavior="UNIQUE"/>
+    <patient_identifier_type patient_identifier_type_id="4" name="Code National" description="Code National du patient" creator="1" date_created="2016-10-06 00:00:00" required="0" location_behavior="NOT_USED" retired="0" uuid="9fb4533d-4fd5-4276-875b-2ab41597f5dd" uniqueness_behavior="NON_UNIQUE"/>
+    <patient_identifier_type patient_identifier_type_id="9" name="iSantePlus ID" description="OpenMRS patient identifier, with check-digit" creator="1" date_created="2019-04-09 15:24:35" required="1" validator="org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator" retired="0" uuid="05a29f94-c0ed-11e2-94be-8c13b969e334"/>
 
     <!-- Attribute types -->
     <person_attribute_type person_attribute_type_id="4" name="First Name of Mother"
@@ -106,25 +108,24 @@
                     creator="1" date_created="2013-08-12 14:08:05" uuid="67a71486-1a54-468f-ac3e-7091a9a79584"/>
 
     <!-- Location -->
-    <location location_id="2" name="Bayonnais" creator="1" date_created="2005-01-06 00:00:00"/>
+    <location location_id="2" name="HUEH" city_village="Port-au-Prince" state_province="Ouest" country="Haiti" latitude="18.5398" longitude="-72.3402" creator="1" date_created="2019-04-09 16:19:39" address3="6ème Turgeau^111-01" retired="0" uuid="bdbf4cf8-3599-3abc-a7e4-99d1e8ef7238"/>
+
+    <location_attribute_type location_attribute_type_id="2" name="siteCode" description="The new site code for this location" datatype="org.openmrs.customdatatype.datatype.FreeTextDatatype" min_occurs="0" max_occurs="1" creator="1" date_created="2019-04-09 16:19:35" retired="0" uuid="6242bf19-207e-4076-9d28-9290525b8ed9"/>
+
+    <location_attribute location_attribute_id="2009" location_id="2" attribute_type_id="2" value_reference="111600" uuid="3309f67d-eacb-49a8-9b07-1e85755d14fc" creator="1" date_created="2019-04-09 16:19:39" voided="0"/>
 
     <!-- Patient -->
-    <person person_id="10" gender="M" birthdate="1987-02-11 10:15:00" dead="0"
-            creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
-    <patient patient_id="10" creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
+    <person person_id="10" gender="M" birthdate="1989-01-01" birthdate_estimated="1" dead="0" creator="1" date_created="2021-05-13 14:11:22" voided="0" uuid="d63549d1-839c-461f-9046-0f4a5f813426" deathdate_estimated="0"/>
+    <patient patient_id="10" creator="1" date_created="2021-05-13 14:11:22" voided="0" allergy_status="Unknown"/>
 
-    <patient_identifier patient_identifier_id="20" patient_id="10" identifier="1004X"
-                        identifier_type="1" creator="1" date_created="2005-01-06 00:00:00" voided="0"
-                        preferred="1" location_id="2"/>
-    <patient_identifier patient_identifier_id="21" patient_id="10" identifier="NOT_IN_HL7"
-                        identifier_type="3" creator="1" date_created="2005-01-06 00:00:00" voided="0"
-                        preferred="0" location_id="2"/>
     <patient_identifier patient_identifier_id="22" patient_id="10" identifier="5234A"
                         identifier_type="2" creator="1" date_created="2005-01-06 00:00:00" voided="0"
-                        preferred="1" location_id="2"/>
+                        preferred="0" location_id="2"/>
     <patient_identifier patient_identifier_id="23" patient_id="10" identifier="342342"
                         identifier_type="4" creator="1" date_created="2005-01-06 00:00:00" voided="0"
                         preferred="0" location_id="2"/>
+
+    <patient_identifier patient_identifier_id="21" patient_id="10" identifier="11003L5094" identifier_type="9" preferred="1" location_id="2" creator="1" date_created="2021-05-13 14:11:22" voided="0" uuid="dd55c029-6ac8-41b2-a81a-41121db41949"/>
 
     <person_address person_address_id="4" person_id="10" country="Haiti" city_village="Anse Rouge"
                     address1="Anba Morne Porte" address2="Trou coucou" address3="1ère L'Arbre"
@@ -136,22 +137,23 @@
 
     <person_attribute person_attribute_id="1" person_id="10" person_attribute_type_id="4"
                       creator="1" date_created="2005-01-06 00:00:00" voided="0" value="Janine"/>
-    <person_attribute person_attribute_id="2" person_id="10" person_attribute_type_id="8"
-                      creator="1" date_created="2005-01-06 00:00:00" voided="0" value="765432101"/>
 
     <!-- Provider -->
-    <person person_id="11" gender="M" birthdate="1982-02-11 10:15:00" dead="0"
+    <person person_id="11" gender="M" birthdate_estimated="false" birthdate="1982-02-11 10:15:00" dead="0"
             creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
-    <provider provider_id="11" person_id="11" creator="1" date_created="2005-01-06 00:00:00" identifier="PROVIDER_ID" retired="0"/>
+   <!-- <provider provider_id="11" person_id="11" creator="1" date_created="2005-01-06 00:00:00" identifier="PROVIDER_ID" retired="0"/> -->
+    <provider provider_id="11" person_id="11" identifier="M5zQapPyTZI" creator="1" date_created="2019-04-09 15:24:35" changed_by="1" date_changed="2019-04-09 16:19:23" retired="0" uuid="e5a171a3-014b-3536-8b01-9415f4e06d3e"/>
 
     <person_name person_name_id="5" preferred="1" person_id="11" given_name="Prov"
                  middle_name="Ider" family_name="Fami" family_name_prefix="von" creator="1" degree="dr" prefix="a"
                  date_created="2005-01-06 00:00:00" voided="0"/>
 
+    <form form_id="1" uuid="02640A2A-EE55-4362-A086-86F0480BA327" name="test-form" version="1.0" published="1"/>
+
     <!-- Registration Encounter -->
     <encounter encounter_id="20" patient_id="10" encounter_type="28"
                encounter_datetime="2018-03-28 10:13:23"
-               creator="1" date_created="2005-01-06 00:00:00" voided="0"/>
+               creator="1" date_created="2005-01-06 00:00:00" voided="0" form_id="1"/>
 
     <obs obs_id="15" person_id="10" encounter_id="20" concept_id="1054"
          creator="1" date_created="2005-01-06 00:00:00" voided="0"
@@ -167,11 +169,61 @@
          obs_group_id="17" value_text="Birth City" obs_datetime="2005-01-06 00:00:00"/>
 
     <!-- Encounter for Oru Receiver Test-->
+    <visit_type visit_type_id="1" name="Facility Visit" description="Patient visits the clinic/hospital (as opposed to a home visit, or telephone contact)" creator="1" date_created="2013-08-02 00:39:43" changed_by="1" date_changed="2019-04-09 15:27:44" retired="0" uuid="7b0f5697-27e3-40c4-8bae-f4049abfb4ed"/>
+
+    <visit visit_id="1" patient_id="10" visit_type_id="1" date_started="2021-05-30 23:38:34" date_stopped="2021-05-31 12:40:47" location_id="2" creator="1" date_created="2021-05-30 23:38:34" changed_by="1" date_changed="2021-05-31 12:40:47" voided="0" uuid="6f3c806a-de52-445b-b226-71f55a6e7918"/>
+
     <encounter encounter_id="21"
                patient_id="10" encounter_type="22"
                encounter_datetime="2018-03-28 17:16:07"
                creator="1" date_created="2005-01-06 00:00:00" voided="0"
-               uuid="549c78dc-31da-11e8-acac-c3add5b19973"/>
+               uuid="549c78dc-31da-11e8-acac-c3add5b19973"
+               form_id="1"
+               location_id="2"
+               visit_id="1"/>
 
+    <encounter_role encounter_role_id="3" name="Medecin" description="Encounter role for doctor" creator="1" date_created="2016-11-09 09:00:00" retired="0" uuid="322fc5ba-2ed6-44cf-8ebc-963dc40322af"/>
+
+    <!-- <encounter_provider encounter_provider_id="1"
+                encounter_id="21"
+                provider_id="11"
+                encounter_role_id="1"
+                creator="1"
+                date_created="2021-06-01"/>
+    -->
+    <encounter_provider encounter_provider_id="1" encounter_id="21" provider_id="11" encounter_role_id="3" creator="1" date_created="2021-05-31 19:14:07" voided="0" uuid="32fed42f-0304-44ac-a02a-8e2007ee8602"/>
+
+    <concept concept_id="856" retired="0" datatype_id="1" class_id="1" is_set="0" creator="1" date_created="2004-05-05 00:00:00" version="" changed_by="1" date_changed="2013-12-24 04:20:42" retired_by="1" uuid="856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+    <concept concept_id="160542" retired="0" datatype_id="4" class_id="11" is_set="0" creator="1" date_created="2012-06-14 16:19:47" version="" changed_by="1" date_changed="2016-02-18 21:33:39" retired_by="1" uuid="160542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+    <concept concept_id="509165468" retired="0" datatype_id="2" class_id="1" is_set="0" creator="1" date_created="2020-08-26 13:47:18" uuid="372cba89-1924-451c-9da4-8a9ac1e5a681"/>
+    <concept concept_id="509165916" retired="0" datatype_id="4" class_id="1" is_set="0" creator="1" date_created="2020-09-03 14:18:05" changed_by="1" date_changed="2020-09-08 12:05:40" uuid="71e6fd5c-1544-4c9d-a452-32fdba8efc82"/>
+    <concept concept_id="1271" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:43:57" version="" changed_by="1" date_changed="2011-09-24 13:45:31" retired_by="1" uuid="1271AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+    <concept concept_id="5096" retired="0" datatype_id="6" class_id="11" is_set="0" creator="1" date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2016-03-16 03:00:02" retired_by="1" uuid="5096AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+    <concept concept_id="160632" retired="0" datatype_id="3" class_id="7" is_set="0" creator="1" date_created="2012-06-24 15:11:32" changed_by="1" date_changed="2020-08-26 14:01:57" uuid="160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+    <concept concept_id="164181" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2016-11-20 16:21:44" version="" changed_by="1" date_changed="2016-11-20 16:21:52" retired_by="1" uuid="164181AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+    <concept concept_id="509165467" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2020-08-26 13:47:18" uuid="63cbd0ac-7b4d-477a-910d-8e75168275bf"/>
+    <concept concept_id="509165918" retired="0" datatype_id="2" class_id="11" is_set="0" creator="1" date_created="2020-09-03 14:31:13" changed_by="1" date_changed="2020-09-08 12:05:40" uuid="6b41328f-48bc-497c-8977-283feaa9cea6"/>
+
+    <concept_reference_map concept_map_id="138125" creator="1" date_created="2011-01-22 18:15:01" concept_id="856" uuid="138125ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB" concept_reference_term_id="138125" concept_map_type_id="2" changed_by="1"/>
+    <concept_reference_map concept_map_id="284268" creator="1" date_created="2020-08-26 13:47:18" concept_id="509165468" uuid="4a42e119-7cd1-48db-88ea-3b500b271138" concept_reference_term_id="284268" concept_map_type_id="2"/>
+    <concept_reference_map concept_map_id="284269" creator="1" date_created="2020-08-26 13:47:18" concept_id="509165468" uuid="96bee95b-f579-49bc-84eb-5b67787bfcd7" concept_reference_term_id="284269" concept_map_type_id="2"/>
+
+    <concept_reference_source concept_source_id="35" name="LNSP Code" description="LNSP test code" creator="1" date_created="2020-08-26 13:47:17" retired="0" uuid="f124da75-9f50-4b25-be97-13c029e3a65b"/>
+    <concept_reference_source concept_source_id="36" name="LNSP Result Code" description="LNSP test code" creator="1" date_created="2020-08-26 13:47:17" retired="0" uuid="c19e926e-fc28-4d78-9b99-eb42032abf3c"/>
+
+    <concept_reference_term concept_reference_term_id="138125" concept_source_id="6" code="25836-8" creator="1" date_created="2011-01-22 00:00:00" changed_by="1" retired="0" retired_by="1" uuid="2e47a031-2bef-3eff-92da-acc8065c596a"/>
+    <concept_reference_term concept_reference_term_id="284268" concept_source_id="35" code="VLCV1" creator="1" date_created="2020-08-26 13:47:18" retired="0" uuid="800f48d9-c27b-4d34-8678-706c69c2b4cf"/>
+    <concept_reference_term concept_reference_term_id="284269" concept_source_id="36" code="LBCV1" creator="1" date_created="2020-08-26 13:47:18" retired="0" uuid="45e35363-a425-44e8-87bb-60445e9a1919"/>
+
+    <obs obs_id="19" person_id="10" encounter_id="21" concept_id="160632"
+         creator="1" date_created="2005-01-06 00:00:00" voided="0"
+         value_text="SCC" obs_datetime="2005-01-06 00:00:00"/>
+    <obs obs_id="1801856" person_id="10" concept_id="160632" encounter_id="21" obs_datetime="2019-10-24 15:38:02" location_id="1"  value_text="scc" creator="1" date_created="2019-10-24 15:38:02" voided="0" uuid="e6aa5fd1-a37f-44a6-a499-60cd8971d20e"/>
+    <obs obs_id="1801859" person_id="10" concept_id="5096" encounter_id="21" obs_datetime="2019-10-24 15:38:02" location_id="1"  value_datetime="2019-10-31 00:00:00"  creator="1" date_created="2019-10-24 15:38:02"  voided="0" uuid="af875e28-af26-43c1-b6d5-04d6536b1f5f"/>
+    <obs obs_id="1807138" person_id="10" concept_id="509165467" encounter_id="21" obs_datetime="2021-05-30 23:38:34" location_id="1" value_coded="509165468" creator="1" date_created="2021-05-31 19:14:08" voided="0" uuid="1386c407-b3cd-44de-91d4-446d8d233e49"/>
+    <obs obs_id="1807137" person_id="10" concept_id="1271" encounter_id="21" obs_datetime="2021-05-30 23:38:34" location_id="1" value_coded="856" creator="1" date_created="2021-05-31 19:14:08" voided="0" uuid="edef806e-3f37-4b63-a77e-b9f331036b34"/>
+    <obs obs_id="1807136" person_id="10" concept_id="509165918" encounter_id="21" obs_datetime="2021-05-30 23:38:34" location_id="1" value_coded="509165916" creator="1" date_created="2021-05-31 19:14:08" voided="0" uuid="f29ed956-16ab-445e-b79e-0478537c835e"/>
+    <obs obs_id="1807135" person_id="10" concept_id="164181" encounter_id="21" obs_datetime="2021-05-30 23:38:34" location_id="1" value_coded="160542" creator="1" date_created="2021-05-31 19:14:08" voided="0" uuid="95fa405a-a06b-4dfe-850d-bed41fee4341"/>
+    <obs obs_id="1807134" person_id="10" concept_id="160632" encounter_id="21" obs_datetime="2021-05-30 23:38:34" location_id="1" value_text="SCC" creator="1" date_created="2021-05-31 19:14:08" voided="0" uuid="136c0b31-e8c6-461d-ac1a-f842ca430b64"/>
 
 </dataset>

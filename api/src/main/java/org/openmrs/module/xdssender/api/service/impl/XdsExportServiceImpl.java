@@ -2,25 +2,32 @@ package org.openmrs.module.xdssender.api.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dcm4chee.xds2.infoset.ihe.ProvideAndRegisterDocumentSetRequestType;
 import org.dcm4chee.xds2.infoset.ihe.ProvideAndRegisterDocumentSetRequestType.Document;
+import org.dcm4chee.xds2.infoset.rim.IdentifiableType;
 import org.dcm4chee.xds2.infoset.rim.RegistryResponseType;
 import org.openmrs.Encounter;
 import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.cda.ClinicalDocumentBuilder;
 import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
 import org.openmrs.module.xdssender.api.fhir.FhirResourceDocumentBuilder;
+import org.openmrs.module.xdssender.api.fhir.exceptions.ResourceGenerationException;
 import org.openmrs.module.xdssender.api.hl7.ORM_O01DocumentBuilder;
 import org.openmrs.module.xdssender.api.model.DocumentData;
 import org.openmrs.module.xdssender.api.model.DocumentInfo;
 import org.openmrs.module.xdssender.api.service.XdsExportService;
 import org.openmrs.module.xdssender.api.xds.MessageUtil;
 import org.openmrs.module.xdssender.api.xds.XdsSender;
+import org.openmrs.module.xdssender.api.xds.XdsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -50,6 +57,7 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 	@Override
 	public DocumentInfo exportProvideAndRegister(Encounter encounter, Patient patient) {
 		try {
+
 			DocumentModel clinicalDocModel = clinicalDocBuilder.buildDocument(patient, encounter);
 			DocumentInfo clinicalDocInfo = new DocumentInfo(encounter, patient, clinicalDocModel,
 					"text/xsl", config.getProviderRoot());
@@ -66,21 +74,23 @@ public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExpor
 				additionalData.add(labOrderDoc);
 			}
 
+			// Assign a placeholder System Identifier to be used for validating against the MPI
+			// patient.addIdentifier(XdsUtil.getPlaceholderSystemIdentifier(patient));
 			DocumentData patientFhirResourceDoc = null;
 			DocumentModel patientFhirResourceDocModel = fhirResourceBuilder.buildDocument(patient, encounter);
 			if (patientFhirResourceDocModel != null) {
 				DocumentInfo patientFhirResourceDocInfo = new DocumentInfo(encounter, patient, patientFhirResourceDocModel,
-						"text/plain", config.getProviderRoot());
+						"text/fhir", config.getProviderRoot());
 				patientFhirResourceDoc = new DocumentData(patientFhirResourceDocInfo, patientFhirResourceDocModel.getData());
 				
 				additionalData.add(patientFhirResourceDoc);
-			}			
+			}
 			
 			ProvideAndRegisterDocumentSetRequestType request = messageUtil.createProvideAndRegisterDocument(clinicalDoc,
 					additionalData, encounter);
 
 			logRequest(request);
-			
+
 			RegistryResponseType response = xdsSender.sendProvideAndRegister(request);
 
 			if (!response.getStatus().contains("Success"))

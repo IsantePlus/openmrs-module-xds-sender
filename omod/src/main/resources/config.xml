@@ -159,6 +159,12 @@
 		<defaultValue>f037e97b-471e-4898-a07c-b8e169e0ddc4</defaultValue>
 	</globalProperty>
 
+	<globalProperty>
+		<property>xdssender.ecidRoot</property>
+		<description>ECID Root</description>
+		<defaultValue>http://openclientregistry.org/fhir/sourceid</defaultValue>
+	</globalProperty>
+
 	<!-- AOP
 	<advice>
 		<point>org.openmrs.api.FormService</point>

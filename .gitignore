@@ -17,3 +17,11 @@ target
 
 # Log Files
 *.log
+
+# test files
+api/null/*
+null/*
+
+#vs Code
+.vscode/*
+api/id_file

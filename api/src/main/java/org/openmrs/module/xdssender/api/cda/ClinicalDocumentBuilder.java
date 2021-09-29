@@ -68,11 +68,14 @@ public class ClinicalDocumentBuilder {
 			//relevantObs = Context.getObsService().getObservationsByPerson(builder.getRecordTarget());
 		
 		for (Obs obs : relevantObs) {
-			//we want to have all obs groups at the end of the list
-			if (obs.hasGroupMembers()) {
-				medicationObs.add(obs);
-			} else {
-				medicationObs.add(0, obs);	//this probably is some group member
+			// Ensure that only obs relating to Tests are eliminated from the list
+			if (!obs.getConcept().getConceptClass().getName().equals("Test")) {
+				//we want to have all obs groups at the end of the list
+				if (obs.hasGroupMembers()) {
+					medicationObs.add(obs);
+				} else {
+					medicationObs.add(0, obs);	//this probably is some group member
+				}
 			}
 		}
 		

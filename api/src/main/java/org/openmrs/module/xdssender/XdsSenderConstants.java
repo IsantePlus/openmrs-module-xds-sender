@@ -485,7 +485,17 @@ public final class XdsSenderConstants {
 	public static final String SCT_TEMPLATE_HISTORY_OF_BLOOD_TRANSFUSIONS = "1.3.6.1.4.1.19376.1.5.3.1.1.9.12";
 	
 	public static final String LOCATION_SITECODE_ATTRIBUTE_UUID = "6242bf19-207e-4076-9d28-9290525b8ed9";
-	
+
+	public static final String SYSTEM_IDENTIFIER_TYPE_NAME = "SYSTEM";
+
+	public static final String PROP_PID_LOCAL = "fhir2.uriPrefix";
+
+	public static final String IDENTIFIER_SYSTEM = "http://openclientregistry.org/fhir/sourceid";
+
+	public static final String SYSTEM_IDENTIFIER_TYPE_UUID = "99F5A4C3-CEEA-4F5F-ABE6-399CD4C9FE24";
+
+	public static final String ECID_IDENTIFIER_TYPE_NAME = "ECID";
+
 	private XdsSenderConstants() {
 	}
 }
