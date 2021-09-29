@@ -219,13 +219,13 @@
 			<url>https://dcm4che.org/maven2</url>
 		</repository>
 		<repository>
-			<id>marc-te-main</id>
-			<url>https://te.marc-hi.ca/mvn</url>
+			<id>santesuite-main</id>
+			<url>http://santesuite.org/mvn</url>
+			<name>SanteSuite</name>
 		</repository>
 		<repository>
-			<id>santesuite-main</id>
-			<url>https://santesuite.org/mvn</url>
-			<name>SanteSuite</name>
+			<id>marc-te-main</id>
+			<url>http://te.marc-hi.ca/mvn</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
