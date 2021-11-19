@@ -24,7 +24,7 @@ public class PatientEcidUpdater {
 
     private static final String ECID_UUID = "f54ed6b9-f5b9-4fd5-a588-8f7561a78401";
     private static final String CODE_NATIONAL_UUID = "9fb4533d-4fd5-4276-875b-2ab41597f5dd";
-    private static final String FETCHER_BEAN_ID = "registrationcore.mpiPatientFetcherPdq";
+    private static final String FETCHER_BEAN_ID = "registrationcore.mpiPatientFetcherFhir";
     private static final String FETCH_PATIENT_METHOD = "fetchMpiPatient";
 
     @Autowired
@@ -51,6 +51,8 @@ public class PatientEcidUpdater {
 
         if (mpiPatient != null) {
             String ecid = getEcid(mpiPatient);
+
+            ecid = ecid == null ? patient.getUuid() : ecid;
 
             PatientIdentifierType ecidIdType = patientService
                     .getPatientIdentifierTypeByUuid(ECID_UUID);
