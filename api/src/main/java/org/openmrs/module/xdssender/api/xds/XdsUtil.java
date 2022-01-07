@@ -504,7 +504,7 @@ public final class XdsUtil {
         XdsUtil util = new XdsUtil();
         HumanName patientName = pat.getNameFirstRep();
         Date birthDate = pat.getBirthDate();
-        String gender = pat.getGender().getDisplay();
+        String gender = pat.getGender() != null ? pat.getGender().getDisplay() : "";
         Address addressFirstRep = pat.getAddressFirstRep();
         org.hl7.fhir.r4.model.Patient.ContactComponent patientContacts = pat.getContactFirstRep();
         Reference patientGeneralPractitioner = pat.getGeneralPractitionerFirstRep();
@@ -515,7 +515,7 @@ public final class XdsUtil {
         putValue(ccdStringMap, "givenName", patientName.getGiven().toString().replace("[", "").replace("]", ""));
         putValue(ccdStringMap, "birthDate", util.formatDate(birthDate));
         putValue(ccdStringMap, "gender", gender);
-        putValue(ccdStringMap, "address", addressFirstRep);
+        putValue(ccdStringMap, "address", addressFirstRep.getText());
 
         putValue(ccdStringMap, "patientId", patientId.getValue());
         putValue(ccdStringMap, "maritalStatus", maritalStatus.getText());
@@ -536,8 +536,17 @@ public final class XdsUtil {
                             || ccdStringMap.get(key) == null
                             || ((String) ccdStringMap.get(key)).isEmpty())) {
                 ccdStringMap.put(key, value);
+            } else {
+                if(!ccdStringMap.containsKey(key)) {
+                    ccdStringMap.put(key,"");
+                }
             }
+            return;
         } catch (Exception e) {
+            if(!ccdStringMap.containsKey(key)) {
+                ccdStringMap.put(key,"");
+            }
+        } finally {
             return;
         }
     }
