@@ -50,8 +50,7 @@ public class EncounterEventListener implements EventListener {
 			Context.openSession();
 			Context.authenticate(config.getOpenmrsUsername(), config.getOpenmrsPassword());
 			
-			if (Event.Action.CREATED.toString().equals(messageAction)
-			        || Event.Action.UPDATED.toString().equals(messageAction)) {
+			if (Event.Action.CREATED.toString().equals(messageAction)) {
 				
 				LOGGER.debug("Encounter event detected");
 				String uuid = ((MapMessage) message).getString("uuid");
