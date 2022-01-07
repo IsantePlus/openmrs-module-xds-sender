@@ -219,7 +219,14 @@ public final class XdsUtil {
         ccdStringMap.put("conditions", conditions);
         ccdStringMap.put("diagnosticReports", diagnosticReports);
         GStringTemplateEngine templateEngine = new GStringTemplateEngine();
-        String htmlString = templateEngine.createTemplate(ccdTemplate).make(ccdStringMap).toString();
+        String htmlString;
+        try {
+            htmlString = templateEngine.createTemplate(ccdTemplate).make(ccdStringMap).toString();
+        } catch (Exception e) {
+            logger.error("Could not parse HTML!\n" + e.toString());
+            htmlString = "<h2>CCD was not rendered correctly</h2>";
+        }
+
         return htmlString;
     }
 
@@ -515,7 +522,7 @@ public final class XdsUtil {
         putValue(ccdStringMap, "givenName", patientName.getGiven().toString().replace("[", "").replace("]", ""));
         putValue(ccdStringMap, "birthDate", util.formatDate(birthDate));
         putValue(ccdStringMap, "gender", gender);
-        putValue(ccdStringMap, "address", addressFirstRep.getText());
+        putValue(ccdStringMap, "address", addressFirstRep);
 
         putValue(ccdStringMap, "patientId", patientId.getValue());
         putValue(ccdStringMap, "maritalStatus", maritalStatus.getText());
