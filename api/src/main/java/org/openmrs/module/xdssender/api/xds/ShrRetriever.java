@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.openmrs.module.fhir2.api.FhirPatientIdentifierSystemService;
+
 
 @Component("xdssender.ShrRetriever")
 public class ShrRetriever {
@@ -27,6 +29,9 @@ public class ShrRetriever {
 
 	@Autowired
 	private XdsSenderConfig config;
+
+	@Autowired
+	private FhirPatientIdentifierSystemService patientIdentifierSystemService;
 
 	// Todo: fix autowiring
 	// @Autowired
@@ -39,16 +44,16 @@ public class ShrRetriever {
 
 	public Bundle sendRetrieveCCD(Patient patient) {
 		try {
-			String mpiIdentifier = config.getLocalPatientIdRoot() + patient.getUuid();
-
 			IGenericClient mpiClient = getAuthenticatedClient(config.getMpiEndpoint(), config.getOshrUsername(), config.getOshrPassword());
 
-			// By default, just get this instance's patient
-			String patientIds = patient.getUuid();
+			// TODO remove hardcoded system all over
+			PatientIdentifier mpiIdentifier = patient.getPatientIdentifier("iSantePlus ID");
+			String systemUrl = patientIdentifierSystemService.getUrlByPatientIdentifierType(mpiIdentifier.getIdentifierType());
+			String patientIds = mpiIdentifier.getIdentifier();
 
 			// Send request to MPI with the patient info, and get all of the identifiers for linked Patient resources
 			Bundle linkedPatientBundle = mpiClient.search()
-					.byUrl("/Patient?identifier=urn:ietf:rfc:3986|" + mpiIdentifier + "&_include=Patient:link")
+					.byUrl("/Patient?identifier="+systemUrl+"|" + patientIds + "&_include=Patient:link")
 					.returnBundle(Bundle.class).execute();
 
 			// Loop through the Golden Record Patient resource links
@@ -63,7 +68,7 @@ public class ShrRetriever {
 						break;
 					}
 
-
+					// Handle Golden Record
 					if (candidatePatient.hasMeta()
 							&& candidatePatient.getMeta().hasTag()
 							&& candidatePatient.getMeta().getTagFirstRep().hasCode()
@@ -88,17 +93,15 @@ public class ShrRetriever {
 									.byUrl("/Patient?_id=" + mpiPatientIds + "&_elements=identifier")
 									.returnBundle(Bundle.class).execute();
 
-							// Get iSantePlus uuids
+							// Get iSantePlus IDs
 							if(linkedPatientIdentifiers.hasTotal() && linkedPatientIdentifiers.getTotal() > 0) {
 								patientIdList = new ArrayList<>();
 
 								for (Bundle.BundleEntryComponent patientIdentifier : linkedPatientIdentifiers.getEntry()) {
 									org.hl7.fhir.r4.model.Patient p = (org.hl7.fhir.r4.model.Patient) patientIdentifier.getResource();
 									for(Identifier i : p.getIdentifier()) {
-										// TODO remove hardcoded system all over
-										if(i.hasSystem() && i.getSystem().equals("urn:ietf:rfc:3986")) {
-											String[] uuidString = i.getValue().split("/");
-											patientIdList.add(uuidString[uuidString.length - 1]);
+										if(i.hasSystem() && i.getSystem().contains('3-isanteplus-id')) {
+											patientIdList.add(i.getSystem()+"|"+i.getValue());
 											break;
 										}
 									}
@@ -125,7 +128,7 @@ public class ShrRetriever {
 
 			// Get SHR Bundle for collected patient ids
 			IGenericClient shrClient = getAuthenticatedClient(config.getExportCcdEndpoint(), config.getOshrUsername(), config.getOshrPassword());
-			Bundle returnBundle =  shrClient.search().byUrl("/Patient?_id=" + patientIds + "&_revinclude=*").returnBundle(Bundle.class)
+			Bundle returnBundle =  shrClient.search().byUrl("/Patient?identifier=" + patientIds + "&_revinclude=*").returnBundle(Bundle.class)
 					.execute();
 
 			if(!returnBundle.hasTotal() || returnBundle.getTotal() == 0)
