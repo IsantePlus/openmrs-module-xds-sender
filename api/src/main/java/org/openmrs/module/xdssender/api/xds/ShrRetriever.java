@@ -100,7 +100,7 @@ public class ShrRetriever {
 								for (Bundle.BundleEntryComponent patientIdentifier : linkedPatientIdentifiers.getEntry()) {
 									org.hl7.fhir.r4.model.Patient p = (org.hl7.fhir.r4.model.Patient) patientIdentifier.getResource();
 									for(Identifier i : p.getIdentifier()) {
-										if(i.hasSystem() && i.getSystem().contains('3-isanteplus-id')) {
+										if(i.hasSystem() && i.getSystem().contains("3-isanteplus-id")) {
 											patientIdList.add(i.getSystem()+"|"+i.getValue());
 											break;
 										}
