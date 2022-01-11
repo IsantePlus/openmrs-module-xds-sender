@@ -933,7 +933,7 @@ public final class XdsUtil {
         //        Indication for medication  160742AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (Disease)
         private Date startDate, nextRefill; //Date medication refills due  162549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         private int numberOfDays, numberDispensed; //Medication dispensed 1443AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (Number Dispensed)
-
+        private String nextRefillStr;
         public Medication(org.hl7.fhir.r4.model.Medication medication) {
         }
 
@@ -1083,8 +1083,8 @@ public final class XdsUtil {
             this.dataSource = dataSource;
         }
 
-        public Date getNextRefill() {
-            return nextRefill;
+        public String getNextRefill() {
+            return formatDate(nextRefill);
         }
 
         public void setNextRefill(Date nextRefill) {
