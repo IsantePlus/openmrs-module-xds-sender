@@ -1083,8 +1083,8 @@ public final class XdsUtil {
             this.dataSource = dataSource;
         }
 
-        public Date getNextRefill() {
-            return nextRefill;
+        public String getNextRefill() {
+            return formatDate(nextRefill);
         }
 
         public void setNextRefill(Date nextRefill) {
