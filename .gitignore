@@ -25,3 +25,6 @@ null/*
 #vs Code
 .vscode/*
 api/id_file
+
+.flattened-pom.xml
+
