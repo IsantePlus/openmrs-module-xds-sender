@@ -104,10 +104,12 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 			HL7Service hl7Service = Context.getHL7Service();
 			for (NotificationMessageHolderType notification : response.getNotificationMessage()) {
 				Element el = (Element) notification.getMessage().getAny();
-				String decodedMessage = new String(Base64.decodeBase64(el.getTextContent()), "UTF-8");
+				String decodedMessage = new String(Base64.decodeBase64(el.getTextContent().getBytes()));
+				// Replace new line character with it's ASCII equivalent
+				// Remove the time component from the birthdate to fix a HL7 parsing error
 				String parsedMessage = OruR01Util
-				        .changeMessageVersionFrom251To25(decodedMessage.replace("\n", Character.toString((char) 13)) // Replace new line character with it's ASCII equivalent
-				                .replaceAll("\\[[0-9]{4}\\]", "")); // Remove the time component from the birthdate to fix a HL7 parsing error
+				        .changeMessageVersionFrom251To25(decodedMessage.replace("\n", Character.toString((char) 13))
+				                .replaceAll("\\[[0-9]{4}\\]", ""));
 
 				log.debug(parsedMessage);
 				Message message = hl7Service.parseHL7String(parsedMessage);
