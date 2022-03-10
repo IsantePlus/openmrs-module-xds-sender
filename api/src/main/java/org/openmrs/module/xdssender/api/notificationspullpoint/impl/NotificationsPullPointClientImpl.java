@@ -67,16 +67,10 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		LocationTag loginLocationTag = Context.getLocationService().getLocationTagByName(LOCATION_TAG_NAME);
 		List<Location> locations = Context.getLocationService().getLocationsByTag(loginLocationTag);
 		List<Message> returnMessages = new ArrayList<Message>();
-
 		for (Location location : locations) {
 			returnMessages.addAll(this.getNewMessages(location));
 		}
-
-		if (returnMessages.size() > 0) {
-			return returnMessages;
-		}
-
-		return null;
+		return returnMessages;
 	}
 
 	@Override
@@ -171,6 +165,7 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 				+ "  </SOAP-ENV:Body>\r\n"
 				+ "</SOAP-ENV:Envelope>",
 		    facilitySiteCode);
+			log.debug(getMessagesPayload);
 		RequestBody body = RequestBody.create(
 				getMessagesPayload,
 		    mediaType);
@@ -185,6 +180,7 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		JAXBContext jaxbContext = JAXBContext.newInstance("org.openmrs.module.xdssender.notificationspullpoint");
 		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 		String responseText = response.body().string();
+		log.debug(responseText);
 		Object res = unmarshaller.unmarshal(IOUtils.toInputStream(responseText));
 
 		return res;
