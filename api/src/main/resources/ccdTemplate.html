@@ -36,7 +36,7 @@
     }
 
     th {
-        background: teal;
+        background: #163160 !important;
         color: white;
         text-transform: uppercase;
         font-weight: normal;
@@ -205,7 +205,7 @@
                 <thead>
                 <tr>
                     <th>Encounter</th>
-                    <th>Providers</th>
+                   <!-- <th>Providers</th> -->
                     <th>Location</th>
                     <th>Date</th>
                 </tr>
@@ -219,7 +219,7 @@
                 <% encounters.each{ encounter -> %>
                 <tr>
                     <td><%= encounter.type  %></td>
-                    <td><%= encounter.providers  %></td>
+                   <!-- <td><%= encounter.providers  %></td> -->
                     <td><%= encounter.location  %></td>
                     <td><%= encounter.formattedDate  %></td>
                 </tr>
@@ -241,7 +241,7 @@
                 <tr>
                     <th>Medication</th>
                     <th>Date Requested</th>
-                    <th>Requester</th>
+                   <!-- <th>Requester</th> -->
                     <th>Category</th>
                     <th>Location</th>
                 </tr>
@@ -256,7 +256,7 @@
                 <tr>
                     <td><%= medicationPrescription.identifier  %></td>
                     <td><%= medicationPrescription.formattedDate  %></td>
-                    <td><%= medicationPrescription.requester  %></td>
+                   <!-- <td><%= medicationPrescription.requester  %></td> -->
                     <td><%= medicationPrescription.category  %></td>
                     <td><%= medicationPrescription.location %></td>
 
@@ -320,7 +320,7 @@
                     <th>Problem Type</th>
                     <th>Effective Dates</th>
                     <th>Location</th>
-                    <th>Code</th>
+                   <!-- <th>Code</th> -->
                 </tr>
                 </thead>
             </table>
@@ -335,7 +335,7 @@
                     <td><%= condition.type %></td>
                     <td><%= condition.formattedDate %></td>
                     <td><%= condition.location %></td>
-                    <td><%= condition.code %></td>
+                   <!-- <td><%= condition.code %></td> -->
                 </tr>
                 <%}
                 }else{ %>
@@ -359,7 +359,7 @@
                     <th>Indications</th>
                     <th>Outcome</th>
                     <th>Location</th>
-                    <th>Code</th>
+                  <!--  <th>Code</th> -->
                 </tr>
                 </thead>
             </table>
@@ -376,7 +376,7 @@
                     <td><%= procedure.indications %></td>
                     <td><%= procedure.outcome %></td>
                     <td><%= procedure.location %></td>
-                    <td><%= procedure.code %></td>
+                   <!-- <td><%= procedure.code %></td> -->
                 </tr>
                 <%}
                 }else{ %>
@@ -399,7 +399,7 @@
                     <th>Category</th>
                     <th>Date</th>
                     <th>Result</th>
-                    <th>Code</th>
+                   <!-- <th>Code</th> -->
                     <th>Location</th>
                 </tr>
                 </thead>
@@ -415,7 +415,7 @@
                     <td><%= diagnosticReport.category %></td>
                     <td><%= diagnosticReport.formattedDate %></td>
                     <td><%= diagnosticReport.result %></td>
-                    <td><%= diagnosticReport.identifier %></td>
+                   <!-- <td><%= diagnosticReport.identifier %></td> -->
                     <td><%= diagnosticReport.location %></td>
                 </tr>
                 <%}
@@ -472,7 +472,7 @@
                     <th>Value</th>
                     <th>Date</th>
                     <th>Location</th>
-                    <th>Code</th>
+                  <!--  <th>Code</th> -->
                 </tr>
                 </thead>
             </table>
@@ -487,7 +487,7 @@
                     <td><%= vitalSign.value  %></td>
                     <td><%= vitalSign.formattedDate  %></td>
                     <td><%= vitalSign.location  %></td>
-                    <td><%= vitalSign.id  %></td>
+                  <!--  <td><%= vitalSign.id  %></td> -->
                 </tr>
                 <%}
                 }else{ %>
