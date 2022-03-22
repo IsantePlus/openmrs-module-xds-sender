@@ -324,7 +324,7 @@ public final class XdsUtil {
                         medication.setIndications(memberResource.getValueCodeableConcept().getCodingFirstRep().getDisplay());
                         break;
                     }
-                    case "162549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
+                        case "162549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
 //                        process Date medication refills due
                         medication.setNextRefill(memberResource.getValueDateTimeType().getValue());
                         break;
