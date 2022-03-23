@@ -89,6 +89,8 @@ public final class XdsUtil {
         List<AllergyIntolerance> intolerances = new ArrayList<>();
 //		process the resource entries individually and push them to the template
 
+        Date nextRefill = null;
+
         for (Bundle.BundleEntryComponent bundleEntry : entry) {
             Resource eResource = bundleEntry.getResource();
             switch (eResource.getResourceType().name()) {
@@ -105,7 +107,6 @@ public final class XdsUtil {
                     } else if (codes.contains(obs.getCode().getCodingFirstRep().getCode())) {
                         vitalSigns.add(mapObservationResource(obs));
                     } else {
-                        Date nextRefill = null;
 //                        Process other obs
                         switch (obs.getCode().getCodingFirstRep().getCode()) {
                             case "984AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
