@@ -130,14 +130,18 @@ public final class XdsUtil {
                             case "163711AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
                                 // Current Medication Dispensed Construct
                                 Medication medication = mapMedicationList(obs);
-                                if(nextRefill != null) medication.setNextRefill(nextRefill);
+                                if(nextRefill != null && obs.getEncounter().getId() == medication.encounterId) {
+                                    medication.setNextRefill(nextRefill);
+                                }
                                 medications.add(medication);
                                 break;
                             }
                             case "162549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
                                 //                        process Date medication refills due
                                 for (int i = 0; i < medications.size(); i++) {
-                                    medications.get(i).setNextRefill(obs.getValueDateTimeType().getValue());
+                                    if(obs.getEncounter().getId() == medications.get(i).encounterId) {
+                                        medications.get(i).setNextRefill(obs.getValueDateTimeType().getValue());
+                                    }
                                 }
                                 break;
                             }
@@ -291,7 +295,8 @@ public final class XdsUtil {
                 obs.getStatus().getDisplay(), "", "",
                 obs.getValue().toString(),
                 ((Encounter) obs.getEncounter().getResource()).getLocationFirstRep().getLocation().getDisplay(),
-                null, 0, "", 0);
+                null, 0, "", 0,
+                (obs.getEncounter().isEmpty() ? "" : obs.getEncounter().getId()));
 //        TODO - Should we use current
         if (obs.hasHasMember()) {
             List<Reference> members = obs.getHasMember();
@@ -935,7 +940,7 @@ public final class XdsUtil {
 
     private class Medication implements Comparable<Medication> {
         private String medication, brandName, productForm, dose, route, adminInstructions, pharmInstructions,
-                status, indications, reaction, description, dataSource, strength;
+                status, indications, reaction, description, dataSource, strength, encounterId;
         //        Indication for medication  160742AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (Disease)
         private Date startDate, nextRefill; //Date medication refills due  162549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         private int numberOfDays, numberDispensed; //Medication dispensed 1443AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (Number Dispensed)
@@ -946,7 +951,7 @@ public final class XdsUtil {
         public Medication(String medication, String brandName, Date startDate, String productForm, String dose,
                           String route, String adminInstructions, String pharmInstructions, String status, String indications,
                           String reaction, String description, String dataSource, Date nextRefill, int numberOfDays,
-                          String strength, int numberDispensed) {
+                          String strength, int numberDispensed, String encounterId) {
             this.medication = medication;
             this.brandName = brandName;
             this.startDate = startDate;
@@ -964,6 +969,7 @@ public final class XdsUtil {
             this.numberOfDays = numberOfDays;
             this.strength = strength;
             this.numberDispensed = numberDispensed;
+            this.encounterId = encounterId;
         }
 
         public int getNumberDispensed() {
