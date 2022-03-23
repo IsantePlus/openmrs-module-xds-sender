@@ -105,6 +105,7 @@ public final class XdsUtil {
                     } else if (codes.contains(obs.getCode().getCodingFirstRep().getCode())) {
                         vitalSigns.add(mapObservationResource(obs));
                     } else {
+                        Date nextRefill = null;
 //                        Process other obs
                         switch (obs.getCode().getCodingFirstRep().getCode()) {
                             case "984AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
@@ -128,9 +129,18 @@ public final class XdsUtil {
                             case "163711AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
                                 // Current Medication Dispensed Construct
                                 Medication medication = mapMedicationList(obs);
+                                if(nextRefill != null) medication.setNextRefill(nextRefill);
                                 medications.add(medication);
                                 break;
                             }
+                            case "162549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
+                                //                        process Date medication refills due
+                                for (int i = 0; i < medications.size(); i++) {
+                                    medications.get(i).setNextRefill(obs.getValueDateTimeType().getValue());
+                                }
+                                break;
+                            }
+
                         }
 
                     }
@@ -322,11 +332,6 @@ public final class XdsUtil {
                     case "160742AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
 //                        process Indication for medication
                         medication.setIndications(memberResource.getValueCodeableConcept().getCodingFirstRep().getDisplay());
-                        break;
-                    }
-                        case "162549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
-//                        process Date medication refills due
-                        medication.setNextRefill(memberResource.getValueDateTimeType().getValue());
                         break;
                     }
                 }
