@@ -248,13 +248,13 @@
 		</repository>
 		<repository>
 			<id>santesuite-main</id>
-			<url>http://santesuite.org/mvn</url>
+			<url>https://santesuite.org/mvn</url>
 			<name>SanteSuite</name>
 		</repository>
-		<repository>
-			<id>marc-te-main</id>
-			<url>http://te.marc-hi.ca/mvn</url>
-		</repository>
+<!--		<repository>-->
+<!--			<id>marc-te-main</id>-->
+<!--			<url>https://te.marc-hi.ca/mvn</url>-->
+<!--		</repository>-->
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
