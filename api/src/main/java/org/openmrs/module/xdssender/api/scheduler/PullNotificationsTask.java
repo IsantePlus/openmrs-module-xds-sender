@@ -1,6 +1,10 @@
 package org.openmrs.module.xdssender.api.scheduler;
 
 import ca.uhn.hl7v2.model.Message;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.openmrs.api.context.Context;
 import org.openmrs.hl7.HL7Service;
 import org.openmrs.module.xdssender.api.notificationspullpoint.NotificationsPullPointClient;
@@ -23,12 +27,17 @@ public class PullNotificationsTask extends AbstractTask {
 	public void execute() {
 		LOGGER.info("Executing " + TASK_NAME);
 		HL7Service hl7Service = Context.getHL7Service();
-		for (Message msg : getNotificationsPullPointClient().getNewMessages()) {
-			try {
+		List<Message> queuedMessages  = new ArrayList<>(getNotificationsPullPointClient().getNewMessages());
+
+		for (Message msg : queuedMessages) {
+			try {			
 				hl7Service.processHL7Message(msg);
 			}
 			catch (Exception e) {
 				LOGGER.error(e.getMessage(), e);
+				if(LOGGER.isDebugEnabled()){
+					e.printStackTrace();;
+				}
 			}
 		}
 	}
