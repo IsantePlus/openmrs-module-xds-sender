@@ -40,8 +40,10 @@ public class XdsSenderConfig {
 	private static final String ENCOUNTER_ROOT = "xdssender.encounterRoot";
 	
 	private static final String OBS_ROOT = "xdssender.obsRoot";
-	
+
 	private static final String ECID_ROOT = "xdssender.ecidRoot";
+
+	private static final String CR_ROOT = "xdssender.crRoot";
 	
 	private static final String CODE_NATIONAL_ROOT = "xdssender.codeNationalRoot";
 	
@@ -247,5 +249,8 @@ public class XdsSenderConfig {
 		return Context.getRegisteredComponent(getProperty(propertyName), type);
 	}
 
+	public String getCrRoot() {
+		return getProperty(CR_ROOT, "http://openclientregistry.org/fhir/sourceid");
+	}
 
 }

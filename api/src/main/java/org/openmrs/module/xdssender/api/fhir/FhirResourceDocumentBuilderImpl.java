@@ -118,8 +118,8 @@ public class FhirResourceDocumentBuilderImpl implements FhirResourceDocumentBuil
 				throw new ResourceGenerationException("Unable to retrieve the Local PID, ensure that the \"PID LOCAL\" global property has been set");
 			}
 
-			patientResource.addIdentifier().setSystem(XdsSenderConfig.getInstance().getEcidRoot()).setValue(systemPatientIdentifier.getIdentifier());
-			// qpatientResource.addIdentifier().setSystem(XdsSenderConstants.IDENTIFIER_SYSTEM).setValue(systemPatientIdentifier.getIdentifier());
+			patientResource.addIdentifier().setSystem(XdsSenderConfig.getInstance().getCrRoot()).setValue(systemPatientIdentifier.getIdentifier());
+			// patientResource.addIdentifier().setSystem(XdsSenderConstants.IDENTIFIER_SYSTEM).setValue(systemPatientIdentifier.getIdentifier());
 		}
 
 		return patientResource;
