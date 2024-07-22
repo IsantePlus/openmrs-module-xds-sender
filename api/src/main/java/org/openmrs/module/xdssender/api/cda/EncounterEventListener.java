@@ -177,9 +177,9 @@ public class EncounterEventListener implements EventListener {
 			synchronized (EncounterEventListener.class) {
 				if (VIRAL_LOAD_CONCEPT_ID == -1) {
 					ConceptService conceptService = Context.getService(ConceptService.class);
-					Concept concept = conceptService.getConceptByMapping("CIEL", "856");
+					Concept concept = conceptService.getConceptByMapping("856", "CIEL");
 					if (concept == null) {
-						concept = conceptService.getConceptByMapping("LOINC", "25836-8");
+						concept = conceptService.getConceptByMapping("25836-8", "LOINC");
 					}
 
 					if (concept != null) {
@@ -197,9 +197,9 @@ public class EncounterEventListener implements EventListener {
 			synchronized (EncounterEventListener.class) {
 				if (EARLY_INFANT_DIAGNOSIS_CONCEPT_ID == -1) {
 					ConceptService conceptService = Context.getService(ConceptService.class);
-					Concept concept = conceptService.getConceptByMapping("CIEL", "844");
+					Concept concept = conceptService.getConceptByMapping("844", "CIEL");
 					if (concept == null) {
-						concept = conceptService.getConceptByMapping("LOINC", "44871-2");
+						concept = conceptService.getConceptByMapping("44871-2", "LOINC");
 					}
 
 					if (concept != null) {
