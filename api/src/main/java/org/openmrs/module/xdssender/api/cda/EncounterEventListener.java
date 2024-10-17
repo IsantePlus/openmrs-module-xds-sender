@@ -18,6 +18,7 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 import org.openmrs.event.Event;
 import org.openmrs.event.EventListener;
+import org.openmrs.module.labintegration.api.model.OrderDestination;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.errorhandling.ErrorHandlingService;
 import org.openmrs.module.xdssender.api.errorhandling.ExportProvideAndRegisterParameters;
@@ -81,18 +82,18 @@ public class EncounterEventListener implements EventListener {
 								LOGGER.debug("Matching encounter types to send XDS repository: {}", uuid);
 								Encounter e = Context.getEncounterService().getEncounterByUuid(uuid);
 
+								if (!encounterTypesToProcess.contains(e.getEncounterType().getUuid())) {
+									LOGGER.debug("Skipping encounter {} because the event listener doesn't process encounters of type {}", e.getUuid(), e.getEncounterType().getUuid());
+									return;
+								}
+
 								// Since we are no longer using the XDSSender to send everything to an XDS Repository,
 								// we want to check that this encounter has an appropriate "order". Note that "orders"
 								// are stored as obs
 								boolean shouldSendEncounter = shouldSendEncounter(e);
-
 								if (shouldSendEncounter) {
-									for (String encounterTypeUuid : encounterTypesToProcess) {
-										if (encounterTypeUuid.equals(e.getEncounterType().getUuid())) {
-											LOGGER.debug("Exporting encounter {} to XDS repository", uuid);
-											exportEncounter(uuid);
-										}
-									}
+									LOGGER.debug("Exporting encounter {} to XDS repository", uuid);
+									exportEncounter(uuid);
 								} else {
 									LOGGER.info("Skipping encounter {} because there are no appropriate lab orders", uuid);
 								}
@@ -169,6 +170,11 @@ public class EncounterEventListener implements EventListener {
 				}
 			}
 		}
+
+		if (shouldSendEncounter) {
+			shouldSendEncounter = OrderDestination.searchForExistence(e, OrderDestination.SCC);
+		}
+
 		return shouldSendEncounter;
 	}
 
