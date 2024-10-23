@@ -3,7 +3,7 @@ package org.openmrs.module.xdssender.api.notificationspullpoint.impl;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +13,6 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationTag;
@@ -57,7 +56,7 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 	private static final Logger log = LoggerFactory.getLogger(NotificationsPullPointClientImpl.class);
 
 	public static final String FACILITY_QNAME = "facility";
-	private BigInteger MAX_MESSAGES_PER_REQUEST = BigInteger.valueOf(100);
+	private static final BigInteger MAX_MESSAGES_PER_REQUEST = BigInteger.valueOf(100);
 
 	@Autowired
 	private XdsSenderConfig config;
@@ -66,7 +65,7 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 	public List<Message> getNewMessages() {
 		LocationTag loginLocationTag = Context.getLocationService().getLocationTagByName(LOCATION_TAG_NAME);
 		List<Location> locations = Context.getLocationService().getLocationsByTag(loginLocationTag);
-		List<Message> returnMessages = new ArrayList<Message>();
+		List<Message> returnMessages = new ArrayList<>();
 		for (Location location : locations) {
 			returnMessages.addAll(this.getNewMessages(location));
 		}
@@ -93,30 +92,30 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		List<Message> result = new ArrayList<>();
 		GetMessagesResponse response;
 		try {
-			// response = (GetMessagesResponse) getResponse(request);
-			response = (GetMessagesResponse) getResponseHttpClient(request);
+			response = getResponseHttpClient(request);
 			HL7Service hl7Service = Context.getHL7Service();
-			for (NotificationMessageHolderType notification : response.getNotificationMessage()) {
-				Element el = (Element) notification.getMessage().getAny();
-				String decodedMessage = new String(Base64.decodeBase64(el.getTextContent().getBytes()));
-				// Replace new line character with it's ASCII equivalent
-				// Remove the time component from the birthdate to fix a HL7 parsing error
-				String parsedMessage = OruR01Util
-				        .changeMessageVersionFrom251To25(decodedMessage.replace("\n", Character.toString((char) 13))
-				                .replaceAll("\\[[0-9]{4}\\]", ""));
+			if (response != null) {
+				for (NotificationMessageHolderType notification : response.getNotificationMessage()) {
+					Element el = (Element) notification.getMessage().getAny();
+					String decodedMessage = new String(Base64.decodeBase64(el.getTextContent().getBytes()));
+					// Replace new line character with it's ASCII equivalent
+					// Remove the time component from the birthdate to fix a HL7 parsing error
+					String parsedMessage = OruR01Util
+							.changeMessageVersionFrom251To25(decodedMessage.replace("\n", Character.toString((char) 13))
+									.replaceAll("\\[[0-9]{4}\\]", ""));
 
-				log.debug(parsedMessage);
-				Message message = hl7Service.parseHL7String(parsedMessage);
-				
-				result.add(message);
+					log.debug(parsedMessage);
+					Message message = hl7Service.parseHL7String(parsedMessage);
+
+					result.add(message);
+				}
 			}
 		}
 		catch (Exception e) {
-			log.debug("Error getting response in NotificationsPullPointClientImpl: ", e);
-			e.printStackTrace();
-		} finally {
-			return result;
+			log.error("Error getting response in NotificationsPullPointClientImpl: ", e);
 		}
+
+		return result;
 	}
 
 	private Object getResponse(Object requestPayload) throws Exception {
@@ -140,7 +139,7 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		    addAuthorizationHeader);
 	}
 
-	private Object getResponseHttpClient(GetMessages requestPayload) throws Exception {
+	private GetMessagesResponse getResponseHttpClient(GetMessages requestPayload) throws Exception {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
 		marshaller.setContextPath("org.openmrs.module.xdssender.notificationspullpoint");
 		marshaller.afterPropertiesSet();
@@ -150,8 +149,7 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("text/xml; charset=utf-8");
 		String facilitySiteCode = requestPayload.getOtherAttributes().get(new QName(FACILITY_QNAME));
-		String getMessagesPayload = String.format(""
-				+ "<SOAP-ENV:Envelope\r\n  "
+		String getMessagesPayload = String.format("<SOAP-ENV:Envelope\r\n  "
 				+ "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n"
 				+ "  <SOAP-ENV:Header/>\r\n"
 				+ "  <SOAP-ENV:Body>\r\n"
@@ -168,25 +166,24 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 				+ "</SOAP-ENV:Envelope>",
 		    facilitySiteCode);
 			log.debug(getMessagesPayload);
-		RequestBody body = RequestBody.create(
-				getMessagesPayload,
-		    mediaType);
+
+		RequestBody body = RequestBody.create(getMessagesPayload, mediaType);
 		Request request = new Request.Builder().url(config.getNotificationsPullPointEndpoint()).method("POST", body)
 		        .addHeader("Content-Type", "text/xml; charset=utf-8")
-		        .addHeader("Accept", "text/xml, text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2")
+		        .addHeader("Accept", "text/xml, text/html")
 		        .addHeader("Authorization", generateBasicAuthenticationHeader(config.getNotificationsPullPointUsername(),
 		            config.getNotificationsPullPointPassword()))
 		        .build();
-		Response response = client.newCall(request).execute();
 
-		JAXBContext jaxbContext = JAXBContext.newInstance("org.openmrs.module.xdssender.notificationspullpoint");
-		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-		String responseText = response.body().string();
-		log.debug(responseText);
-		Object res = unmarshaller.unmarshal(IOUtils.toInputStream(responseText));
+		try (Response response = client.newCall(request).execute()) {
+			JAXBContext jaxbContext = JAXBContext.newInstance("org.openmrs.module.xdssender.notificationspullpoint");
+			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+			if (response.body() != null) {
+				return (GetMessagesResponse) unmarshaller.unmarshal(response.body().byteStream());
+			}
 
-		return res;
-
+			return null;
+		}
 	}
 	
 	private void addAuthorizationHeader() {
@@ -211,8 +208,8 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 	}
 
 	private static String generateBasicAuthenticationHeader(String userName, String userPassword) {
-		byte[] bytesEncoded = Base64.encodeBase64((userName + ":" + userPassword).getBytes(Charset.forName("UTF-8")));
-		return "Basic " + new String(bytesEncoded, Charset.forName("UTF-8"));
+		byte[] bytesEncoded = Base64.encodeBase64((userName + ":" + userPassword).getBytes(StandardCharsets.UTF_8));
+		return "Basic " + new String(bytesEncoded, StandardCharsets.UTF_8);
 	}
 
 }
