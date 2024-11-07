@@ -48,5 +48,5 @@
                                 baseColumnNames="patient_id" referencedTableName="patient"
                                 referencedColumnNames="patient_id" />
    </changeSet>
-   
+
 </databaseChangeLog>
