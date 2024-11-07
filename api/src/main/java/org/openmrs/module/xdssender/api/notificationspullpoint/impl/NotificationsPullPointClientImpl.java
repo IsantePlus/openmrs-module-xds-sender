@@ -159,8 +159,11 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("text/xml; charset=utf-8");
 		String facilitySiteCode = requestPayload.getOtherAttributes().get(new QName(FACILITY_QNAME));
-		String sinceAttribute = StringUtils.isNotBlank(lastRequestDate) ? String.format("since=\"%s\"", lastRequestDate) : "";
-        String maximumNumberElement = StringUtils.isBlank(lastRequestDate) ? "<ns2:MaximumNumber>100</ns2:MaximumNumber>\r\n" : "";
+		String sinceAttribute = StringUtils.isNotBlank(lastRequestDate) ? String.format("since=\"%s\"", lastRequestDate)
+				: "";
+		String maximumNumberElement = StringUtils.isBlank(lastRequestDate)
+				? "<ns2:MaximumNumber>100</ns2:MaximumNumber>\r\n"
+				: "";
 
 		String getMessagesPayload = String.format("<SOAP-ENV:Envelope\r\n  "
 				+ "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n"
