@@ -39,13 +39,13 @@ public class CcdDaoImpl implements CcdDao {
 
 	@Override
 	public RequestDate saveOrUpdateRequestDate(RequestDate requestDate) throws APIException {
-        sessionFactory.getCurrentSession().saveOrUpdate(requestDate);
-        return requestDate;
-    }
+		sessionFactory.getCurrentSession().saveOrUpdate(requestDate);
+		return requestDate;
+	}
 
 	@Override
-    public RequestDate getLastRequestDate() throws APIException {
-        String hql = "FROM RequestDate rd WHERE rd.date = (SELECT MAX(t.date) FROM RequestDate t)";
-        return (RequestDate)sessionFactory.getCurrentSession().createQuery(hql).uniqueResult();   
-    }
+	public RequestDate getLastRequestDate() throws APIException {
+		String hql = "FROM RequestDate rd WHERE rd.date = (SELECT MAX(t.date) FROM RequestDate t)";
+		return (RequestDate) sessionFactory.getCurrentSession().createQuery(hql).uniqueResult();
+	}
 }

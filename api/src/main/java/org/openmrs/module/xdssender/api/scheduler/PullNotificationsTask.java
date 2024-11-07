@@ -28,7 +28,7 @@ public class PullNotificationsTask extends AbstractTask {
 		LOGGER.info("Executing " + TASK_NAME);
 		HL7Service hl7Service = Context.getHL7Service();
 		Date newDate = new Date();
-        Boolean success = true;
+		Boolean success = true;
 		for (Message msg : getNotificationsPullPointClient().getNewMessages()) {
 			try {
 				hl7Service.processHL7Message(msg);

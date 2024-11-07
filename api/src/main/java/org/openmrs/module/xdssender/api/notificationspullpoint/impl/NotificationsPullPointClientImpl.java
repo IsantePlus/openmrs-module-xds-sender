@@ -75,15 +75,15 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 	@Override
 	public List<Message> getNewMessages() {
 		SimpleDateFormat dateFormatter = new SimpleDateFormat(XdsSenderConstants.SOAP_REQUEST_DATE_TIME_FORMAT);
-		TimeZone timeZone = TimeZone.getDefault(); 
-        dateFormatter.setTimeZone(timeZone);
+		TimeZone timeZone = TimeZone.getDefault();
+		dateFormatter.setTimeZone(timeZone);
 		Date newDate = new Date();
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(newDate);
 		calendar.add(Calendar.DAY_OF_YEAR, -5);
 		Date fiveDaysAgo = calendar.getTime();
-		
+
 		RequestDate lastRequest = ccdService.getLastRequestDate();
 		lastRequestDate = dateFormatter.format(fiveDaysAgo);
 		if (lastRequest != null) {
