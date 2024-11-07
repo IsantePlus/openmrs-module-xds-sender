@@ -48,22 +48,24 @@
                                 baseColumnNames="patient_id" referencedTableName="patient"
                                 referencedColumnNames="patient_id" />
    </changeSet>
-    <changeSet id="create-request-date-table-2024-11-07" author="mozzymutesa" >
-		<preConditions onFail="MARK_RAN">
-			<not><tableExists tableName="request_date"/></not>
-		</preConditions>
-		<comment>
-			Creating the request_date table
-		</comment>
-		<createTable tableName="request_date">
-			<column name="id" type="int" autoIncrement="true">
-				<constraints primaryKey="true" nullable="false"/>
-			</column>
+   <changeSet id="create-request-date-table-2024-11-07" author="mozzymutesa" >
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="request_date"/>
+            </not>
+        </preConditions>
+        <comment>
+                Creating the request_date table
+            </comment>
+        <createTable tableName="request_date">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
             <column name="date" type="DATETIME"/>
             <column name="uuid" type="char(38)">
-				<constraints nullable="false" unique="true"></constraints>
-			</column>
-		</createTable>
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
     </changeSet> 
 
 </databaseChangeLog>
