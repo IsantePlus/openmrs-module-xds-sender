@@ -3,15 +3,15 @@ package org.openmrs.module.xdssender.api.scheduler;
 import ca.uhn.hl7v2.model.Message;
 import org.openmrs.api.context.Context;
 import org.openmrs.hl7.HL7Service;
-import org.openmrs.module.xdssender.api.model.RequestDate;
+import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.notificationspullpoint.NotificationsPullPointClient;
 import org.openmrs.module.xdssender.api.notificationspullpoint.impl.NotificationsPullPointClientImpl;
-import org.openmrs.module.xdssender.api.service.CcdService;
-import org.openmrs.module.xdssender.api.service.impl.CcdServiceImpl;
 import org.openmrs.scheduler.tasks.AbstractTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Date;
+
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 public class PullNotificationsTask extends AbstractTask {
 	
@@ -27,8 +27,7 @@ public class PullNotificationsTask extends AbstractTask {
 	public void execute() {
 		LOGGER.info("Executing " + TASK_NAME);
 		HL7Service hl7Service = Context.getHL7Service();
-		Date newDate = new Date();
-		Boolean success = true;
+		boolean success = true;
 		for (Message msg : getNotificationsPullPointClient().getNewMessages()) {
 			try {
 				hl7Service.processHL7Message(msg);
@@ -40,9 +39,7 @@ public class PullNotificationsTask extends AbstractTask {
 		}
 
 		if(success){
-			RequestDate req = new RequestDate();
-			req.setRequestDate(newDate);
-			getCcdService().saveOrUpdateRequestDate(req);
+			Context.getAdministrationService().setGlobalProperty(XdsSenderConstants.PULL_NOTIFICATIONS_TASK_LAST_SUCCESS_RUN ,DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
 		}
 		
 	}
@@ -50,10 +47,5 @@ public class PullNotificationsTask extends AbstractTask {
 	private NotificationsPullPointClient getNotificationsPullPointClient() {
 		return Context.getRegisteredComponent("xdssender.NotificationsPullPointClientImpl",
 		    NotificationsPullPointClientImpl.class);
-	}
-
-	private CcdService getCcdService() {
-		return Context.getRegisteredComponent("xdsSender.CcdService",
-		    CcdServiceImpl.class);
 	}
 }

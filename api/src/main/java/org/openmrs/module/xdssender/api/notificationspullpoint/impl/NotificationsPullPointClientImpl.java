@@ -17,6 +17,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationTag;
@@ -25,7 +26,6 @@ import org.openmrs.hl7.HL7Service;
 import org.openmrs.module.labintegration.api.hl7.messages.util.OruR01Util;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.XdsSenderConstants;
-import org.openmrs.module.xdssender.api.model.RequestDate;
 import org.openmrs.module.xdssender.api.notificationspullpoint.NotificationsPullPointClient;
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessages;
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessagesResponse;
@@ -69,27 +69,10 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 	@Autowired
 	private XdsSenderConfig config;
 
-	@Autowired
-	private CcdService ccdService;
 
 	@Override
 	public List<Message> getNewMessages() {
-		SimpleDateFormat dateFormatter = new SimpleDateFormat(XdsSenderConstants.SOAP_REQUEST_DATE_TIME_FORMAT);
-		TimeZone timeZone = TimeZone.getDefault();
-		dateFormatter.setTimeZone(timeZone);
-		Date newDate = new Date();
-
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(newDate);
-		calendar.add(Calendar.DAY_OF_YEAR, -5);
-		Date fiveDaysAgo = calendar.getTime();
-
-		RequestDate lastRequest = ccdService.getLastRequestDate();
-		lastRequestDate = dateFormatter.format(fiveDaysAgo);
-		if (lastRequest != null) {
-			lastRequestDate = dateFormatter.format(lastRequest.getRequestDate());
-		}
-
+		lastRequestDate = Context.getAdministrationService().getGlobalProperty(XdsSenderConstants.PULL_NOTIFICATIONS_TASK_LAST_SUCCESS_RUN , "");
 		LocationTag loginLocationTag = Context.getLocationService().getLocationTagByName(LOCATION_TAG_NAME);
 		List<Location> locations = Context.getLocationService().getLocationsByTag(loginLocationTag);
 		List<Message> returnMessages = new ArrayList<>();
@@ -176,6 +159,9 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("text/xml; charset=utf-8");
 		String facilitySiteCode = requestPayload.getOtherAttributes().get(new QName(FACILITY_QNAME));
+		String sinceAttribute = StringUtils.isNotBlank(lastRequestDate) ? String.format("since=\"%s\"", lastRequestDate) : "";
+        String maximumNumberElement = StringUtils.isBlank(lastRequestDate) ? "<ns2:MaximumNumber>100</ns2:MaximumNumber>\r\n" : "";
+
 		String getMessagesPayload = String.format("<SOAP-ENV:Envelope\r\n  "
 				+ "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n"
 				+ "  <SOAP-ENV:Header/>\r\n"
@@ -186,12 +172,12 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 				+ "      xmlns:ns4=\"http://docs.oasis-open.org/wsrf/bf-2\"\r\n"
 				+ "      xmlns:ns5=\"http://docs.oasis-open.org/wsn/t-1\"\r\n"
 				+ "      xmlns:ns6=\"http://docs.oasis-open.org/wsn/br-2\"\r\n"
-				+ "      facility=\"%s\"\r\n"
-				+ "      since=\"%s\">\r\n"
+				+ "      facility=\"%s\" %s>\r\n"
+				+ "      %s"
 				+ "    </ns2:GetMessages>\r\n"
 				+ "  </SOAP-ENV:Body>\r\n"
 				+ "</SOAP-ENV:Envelope>",
-		    facilitySiteCode ,lastRequestDate);
+		    facilitySiteCode ,sinceAttribute ,maximumNumberElement);
 			log.debug(getMessagesPayload);
 
 		RequestBody body = RequestBody.create(getMessagesPayload, mediaType);

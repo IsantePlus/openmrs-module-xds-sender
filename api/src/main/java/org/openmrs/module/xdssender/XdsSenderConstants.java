@@ -496,7 +496,7 @@ public final class XdsSenderConstants {
 
 	public static final String ECID_IDENTIFIER_TYPE_NAME = "ECID";
 
-	public static final String SOAP_REQUEST_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+	public static final String PULL_NOTIFICATIONS_TASK_LAST_SUCCESS_RUN = "xdssender.PullNotificationsTask.lastSuccessfulRun";
 
 	private XdsSenderConstants() {
 	}
