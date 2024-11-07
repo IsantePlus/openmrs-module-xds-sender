@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -21,10 +25,12 @@ import org.openmrs.hl7.HL7Service;
 import org.openmrs.module.labintegration.api.hl7.messages.util.OruR01Util;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.XdsSenderConstants;
+import org.openmrs.module.xdssender.api.model.RequestDate;
 import org.openmrs.module.xdssender.api.notificationspullpoint.NotificationsPullPointClient;
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessages;
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessagesResponse;
 import org.openmrs.module.xdssender.notificationspullpoint.NotificationMessageHolderType;
+import org.openmrs.module.xdssender.api.service.CcdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,11 +64,32 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 	public static final String FACILITY_QNAME = "facility";
 	private static final BigInteger MAX_MESSAGES_PER_REQUEST = BigInteger.valueOf(100);
 
+	private String lastRequestDate = "";
+
 	@Autowired
 	private XdsSenderConfig config;
 
+	@Autowired
+	private CcdService ccdService;
+
 	@Override
 	public List<Message> getNewMessages() {
+		SimpleDateFormat dateFormatter = new SimpleDateFormat(XdsSenderConstants.SOAP_REQUEST_DATE_TIME_FORMAT);
+		TimeZone timeZone = TimeZone.getDefault(); 
+        dateFormatter.setTimeZone(timeZone);
+		Date newDate = new Date();
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(newDate);
+		calendar.add(Calendar.DAY_OF_YEAR, -5);
+		Date fiveDaysAgo = calendar.getTime();
+		
+		RequestDate lastRequest = ccdService.getLastRequestDate();
+		lastRequestDate = dateFormatter.format(fiveDaysAgo);
+		if (lastRequest != null) {
+			lastRequestDate = dateFormatter.format(lastRequest.getRequestDate());
+		}
+
 		LocationTag loginLocationTag = Context.getLocationService().getLocationTagByName(LOCATION_TAG_NAME);
 		List<Location> locations = Context.getLocationService().getLocationsByTag(loginLocationTag);
 		List<Message> returnMessages = new ArrayList<>();
@@ -159,12 +186,12 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 				+ "      xmlns:ns4=\"http://docs.oasis-open.org/wsrf/bf-2\"\r\n"
 				+ "      xmlns:ns5=\"http://docs.oasis-open.org/wsn/t-1\"\r\n"
 				+ "      xmlns:ns6=\"http://docs.oasis-open.org/wsn/br-2\"\r\n"
-				+ "      facility=\"%s\">\r\n"
-				+ "      <ns2:MaximumNumber>100</ns2:MaximumNumber>\r\n"
+				+ "      facility=\"%s\"\r\n"
+				+ "      since=\"%s\">\r\n"
 				+ "    </ns2:GetMessages>\r\n"
 				+ "  </SOAP-ENV:Body>\r\n"
 				+ "</SOAP-ENV:Envelope>",
-		    facilitySiteCode);
+		    facilitySiteCode ,lastRequestDate);
 			log.debug(getMessagesPayload);
 
 		RequestBody body = RequestBody.create(getMessagesPayload, mediaType);

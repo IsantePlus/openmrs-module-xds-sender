@@ -6,9 +6,11 @@ import org.dcm4chee.xds2.common.exception.XDSException;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.HumanName;
 import org.openmrs.Patient;
+import org.openmrs.api.APIException;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.domain.Ccd;
 import org.openmrs.module.xdssender.api.domain.dao.CcdDao;
+import org.openmrs.module.xdssender.api.model.RequestDate;
 import org.openmrs.module.xdssender.api.service.CcdService;
 import org.openmrs.module.xdssender.api.service.XdsImportService;
 import org.openmrs.module.xdssender.api.xds.XdsUtil;
@@ -132,5 +134,15 @@ public class CcdServiceImpl implements CcdService {
     @Override
     public void downloadCcdAsPDF(OutputStream stream, Patient patient) {
         LOGGER.info("CCD PDF is being downloaded.");
+    }
+
+    @Override
+    public RequestDate saveOrUpdateRequestDate(RequestDate requestDate) throws APIException {
+        return ccdDao.saveOrUpdateRequestDate(requestDate);
+    }
+
+    @Override
+    public RequestDate getLastRequestDate() throws APIException {
+        return ccdDao.getLastRequestDate();
     }
 }
