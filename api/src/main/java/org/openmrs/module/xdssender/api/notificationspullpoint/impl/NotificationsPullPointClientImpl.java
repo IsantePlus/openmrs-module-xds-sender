@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -159,7 +161,7 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("text/xml; charset=utf-8");
 		String facilitySiteCode = requestPayload.getOtherAttributes().get(new QName(FACILITY_QNAME));
-		String sinceAttribute = StringUtils.isNotBlank(lastRequestDate) ? String.format("since=\"%s\"", lastRequestDate)
+		String sinceAttribute = StringUtils.isNotBlank(lastRequestDate) && isValidISODate(lastRequestDate) ? String.format("since=\"%s\"", lastRequestDate)
 				: "";
 		String maximumNumberElement = StringUtils.isBlank(lastRequestDate)
 				? "<ns2:MaximumNumber>100</ns2:MaximumNumber>\r\n"
@@ -201,6 +203,15 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 			return null;
 		}
 	}
+
+	 private  boolean isValidISODate(String dateString) {
+        try {
+            DateTimeFormatter.ISO_INSTANT.parse(dateString);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
 	
 	private void addAuthorizationHeader() {
 		TransportContext context = TransportContextHolder.getTransportContext();
