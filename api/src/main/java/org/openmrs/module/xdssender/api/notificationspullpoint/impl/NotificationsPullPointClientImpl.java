@@ -204,14 +204,14 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		}
 	}
 
-	 private  boolean isValidISODate(String dateString) {
-        try {
-            DateTimeFormatter.ISO_INSTANT.parse(dateString);
-            return true;
-        } catch (DateTimeParseException e) {
-            return false;
-        }
-    }
+	private boolean isValidISODate(String dateString) {
+		try {
+			DateTimeFormatter.ISO_INSTANT.parse(dateString);
+			return true;
+		} catch (DateTimeParseException e) {
+			return false;
+		}
+	}
 	
 	private void addAuthorizationHeader() {
 		TransportContext context = TransportContextHolder.getTransportContext();
