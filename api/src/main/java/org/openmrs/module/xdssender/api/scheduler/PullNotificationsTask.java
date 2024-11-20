@@ -27,10 +27,11 @@ public class PullNotificationsTask extends AbstractTask {
 	public void execute() {
 		LOGGER.info("Executing " + TASK_NAME);
 		HL7Service hl7Service = Context.getHL7Service();
-		boolean success = true;
+		boolean success = false;
 		for (Message msg : getNotificationsPullPointClient().getNewMessages()) {
 			try {
 				hl7Service.processHL7Message(msg);
+				success = true;
 			}
 			catch (Exception e) {
 				success = false;
