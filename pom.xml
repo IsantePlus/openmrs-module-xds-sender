@@ -28,7 +28,7 @@
 	</modules>
 
 	<properties>
-		<revision>2.4.0-SNAPSHOT</revision>
+		<revision>2.5.0-SNAPSHOT</revision>
 		<openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
 		<everestVersion>1.1.0</everestVersion>
 		<dcm4chee-xds2Version>2.0.6</dcm4chee-xds2Version>

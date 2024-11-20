@@ -4,8 +4,14 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -13,6 +19,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationTag;
@@ -25,6 +32,7 @@ import org.openmrs.module.xdssender.api.notificationspullpoint.NotificationsPull
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessages;
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessagesResponse;
 import org.openmrs.module.xdssender.notificationspullpoint.NotificationMessageHolderType;
+import org.openmrs.module.xdssender.api.service.CcdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,11 +66,15 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 	public static final String FACILITY_QNAME = "facility";
 	private static final BigInteger MAX_MESSAGES_PER_REQUEST = BigInteger.valueOf(100);
 
+	private String lastRequestDate = "";
+
 	@Autowired
 	private XdsSenderConfig config;
 
+
 	@Override
 	public List<Message> getNewMessages() {
+		lastRequestDate = Context.getAdministrationService().getGlobalProperty(XdsSenderConstants.PULL_NOTIFICATIONS_TASK_LAST_SUCCESS_RUN , "");
 		LocationTag loginLocationTag = Context.getLocationService().getLocationTagByName(LOCATION_TAG_NAME);
 		List<Location> locations = Context.getLocationService().getLocationsByTag(loginLocationTag);
 		List<Message> returnMessages = new ArrayList<>();
@@ -149,6 +161,12 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("text/xml; charset=utf-8");
 		String facilitySiteCode = requestPayload.getOtherAttributes().get(new QName(FACILITY_QNAME));
+		String sinceAttribute = StringUtils.isNotBlank(lastRequestDate) && isValidISODate(lastRequestDate) ? String.format("since=\"%s\"", lastRequestDate)
+				: "";
+		String maximumNumberElement = StringUtils.isBlank(lastRequestDate)
+				? "<ns2:MaximumNumber>100</ns2:MaximumNumber>\r\n"
+				: "";
+
 		String getMessagesPayload = String.format("<SOAP-ENV:Envelope\r\n  "
 				+ "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n"
 				+ "  <SOAP-ENV:Header/>\r\n"
@@ -159,12 +177,12 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 				+ "      xmlns:ns4=\"http://docs.oasis-open.org/wsrf/bf-2\"\r\n"
 				+ "      xmlns:ns5=\"http://docs.oasis-open.org/wsn/t-1\"\r\n"
 				+ "      xmlns:ns6=\"http://docs.oasis-open.org/wsn/br-2\"\r\n"
-				+ "      facility=\"%s\">\r\n"
-				+ "      <ns2:MaximumNumber>100</ns2:MaximumNumber>\r\n"
+				+ "      facility=\"%s\" %s>\r\n"
+				+ "      %s"
 				+ "    </ns2:GetMessages>\r\n"
 				+ "  </SOAP-ENV:Body>\r\n"
 				+ "</SOAP-ENV:Envelope>",
-		    facilitySiteCode);
+		    facilitySiteCode ,sinceAttribute ,maximumNumberElement);
 			log.debug(getMessagesPayload);
 
 		RequestBody body = RequestBody.create(getMessagesPayload, mediaType);
@@ -183,6 +201,15 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 			}
 
 			return null;
+		}
+	}
+
+	private boolean isValidISODate(String dateString) {
+		try {
+			DateTimeFormatter.ISO_INSTANT.parse(dateString);
+			return true;
+		} catch (DateTimeParseException e) {
+			return false;
 		}
 	}
 	
