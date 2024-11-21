@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Build and Deploy
 
 # Controls when the action will run. 
 on:
@@ -8,7 +8,6 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
   release:
     types: [ created ]
   # Allows you to run this workflow manually from the Actions tab
@@ -40,25 +39,50 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - uses: s4u/maven-settings-action@v2.2.0
+
+      - name: Build and Test
+        run: mvn --batch-mode --update-snapshots clean package 
+
+      - name: Set settings.xml
+        uses: s4u/maven-settings-action@v2.6.0
         with:
           servers: |
             [{
-                "id": "github-packages",
-                "username": "${{ secrets.RELEASE_USERNAME }}",
-                "password": "${{ secrets.RELEASE_TOKEN }}"
+              "id": "uwdigi-repo-central",
+              "username": "${{ secrets.MAVEN_REPO_USERNAME }}",
+              "password": "${{ secrets.MAVEN_REPO_PASSWORD }}"
+            },
+            {
+              "id": "uwdigi-repo-snapshots",
+              "username": "${{ secrets.MAVEN_REPO_USERNAME }}",
+              "password": "${{ secrets.MAVEN_REPO_PASSWORD }}"
             }]
-          properties: |
-            [
-              { "maven.wagon.http.ssl.insecure": "true" },
-              { "maven.wagon.http.ssl.allowall": "true" },
-              { "maven.wagon.http.ssl.ignore.validity.dates": "true"}
-            ]
-          githubServer: false
-      - name: Build with Maven
-        run: mvn -P 'github-packages' install
-      - name: Publish package
-        run: mvn -P github-packages -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true -B deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        if: github.event_name == 'release' && github.event.action == 'created'
+        if: ${{ github.ref == 'refs/heads/main' && github.repository_owner == 'IsantePlus' && github.event_name != 'pull_request' }}
+
+      - name: Deploy
+        run: mvn --batch-mode clean deploy -DskipTests
+        if: ${{ github.ref == 'refs/heads/main' && github.repository_owner == 'IsantePlus' && github.event_name != 'pull_request'}}    
+
+
+      # - uses: s4u/maven-settings-action@v2.2.0
+      #   with:
+      #     servers: |
+      #       [{
+      #           "id": "github-packages",
+      #           "username": "${{ secrets.RELEASE_USERNAME }}",
+      #           "password": "${{ secrets.RELEASE_TOKEN }}"
+      #       }]
+      #     properties: |
+      #       [
+      #         { "maven.wagon.http.ssl.insecure": "true" },
+      #         { "maven.wagon.http.ssl.allowall": "true" },
+      #         { "maven.wagon.http.ssl.ignore.validity.dates": "true"}
+      #       ]
+      #     githubServer: false
+      # - name: Build with Maven
+      #   run: mvn -P 'github-packages' -B install
+      # - name: Publish package
+      #   run: mvn -P github-packages -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true -B deploy
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      #   if: github.event_name == 'release' && github.event.action == 'created'

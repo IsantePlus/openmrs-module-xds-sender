@@ -41,7 +41,7 @@
 		<springWsVersion>2.4.7.RELEASE</springWsVersion>
 		<hapiFhirVersion>5.0.2</hapiFhirVersion>
 		<fhirModuleVersion>1.3.0</fhirModuleVersion>
-		<labintegrationVersion>2.1.0</labintegrationVersion>
+		<labintegrationVersion>2.2.1-SNAPSHOT</labintegrationVersion>
 	</properties>
 
 	<dependencyManagement>
@@ -188,7 +188,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>flatten-maven-plugin</artifactId>
-				<version>1.1.0</version>
+				<version>1.2.7</version>
 				<configuration>
 					<updatePomFile>true</updatePomFile>
 					<flattenMode>resolveCiFriendliesOnly</flattenMode>
@@ -251,11 +251,32 @@
 			<url>http://santesuite.org/mvn</url>
 			<name>SanteSuite</name>
 		</repository>
-		<repository>
+		<!-- <repository>
 			<id>marc-te-main</id>
 			<url>http://te.marc-hi.ca/mvn</url>
+		</repository> -->
+		<repository>
+			<id>OscarMcMaster</id>
+			<url>https://oscarmcmaster.sourceforge.net/m2/</url>
 		</repository>
+		<repository>
+            <id>uwdigi-repo-central</id>
+            <name>DIGI Public Repository</name>
+            <url>https://packages.uwdigi.org/artifactory/public</url>
+        </repository>
 	</repositories>
+	<distributionManagement>
+        <repository>
+            <id>uwdigi-repo-central</id>
+            <name>libs-release</name>
+            <url>https://packages.uwdigi.org/artifactory/libs-release</url>
+        </repository>
+        <snapshotRepository>
+            <id>uwdigi-repo-snapshots</id>
+            <name>libs-snapshot</name>
+            <url>https://packages.uwdigi.org/artifactory/libs-snapshot</url>
+        </snapshotRepository>
+    </distributionManagement>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>openmrs-repo</id>
