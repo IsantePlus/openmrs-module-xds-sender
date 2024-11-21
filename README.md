@@ -1,5 +1,5 @@
 # XDS Sender Module
-![CI](https://github.com/pmanko/openmrs-module-xds-sender/workflows/CI/badge.svg)
+[![CI](https://github.com/IsantePlus/openmrs-module-xds-sender/actions/workflows/ci.yml/badge.svg)](https://github.com/IsantePlus/openmrs-module-xds-sender/actions/workflows/ci.yml)
 
 The XDS Sender module pushes standardized Continuity of Care Documents (CCD) from OpenMRS to a third party XDS repository like the OpenXDS/OpenSHR shared health record. There is a listener that listens for encounter events. Each time an encounter is created or saved, this module creates a CCD and attempts to push it to the third party system. Failed pushes raise an ActiveMQ event that can be used to trigger subsequent retries through other mechanisms.
 
