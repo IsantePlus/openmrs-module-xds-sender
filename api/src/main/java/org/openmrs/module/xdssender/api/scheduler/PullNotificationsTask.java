@@ -26,18 +26,8 @@ public class PullNotificationsTask extends AbstractTask {
 	@Override
 	public void execute() {
 		LOGGER.info("Executing " + TASK_NAME);
-		HL7Service hl7Service = Context.getHL7Service();
-		boolean success = false;
-		for (Message msg : getNotificationsPullPointClient().getNewMessages()) {
-			try {
-				hl7Service.processHL7Message(msg);
-				success = true;
-			}
-			catch (Exception e) {
-				success = false;
-				LOGGER.error(e.getMessage(), e);
-			}
-		}
+		
+		boolean success  = getNotificationsPullPointClient().getNewMessages();
 
 		if(success){
 			Context.getAdministrationService().setGlobalProperty(XdsSenderConstants.PULL_NOTIFICATIONS_TASK_LAST_SUCCESS_RUN ,DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
