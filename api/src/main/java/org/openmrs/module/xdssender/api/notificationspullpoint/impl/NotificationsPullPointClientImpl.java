@@ -122,7 +122,7 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 					hl7InQueue.setHL7Data(parsedMessage);
 					hl7InQueue.setHL7Source(hl7Service.getHL7Source(1));
 					hl7InQueue.setHL7SourceKey(currentLocation.getName());
-		            hl7Service.saveHL7InQueue(hl7InQueue);
+					hl7Service.saveHL7InQueue(hl7InQueue);
 					success = true;
 				}
 			}
