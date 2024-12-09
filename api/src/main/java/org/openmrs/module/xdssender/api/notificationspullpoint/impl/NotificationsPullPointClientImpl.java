@@ -24,6 +24,7 @@ import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationTag;
 import org.openmrs.api.context.Context;
+import org.openmrs.hl7.HL7InQueue;
 import org.openmrs.hl7.HL7Service;
 import org.openmrs.module.labintegration.api.hl7.messages.util.OruR01Util;
 import org.openmrs.module.xdssender.XdsSenderConfig;
@@ -73,19 +74,20 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 
 
 	@Override
-	public List<Message> getNewMessages() {
+	public boolean getNewMessages() {
+		boolean success = false ;
 		lastRequestDate = Context.getAdministrationService().getGlobalProperty(XdsSenderConstants.PULL_NOTIFICATIONS_TASK_LAST_SUCCESS_RUN , "");
 		LocationTag loginLocationTag = Context.getLocationService().getLocationTagByName(LOCATION_TAG_NAME);
 		List<Location> locations = Context.getLocationService().getLocationsByTag(loginLocationTag);
-		List<Message> returnMessages = new ArrayList<>();
 		for (Location location : locations) {
-			returnMessages.addAll(this.getNewMessages(location));
+			success =  this.getNewMessages(location);
 		}
-		return returnMessages;
+		return success;
 	}
 
 	@Override
-	public List<Message> getNewMessages(Location currentLocation) {
+	public boolean getNewMessages(Location currentLocation) {
+		boolean success = false ;
 		GetMessages request = new GetMessages();
 		String siteCode = null;
 
@@ -101,7 +103,6 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		    currentLocation.getName() + ": " + currentLocation.getId() + ": " + siteCode);
 		request.getOtherAttributes().put(new QName(FACILITY_QNAME), siteCode);
 
-		List<Message> result = new ArrayList<>();
 		GetMessagesResponse response;
 		try {
 			response = getResponseHttpClient(request);
@@ -117,17 +118,21 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 									.replaceAll("\\[[0-9]{4}\\]", ""));
 
 					log.debug(parsedMessage);
-					Message message = hl7Service.parseHL7String(parsedMessage);
-
-					result.add(message);
+					HL7InQueue hl7InQueue = new HL7InQueue();
+					hl7InQueue.setHL7Data(parsedMessage);
+					hl7InQueue.setHL7Source(hl7Service.getHL7Source(1));
+					hl7InQueue.setHL7SourceKey(currentLocation.getName());
+					hl7Service.saveHL7InQueue(hl7InQueue);
+					success = true;
 				}
 			}
 		}
 		catch (Exception e) {
+			success = false;
 			log.error("Error getting response in NotificationsPullPointClientImpl: ", e);
 		}
 
-		return result;
+		return success;
 	}
 
 	private Object getResponse(Object requestPayload) throws Exception {
