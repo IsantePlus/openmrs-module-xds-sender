@@ -108,6 +108,7 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 			response = getResponseHttpClient(request);
 			HL7Service hl7Service = Context.getHL7Service();
 			if (response != null) {
+				success = true;
 				for (NotificationMessageHolderType notification : response.getNotificationMessage()) {
 					Element el = (Element) notification.getMessage().getAny();
 					String decodedMessage = new String(Base64.decodeBase64(el.getTextContent().getBytes()));
@@ -123,7 +124,6 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 					hl7InQueue.setHL7Source(hl7Service.getHL7Source(1));
 					hl7InQueue.setHL7SourceKey(currentLocation.getName());
 					hl7Service.saveHL7InQueue(hl7InQueue);
-					success = true;
 				}
 			}
 		}
