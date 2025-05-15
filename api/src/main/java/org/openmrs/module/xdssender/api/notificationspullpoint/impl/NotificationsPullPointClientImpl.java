@@ -3,9 +3,15 @@ package org.openmrs.module.xdssender.api.notificationspullpoint.impl;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -13,11 +19,12 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationTag;
 import org.openmrs.api.context.Context;
+import org.openmrs.hl7.HL7InQueue;
 import org.openmrs.hl7.HL7Service;
 import org.openmrs.module.labintegration.api.hl7.messages.util.OruR01Util;
 import org.openmrs.module.xdssender.XdsSenderConfig;
@@ -26,6 +33,7 @@ import org.openmrs.module.xdssender.api.notificationspullpoint.NotificationsPull
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessages;
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessagesResponse;
 import org.openmrs.module.xdssender.notificationspullpoint.NotificationMessageHolderType;
+import org.openmrs.module.xdssender.api.service.CcdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,24 +65,29 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 	private static final Logger log = LoggerFactory.getLogger(NotificationsPullPointClientImpl.class);
 
 	public static final String FACILITY_QNAME = "facility";
-	private BigInteger MAX_MESSAGES_PER_REQUEST = BigInteger.valueOf(100);
+	private static final BigInteger MAX_MESSAGES_PER_REQUEST = BigInteger.valueOf(100);
+
+	private String lastRequestDate = "";
 
 	@Autowired
 	private XdsSenderConfig config;
 
+
 	@Override
-	public List<Message> getNewMessages() {
+	public boolean getNewMessages() {
+		boolean success = false ;
+		lastRequestDate = Context.getAdministrationService().getGlobalProperty(XdsSenderConstants.PULL_NOTIFICATIONS_TASK_LAST_SUCCESS_RUN , "");
 		LocationTag loginLocationTag = Context.getLocationService().getLocationTagByName(LOCATION_TAG_NAME);
 		List<Location> locations = Context.getLocationService().getLocationsByTag(loginLocationTag);
-		List<Message> returnMessages = new ArrayList<Message>();
 		for (Location location : locations) {
-			returnMessages.addAll(this.getNewMessages(location));
+			success =  this.getNewMessages(location);
 		}
-		return returnMessages;
+		return success;
 	}
 
 	@Override
-	public List<Message> getNewMessages(Location currentLocation) {
+	public boolean getNewMessages(Location currentLocation) {
+		boolean success = false ;
 		GetMessages request = new GetMessages();
 		String siteCode = null;
 
@@ -90,33 +103,36 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		    currentLocation.getName() + ": " + currentLocation.getId() + ": " + siteCode);
 		request.getOtherAttributes().put(new QName(FACILITY_QNAME), siteCode);
 
-		List<Message> result = new ArrayList<>();
 		GetMessagesResponse response;
 		try {
-			// response = (GetMessagesResponse) getResponse(request);
-			response = (GetMessagesResponse) getResponseHttpClient(request);
+			response = getResponseHttpClient(request);
 			HL7Service hl7Service = Context.getHL7Service();
-			for (NotificationMessageHolderType notification : response.getNotificationMessage()) {
-				Element el = (Element) notification.getMessage().getAny();
-				String decodedMessage = new String(Base64.decodeBase64(el.getTextContent().getBytes()));
-				// Replace new line character with it's ASCII equivalent
-				// Remove the time component from the birthdate to fix a HL7 parsing error
-				String parsedMessage = OruR01Util
-				        .changeMessageVersionFrom251To25(decodedMessage.replace("\n", Character.toString((char) 13))
-				                .replaceAll("\\[[0-9]{4}\\]", ""));
+			if (response != null) {
+				success = true;
+				for (NotificationMessageHolderType notification : response.getNotificationMessage()) {
+					Element el = (Element) notification.getMessage().getAny();
+					String decodedMessage = new String(Base64.decodeBase64(el.getTextContent().getBytes()));
+					// Replace new line character with it's ASCII equivalent
+					// Remove the time component from the birthdate to fix a HL7 parsing error
+					String parsedMessage = OruR01Util
+							.changeMessageVersionFrom251To25(decodedMessage.replace("\n", Character.toString((char) 13))
+									.replaceAll("\\[[0-9]{4}\\]", ""));
 
-				log.debug(parsedMessage);
-				Message message = hl7Service.parseHL7String(parsedMessage);
-				
-				result.add(message);
+					log.debug(parsedMessage);
+					HL7InQueue hl7InQueue = new HL7InQueue();
+					hl7InQueue.setHL7Data(parsedMessage);
+					hl7InQueue.setHL7Source(hl7Service.getHL7Source(1));
+					hl7InQueue.setHL7SourceKey(currentLocation.getName());
+					hl7Service.saveHL7InQueue(hl7InQueue);
+				}
 			}
 		}
 		catch (Exception e) {
-			log.debug("Error getting response in NotificationsPullPointClientImpl: ", e);
-			e.printStackTrace();
-		} finally {
-			return result;
+			success = false;
+			log.error("Error getting response in NotificationsPullPointClientImpl: ", e);
 		}
+
+		return success;
 	}
 
 	private Object getResponse(Object requestPayload) throws Exception {
@@ -140,7 +156,7 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		    addAuthorizationHeader);
 	}
 
-	private Object getResponseHttpClient(GetMessages requestPayload) throws Exception {
+	private GetMessagesResponse getResponseHttpClient(GetMessages requestPayload) throws Exception {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
 		marshaller.setContextPath("org.openmrs.module.xdssender.notificationspullpoint");
 		marshaller.afterPropertiesSet();
@@ -150,8 +166,13 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("text/xml; charset=utf-8");
 		String facilitySiteCode = requestPayload.getOtherAttributes().get(new QName(FACILITY_QNAME));
-		String getMessagesPayload = String.format(""
-				+ "<SOAP-ENV:Envelope\r\n  "
+		String sinceAttribute = StringUtils.isNotBlank(lastRequestDate) && isValidISODate(lastRequestDate) ? String.format("since=\"%s\"", lastRequestDate)
+				: "";
+		String maximumNumberElement = StringUtils.isBlank(lastRequestDate)
+				? "<ns2:MaximumNumber>100</ns2:MaximumNumber>\r\n"
+				: "";
+
+		String getMessagesPayload = String.format("<SOAP-ENV:Envelope\r\n  "
 				+ "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n"
 				+ "  <SOAP-ENV:Header/>\r\n"
 				+ "  <SOAP-ENV:Body>\r\n"
@@ -161,32 +182,40 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 				+ "      xmlns:ns4=\"http://docs.oasis-open.org/wsrf/bf-2\"\r\n"
 				+ "      xmlns:ns5=\"http://docs.oasis-open.org/wsn/t-1\"\r\n"
 				+ "      xmlns:ns6=\"http://docs.oasis-open.org/wsn/br-2\"\r\n"
-				+ "      facility=\"%s\">\r\n"
-				+ "      <ns2:MaximumNumber>100</ns2:MaximumNumber>\r\n"
+				+ "      facility=\"%s\" %s>\r\n"
+				+ "      %s"
 				+ "    </ns2:GetMessages>\r\n"
 				+ "  </SOAP-ENV:Body>\r\n"
 				+ "</SOAP-ENV:Envelope>",
-		    facilitySiteCode);
+		    facilitySiteCode ,sinceAttribute ,maximumNumberElement);
 			log.debug(getMessagesPayload);
-		RequestBody body = RequestBody.create(
-				getMessagesPayload,
-		    mediaType);
+
+		RequestBody body = RequestBody.create(getMessagesPayload, mediaType);
 		Request request = new Request.Builder().url(config.getNotificationsPullPointEndpoint()).method("POST", body)
 		        .addHeader("Content-Type", "text/xml; charset=utf-8")
-		        .addHeader("Accept", "text/xml, text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2")
+		        .addHeader("Accept", "text/xml, text/html")
 		        .addHeader("Authorization", generateBasicAuthenticationHeader(config.getNotificationsPullPointUsername(),
 		            config.getNotificationsPullPointPassword()))
 		        .build();
-		Response response = client.newCall(request).execute();
 
-		JAXBContext jaxbContext = JAXBContext.newInstance("org.openmrs.module.xdssender.notificationspullpoint");
-		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-		String responseText = response.body().string();
-		log.debug(responseText);
-		Object res = unmarshaller.unmarshal(IOUtils.toInputStream(responseText));
+		try (Response response = client.newCall(request).execute()) {
+			JAXBContext jaxbContext = JAXBContext.newInstance("org.openmrs.module.xdssender.notificationspullpoint");
+			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+			if (response.body() != null) {
+				return (GetMessagesResponse) unmarshaller.unmarshal(response.body().byteStream());
+			}
 
-		return res;
+			return null;
+		}
+	}
 
+	private boolean isValidISODate(String dateString) {
+		try {
+			DateTimeFormatter.ISO_INSTANT.parse(dateString);
+			return true;
+		} catch (DateTimeParseException e) {
+			return false;
+		}
 	}
 	
 	private void addAuthorizationHeader() {
@@ -211,8 +240,8 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 	}
 
 	private static String generateBasicAuthenticationHeader(String userName, String userPassword) {
-		byte[] bytesEncoded = Base64.encodeBase64((userName + ":" + userPassword).getBytes(Charset.forName("UTF-8")));
-		return "Basic " + new String(bytesEncoded, Charset.forName("UTF-8"));
+		byte[] bytesEncoded = Base64.encodeBase64((userName + ":" + userPassword).getBytes(StandardCharsets.UTF_8));
+		return "Basic " + new String(bytesEncoded, StandardCharsets.UTF_8);
 	}
 
 }

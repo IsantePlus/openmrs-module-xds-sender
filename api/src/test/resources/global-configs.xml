@@ -10,10 +10,14 @@
                      description="PID Local"
                      uuid="EF15944A-D73C-4D9C-9D86-E06FC076CA70"/>
     <global_property property="xdssender.ecidRoot"
-                     property_value="http://openclientregistry.org/fhir/sourceid"
+                     property_value="2.16.840.1.113883.4.56"
                      description="ECID Root/Identifier Assigning Authotity"
                      uuid="8998B26D-2B53-4AC9-BF03-0F442A43062B"/>
-    <!--                 property_value="2.16.840.1.113883.4.56"-->
+
+    <global_property property="xdssender.crRoot"
+                     property_value="http://openclientregistry.org/fhir/sourceid"
+                     description="CR Root for Identifier going to CR"
+                     uuid="8998B244-2B53-4AC9-CE03-0F442A43011C" />
     <global_property property="mpi-client.pid.local"
                      property_value="http://test-local"
                      description="PID Local"

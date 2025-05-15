@@ -162,7 +162,17 @@
 	<globalProperty>
 		<property>xdssender.ecidRoot</property>
 		<description>ECID Root</description>
+		<defaultValue>2.16.840.1.113883.4.56</defaultValue>
+	</globalProperty>
+
+	<globalProperty>
+		<property>xdssender.crRoot</property>
+		<description>CR Root</description>
 		<defaultValue>http://openclientregistry.org/fhir/sourceid</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>xdssender.PullNotificationsTask.lastSuccessfulRun</property>
+		<description>Time Stamp of Last Succesful Run for XDS Sender Pull Notifications Task </description>
 	</globalProperty>
 
 	<!-- AOP

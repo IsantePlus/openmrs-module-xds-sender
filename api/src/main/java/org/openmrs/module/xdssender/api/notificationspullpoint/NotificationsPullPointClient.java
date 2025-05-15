@@ -8,7 +8,7 @@ import ca.uhn.hl7v2.model.Message;
 
 public interface NotificationsPullPointClient {
 	
-	List<Message> getNewMessages();
+	boolean getNewMessages();
 
-	List<Message> getNewMessages(Location currentLocation);
+	boolean getNewMessages(Location currentLocation);
 }
