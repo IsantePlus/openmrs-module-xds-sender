@@ -33,7 +33,6 @@ import org.openmrs.module.xdssender.api.notificationspullpoint.NotificationsPull
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessages;
 import org.openmrs.module.xdssender.notificationspullpoint.GetMessagesResponse;
 import org.openmrs.module.xdssender.notificationspullpoint.NotificationMessageHolderType;
-import org.openmrs.module.xdssender.api.service.CcdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

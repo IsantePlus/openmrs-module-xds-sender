@@ -93,6 +93,9 @@
 
   <build>
     <plugins>
+      <!--
+        As of June 23, 2025, classes can no longer be generated live due to HTTP -> HTTPS redirection not being followed
+        by SAX; therefore, we've just interned these classes for now. This should all eventually go away.
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>
@@ -118,6 +121,7 @@
           </schemas>
         </configuration>
       </plugin>
+      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>

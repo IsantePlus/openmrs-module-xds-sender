@@ -2,6 +2,7 @@ package org.openmrs.module.xdssender.api.cda;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.jms.JMSException;
@@ -43,6 +44,10 @@ public class EncounterEventListener implements EventListener {
 	private static final int TESTS_ORDERED_CONCEPT_ID = 1271;
 	private static volatile int VIRAL_LOAD_CONCEPT_ID = -1;
 	private static volatile int EARLY_INFANT_DIAGNOSIS_CONCEPT_ID = -1;
+	private static final int ORDER_PLACED_CONCEPT_ID = 165384;
+
+	private static final String CREATED = Event.Action.CREATED.toString();
+	private static final String UPDATED = Event.Action.UPDATED.toString();
 	
 	@Autowired
 	private XdsSenderConfig config;
@@ -60,10 +65,10 @@ public class EncounterEventListener implements EventListener {
 			try {
 				Context.authenticate(config.getOpenmrsUsername(), config.getOpenmrsPassword());
 
-				if (Event.Action.CREATED.toString().equals(messageAction)) {
+				if (CREATED.equals(messageAction) || UPDATED.equals(messageAction)) {
 					LOGGER.debug("Encounter event detected");
 					String uuid = ((MapMessage) message).getString("uuid");
-					List<String> encounterTypesToProcess = null;
+					List<String> encounterTypesToProcess;
 					String propEncounterTypesToProcess = Context.getAdministrationService()
 							.getGlobalProperty(PROP_ENCOUNTER_TYPE_TO_PROCESS);
 
@@ -94,6 +99,15 @@ public class EncounterEventListener implements EventListener {
 								if (shouldSendEncounter) {
 									LOGGER.debug("Exporting encounter {} to XDS repository", uuid);
 									exportEncounter(uuid);
+
+									Obs sentObs = new Obs();
+									sentObs.setPerson(e.getPatient());
+									sentObs.setConcept(Context.getConceptService().getConcept(ORDER_PLACED_CONCEPT_ID));
+									sentObs.setObsDatetime(new Date());
+									sentObs.setLocation(e.getLocation());
+									sentObs.setEncounter(e);
+
+									Context.getObsService().saveObs(sentObs, null);
 								} else {
 									LOGGER.info("Skipping encounter {} because there are no appropriate lab orders", uuid);
 								}
@@ -117,7 +131,7 @@ public class EncounterEventListener implements EventListener {
 	private void exportEncounter(String encounterUuid) {
 		Encounter encounter = Context.getEncounterService().getEncounterByUuid(encounterUuid);
 		if (encounter.getForm() == null) {
-			LOGGER.warn("Skipped sending Encounter %s (formId is NULL " + "-> probably it's the creating encounter)");
+			LOGGER.warn("Skipped sending Encounter {} (formId is NULL -> probably it's the creating encounter)", encounterUuid);
 		} else {
 			Patient patient = Context.getPatientService().getPatient(encounter.getPatient().getPatientId());
 
@@ -175,6 +189,21 @@ public class EncounterEventListener implements EventListener {
 			shouldSendEncounter = OrderDestination.searchForExistence(e, OrderDestination.SCC);
 		}
 
+		if (shouldSendEncounter) {
+			boolean hasBeenSent = false;
+
+			for (Obs obs : e.getAllObs()) {
+				if (obs.getConcept().getConceptId() == ORDER_PLACED_CONCEPT_ID) {
+					hasBeenSent = true;
+					break;
+				}
+			}
+
+			if (hasBeenSent) {
+				shouldSendEncounter = false;
+			}
+		}
+
 		return shouldSendEncounter;
 	}
 
@@ -182,7 +211,7 @@ public class EncounterEventListener implements EventListener {
 		if (VIRAL_LOAD_CONCEPT_ID == -1) {
 			synchronized (EncounterEventListener.class) {
 				if (VIRAL_LOAD_CONCEPT_ID == -1) {
-					ConceptService conceptService = Context.getService(ConceptService.class);
+					ConceptService conceptService = Context.getConceptService();
 					Concept concept = conceptService.getConceptByMapping("856", "CIEL");
 					if (concept == null) {
 						concept = conceptService.getConceptByMapping("25836-8", "LOINC");
@@ -202,7 +231,7 @@ public class EncounterEventListener implements EventListener {
 		if (EARLY_INFANT_DIAGNOSIS_CONCEPT_ID == -1) {
 			synchronized (EncounterEventListener.class) {
 				if (EARLY_INFANT_DIAGNOSIS_CONCEPT_ID == -1) {
-					ConceptService conceptService = Context.getService(ConceptService.class);
+					ConceptService conceptService = Context.getConceptService();
 					Concept concept = conceptService.getConceptByMapping("844", "CIEL");
 					if (concept == null) {
 						concept = conceptService.getConceptByMapping("44871-2", "LOINC");
