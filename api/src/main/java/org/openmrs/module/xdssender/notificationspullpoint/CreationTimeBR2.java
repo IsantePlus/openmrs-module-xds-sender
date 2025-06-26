@@ -7,7 +7,7 @@ import javax.xml.namespace.QName;
 public class CreationTimeBR2
   extends JAXBElement<XMLGregorianCalendar>
 {
-  protected static final QName NAME = new QName("http:docs.oasis-open.orgwsnbr-2", "CreationTime");
+  protected static final QName NAME = new QName("http://docs.oasis-open.org/wsn/br-2", "CreationTime");
   
   public CreationTimeBR2(XMLGregorianCalendar value) {
     super(NAME, XMLGregorianCalendar.class, null, value);

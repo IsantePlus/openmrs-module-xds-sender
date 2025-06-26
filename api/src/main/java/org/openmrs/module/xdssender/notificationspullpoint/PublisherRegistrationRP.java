@@ -11,16 +11,16 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {"publisherReference", "topic", "demand", "creationTime"})
-@XmlRootElement(name = "PublisherRegistrationRP", namespace = "http:docs.oasis-open.orgwsnbr-2")
+@XmlRootElement(name = "PublisherRegistrationRP", namespace = "http://docs.oasis-open.org/wsn/br-2")
 public class PublisherRegistrationRP
 {
-  @XmlElement(name = "PublisherReference", namespace = "http:docs.oasis-open.orgwsnbr-2")
+  @XmlElement(name = "PublisherReference", namespace = "http://docs.oasis-open.org/wsn/br-2")
   protected EndpointReferenceType publisherReference;
-  @XmlElementRef(name = "Topic", namespace = "http:docs.oasis-open.orgwsnbr-2", type = TopicBR2.class, required = false)
+  @XmlElementRef(name = "Topic", namespace = "http://docs.oasis-open.org/wsn/br-2", type = TopicBR2.class, required = false)
   protected List<TopicBR2> topic;
-  @XmlElement(name = "Demand", namespace = "http:docs.oasis-open.orgwsnbr-2")
+  @XmlElement(name = "Demand", namespace = "http://docs.oasis-open.org/wsn/br-2")
   protected boolean demand;
-  @XmlElementRef(name = "CreationTime", namespace = "http:docs.oasis-open.orgwsnbr-2", type = CreationTimeBR2.class, required = false)
+  @XmlElementRef(name = "CreationTime", namespace = "http://docs.oasis-open.org/wsn/br-2", type = CreationTimeBR2.class, required = false)
   protected CreationTimeBR2 creationTime;
   
   public EndpointReferenceType getPublisherReference() {

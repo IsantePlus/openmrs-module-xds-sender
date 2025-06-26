@@ -11,12 +11,12 @@ import javax.xml.namespace.QName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {"publisherRegistrationReference", "consumerReference"})
-@XmlRootElement(name = "RegisterPublisherResponse", namespace = "http:docs.oasis-open.orgwsnbr-2")
+@XmlRootElement(name = "RegisterPublisherResponse", namespace = "http://docs.oasis-open.org/wsn/br-2")
 public class RegisterPublisherResponse
 {
-  @XmlElement(name = "PublisherRegistrationReference", namespace = "http:docs.oasis-open.orgwsnbr-2", required = true)
+  @XmlElement(name = "PublisherRegistrationReference", namespace = "http://docs.oasis-open.org/wsn/br-2", required = true)
   protected EndpointReferenceType publisherRegistrationReference;
-  @XmlElementRef(name = "ConsumerReference", namespace = "http:docs.oasis-open.orgwsnbr-2", type = ConsumerReferenceBR2.class, required = false)
+  @XmlElementRef(name = "ConsumerReference", namespace = "http://docs.oasis-open.org/wsn/br-2", type = ConsumerReferenceBR2.class, required = false)
   protected ConsumerReferenceBR2 consumerReference;
   
   public EndpointReferenceType getPublisherRegistrationReference() {
@@ -42,7 +42,7 @@ public class RegisterPublisherResponse
   public static class ConsumerReferenceBR2
     extends JAXBElement<EndpointReferenceType>
   {
-    protected static final QName NAME = new QName("http:docs.oasis-open.orgwsnbr-2", "ConsumerReference");
+    protected static final QName NAME = new QName("http://docs.oasis-open.org/wsn/br-2", "ConsumerReference");
     
     public ConsumerReferenceBR2(EndpointReferenceType value) {
       super(NAME, EndpointReferenceType.class, RegisterPublisherResponse.class, value);

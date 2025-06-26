@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TopicNamespaceType", namespace = "http:docs.oasis-open.orgwsnt-1", propOrder = {"topic", "any"})
+@XmlType(name = "TopicNamespaceType", namespace = "http://docs.oasis-open.org/wsn/t-1", propOrder = {"topic", "any"})
 public class TopicNamespaceType
   extends ExtensibleDocumented
 {

@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.namespace.QName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "RelatesToType", namespace = "http:www.w3.org200508addressing", propOrder = {"value"})
+@XmlType(name = "RelatesToType", namespace = "http://www.w3.org/200508/addressing", propOrder = {"value"})
 public class RelatesToType
 {
   @XmlValue
@@ -36,7 +36,7 @@ public class RelatesToType
   
   public String getRelationshipType() {
     if (this.relationshipType == null) {
-      return "http:www.w3.org200508addressingreply";
+      return "http://www.w3.org/200508/addressingreply";
     }
     return this.relationshipType;
   }

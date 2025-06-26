@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ProblemActionType", namespace = "http:www.w3.org200508addressing", propOrder = {"action", "soapAction"})
+@XmlType(name = "ProblemActionType", namespace = "http://www.w3.org/200508/addressing", propOrder = {"action", "soapAction"})
 public class ProblemActionType
 {
   @XmlElement(name = "Action")

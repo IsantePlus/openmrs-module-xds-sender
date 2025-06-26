@@ -5,5 +5,5 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ResourceNotDestroyedFaultType", namespace = "http:docs.oasis-open.orgwsnbr-2")
+@XmlType(name = "ResourceNotDestroyedFaultType", namespace = "http://docs.oasis-open.org/wsn/br-2")
 public class ResourceNotDestroyedFaultType extends BaseFaultType {}

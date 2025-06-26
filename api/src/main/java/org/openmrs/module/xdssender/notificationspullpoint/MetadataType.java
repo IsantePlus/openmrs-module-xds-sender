@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "MetadataType", namespace = "http:www.w3.org200508addressing", propOrder = {"any"})
+@XmlType(name = "MetadataType", namespace = "http://www.w3.org/200508/addressing", propOrder = {"any"})
 public class MetadataType
 {
   @XmlAnyElement(lax = true)

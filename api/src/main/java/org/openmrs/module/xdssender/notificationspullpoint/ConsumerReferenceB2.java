@@ -6,7 +6,7 @@ import javax.xml.namespace.QName;
 public class ConsumerReferenceB2
   extends JAXBElement<EndpointReferenceType>
 {
-  protected static final QName NAME = new QName("http:docs.oasis-open.orgwsnb-2", "ConsumerReference");
+  protected static final QName NAME = new QName("http://docs.oasis-open.org/wsn/b-2", "ConsumerReference");
   
   public ConsumerReferenceB2(EndpointReferenceType value) {
     super(NAME, EndpointReferenceType.class, null, value);

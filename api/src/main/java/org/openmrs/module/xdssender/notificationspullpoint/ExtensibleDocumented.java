@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ExtensibleDocumented", namespace = "http:docs.oasis-open.orgwsnt-1", propOrder = {"documentation"})
+@XmlType(name = "ExtensibleDocumented", namespace = "http://docs.oasis-open.org/wsn/t-1", propOrder = {"documentation"})
 @XmlSeeAlso({TopicSetType.class, TopicNamespaceType.class, TopicType.class})
 public abstract class ExtensibleDocumented
 {

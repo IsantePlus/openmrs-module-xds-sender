@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.namespace.QName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "AttributedQNameType", namespace = "http:www.w3.org200508addressing", propOrder = {"value"})
+@XmlType(name = "AttributedQNameType", namespace = "http://www.w3.org/200508/addressing", propOrder = {"value"})
 public class AttributedQNameType
 {
   @XmlValue

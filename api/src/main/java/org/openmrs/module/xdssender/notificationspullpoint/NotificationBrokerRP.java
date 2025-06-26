@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {"topicExpression", "fixedTopicSet", "topicExpressionDialect", "topicSet", "requiresRegistration"})
-@XmlRootElement(name = "NotificationBrokerRP", namespace = "http:docs.oasis-open.orgwsnbr-2")
+@XmlRootElement(name = "NotificationBrokerRP", namespace = "http://docs.oasis-open.org/wsn/br-2")
 public class NotificationBrokerRP
 {
   @XmlElement(name = "TopicExpression")
@@ -21,9 +21,9 @@ public class NotificationBrokerRP
   @XmlElement(name = "TopicExpressionDialect")
   @XmlSchemaType(name = "anyURI")
   protected List<String> topicExpressionDialect;
-  @XmlElement(name = "TopicSet", namespace = "http:docs.oasis-open.orgwsnt-1")
+  @XmlElement(name = "TopicSet", namespace = "http://docs.oasis-open.org/wsn/t-1")
   protected TopicSetType topicSet;
-  @XmlElement(name = "RequiresRegistration", namespace = "http:docs.oasis-open.orgwsnbr-2")
+  @XmlElement(name = "RequiresRegistration", namespace = "http://docs.oasis-open.org/wsn/br-2")
   protected boolean requiresRegistration;
   
   public List<TopicExpressionType> getTopicExpression() {

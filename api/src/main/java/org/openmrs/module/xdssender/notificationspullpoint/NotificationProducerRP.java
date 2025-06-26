@@ -21,7 +21,7 @@ public class NotificationProducerRP
   @XmlElement(name = "TopicExpressionDialect")
   @XmlSchemaType(name = "anyURI")
   protected List<String> topicExpressionDialect;
-  @XmlElement(name = "TopicSet", namespace = "http:docs.oasis-open.orgwsnt-1")
+  @XmlElement(name = "TopicSet", namespace = "http://docs.oasis-open.org/wsn/t-1")
   protected TopicSetType topicSet;
   
   public List<TopicExpressionType> getTopicExpression() {

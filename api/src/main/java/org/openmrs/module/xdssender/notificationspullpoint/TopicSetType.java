@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TopicSetType", namespace = "http:docs.oasis-open.orgwsnt-1", propOrder = {"any"})
+@XmlType(name = "TopicSetType", namespace = "http://docs.oasis-open.org/wsn/t-1", propOrder = {"any"})
 public class TopicSetType
   extends ExtensibleDocumented
 {

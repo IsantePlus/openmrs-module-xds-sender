@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "EndpointReferenceType", namespace = "http:www.w3.org200508addressing", propOrder = {"address", "referenceParameters", "metadata", "any"})
+@XmlType(name = "EndpointReferenceType", namespace = "http://www.w3.org/200508/addressing", propOrder = {"address", "referenceParameters", "metadata", "any"})
 public class EndpointReferenceType
 {
   @XmlElement(name = "Address", required = true)

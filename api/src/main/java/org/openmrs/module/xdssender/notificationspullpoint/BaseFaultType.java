@@ -19,7 +19,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "BaseFaultType", namespace = "http:docs.oasis-open.orgwsrfbf-2", propOrder = {"any", "timestamp", "originator", "errorCode", "description", "faultCause"})
+@XmlType(name = "BaseFaultType", namespace = "http://docs.oasis-open.org/wsrf/bf-2", propOrder = {"any", "timestamp", "originator", "errorCode", "description", "faultCause"})
 @XmlSeeAlso({SubscribeCreationFailedFaultType.class, InvalidFilterFaultType.class, TopicExpressionDialectUnknownFaultType.class, InvalidTopicExpressionFaultType.class, TopicNotSupportedFaultType.class, MultipleTopicsSpecifiedFaultType.class, InvalidProducerPropertiesExpressionFaultType.class, InvalidMessageContentExpressionFaultType.class, UnrecognizedPolicyRequestFaultType.class, UnsupportedPolicyRequestFaultType.class, NotifyMessageNotSupportedFaultType.class, UnacceptableInitialTerminationTimeFaultType.class, NoCurrentMessageOnTopicFaultType.class, UnableToGetMessagesFaultType.class, UnableToDestroyPullPointFaultType.class, UnableToCreatePullPointFaultType.class, UnacceptableTerminationTimeFaultType.class, UnableToDestroySubscriptionFaultType.class, PauseFailedFaultType.class, ResumeFailedFaultType.class, PublisherRegistrationRejectedFaultType.class, PublisherRegistrationFailedFaultType.class, ResourceNotDestroyedFaultType.class})
 public class BaseFaultType
 {
@@ -109,7 +109,7 @@ public class BaseFaultType
     protected String value;
 
     
-    @XmlAttribute(name = "lang", namespace = "http:www.w3.orgXML1998namespace")
+    @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
     protected String lang;
 
     

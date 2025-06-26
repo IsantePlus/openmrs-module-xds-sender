@@ -12,13 +12,13 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "SubscriptionManagerRP")
 public class SubscriptionManagerRP
 {
-  @XmlElementRef(name = "ConsumerReference", namespace = "http:docs.oasis-open.orgwsnb-2", type = ConsumerReferenceB2.class)
+  @XmlElementRef(name = "ConsumerReference", namespace = "http://docs.oasis-open.org/wsn/b-2", type = ConsumerReferenceB2.class)
   protected ConsumerReferenceB2 consumerReference;
   @XmlElement(name = "Filter")
   protected FilterType filter;
   @XmlElement(name = "SubscriptionPolicy")
   protected SubscriptionPolicyType subscriptionPolicy;
-  @XmlElementRef(name = "CreationTime", namespace = "http:docs.oasis-open.orgwsnb-2", type = CreationTimeB2.class, required = false)
+  @XmlElementRef(name = "CreationTime", namespace = "http://docs.oasis-open.org/wsn/b-2", type = CreationTimeB2.class, required = false)
   protected CreationTimeB2 creationTime;
   
   public ConsumerReferenceB2 getConsumerReference() {

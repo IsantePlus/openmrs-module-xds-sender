@@ -16,16 +16,16 @@ import javax.xml.namespace.QName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {"publisherReference", "topic", "demand", "initialTerminationTime", "any"})
-@XmlRootElement(name = "RegisterPublisher", namespace = "http:docs.oasis-open.orgwsnbr-2")
+@XmlRootElement(name = "RegisterPublisher", namespace = "http://docs.oasis-open.org/wsn/br-2")
 public class RegisterPublisher
 {
-  @XmlElement(name = "PublisherReference", namespace = "http:docs.oasis-open.orgwsnbr-2")
+  @XmlElement(name = "PublisherReference", namespace = "http://docs.oasis-open.org/wsn/br-2")
   protected EndpointReferenceType publisherReference;
-  @XmlElementRef(name = "Topic", namespace = "http:docs.oasis-open.orgwsnbr-2", type = TopicBR2.class, required = false)
+  @XmlElementRef(name = "Topic", namespace = "http://docs.oasis-open.org/wsn/br-2", type = TopicBR2.class, required = false)
   protected List<TopicBR2> topic;
-  @XmlElement(name = "Demand", namespace = "http:docs.oasis-open.orgwsnbr-2", defaultValue = "false")
+  @XmlElement(name = "Demand", namespace = "http://docs.oasis-open.org/wsn/br-2", defaultValue = "false")
   protected Boolean demand;
-  @XmlElement(name = "InitialTerminationTime", namespace = "http:docs.oasis-open.orgwsnbr-2")
+  @XmlElement(name = "InitialTerminationTime", namespace = "http://docs.oasis-open.org/wsn/br-2")
   @XmlSchemaType(name = "dateTime")
   protected XMLGregorianCalendar initialTerminationTime;
   @XmlAnyElement(lax = true)
@@ -80,7 +80,7 @@ public class RegisterPublisher
   public static class TopicBR2
     extends JAXBElement<TopicExpressionType>
   {
-    protected static final QName NAME = new QName("http:docs.oasis-open.orgwsnbr-2", "Topic");
+    protected static final QName NAME = new QName("http://docs.oasis-open.org/wsn/br-2", "Topic");
     
     public TopicBR2(TopicExpressionType value) {
       super(NAME, TopicExpressionType.class, RegisterPublisher.class, value);

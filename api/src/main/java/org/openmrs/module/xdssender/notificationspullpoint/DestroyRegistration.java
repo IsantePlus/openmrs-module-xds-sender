@@ -14,7 +14,7 @@ import javax.xml.namespace.QName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {"any"})
-@XmlRootElement(name = "DestroyRegistration", namespace = "http:docs.oasis-open.orgwsnbr-2")
+@XmlRootElement(name = "DestroyRegistration", namespace = "http://docs.oasis-open.org/wsn/br-2")
 public class DestroyRegistration
 {
   @XmlAnyElement(lax = true)

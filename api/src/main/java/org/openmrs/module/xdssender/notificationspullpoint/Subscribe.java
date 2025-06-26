@@ -17,11 +17,11 @@ import javax.xml.namespace.QName;
 @XmlRootElement(name = "Subscribe")
 public class Subscribe
 {
-  @XmlElementRef(name = "ConsumerReference", namespace = "http:docs.oasis-open.orgwsnb-2", type = ConsumerReferenceB2.class)
+  @XmlElementRef(name = "ConsumerReference", namespace = "http://docs.oasis-open.org/wsn/b-2", type = ConsumerReferenceB2.class)
   protected ConsumerReferenceB2 consumerReference;
   @XmlElement(name = "Filter")
   protected FilterType filter;
-  @XmlElementRef(name = "InitialTerminationTime", namespace = "http:docs.oasis-open.orgwsnb-2", type = JAXBElement.class, required = false)
+  @XmlElementRef(name = "InitialTerminationTime", namespace = "http://docs.oasis-open.org/wsn/b-2", type = JAXBElement.class, required = false)
   protected JAXBElement<String> initialTerminationTime;
   @XmlElement(name = "SubscriptionPolicy")
   protected SubscriptionPolicy subscriptionPolicy;
@@ -79,7 +79,7 @@ public class Subscribe
   public static class ConsumerReferenceB2
     extends JAXBElement<EndpointReferenceType>
   {
-    protected static final QName NAME = new QName("http:docs.oasis-open.orgwsnb-2", "ConsumerReference");
+    protected static final QName NAME = new QName("http://docs.oasis-open.org/wsn/b-2", "ConsumerReference");
     
     public ConsumerReferenceB2(EndpointReferenceType value) {
       super(NAME, EndpointReferenceType.class, Subscribe.class, value);

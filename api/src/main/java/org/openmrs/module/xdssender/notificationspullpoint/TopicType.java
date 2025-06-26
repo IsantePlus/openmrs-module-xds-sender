@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TopicType", namespace = "http:docs.oasis-open.orgwsnt-1", propOrder = {"messagePattern", "topic", "any"})
+@XmlType(name = "TopicType", namespace = "http://docs.oasis-open.org/wsn/t-1", propOrder = {"messagePattern", "topic", "any"})
 @XmlSeeAlso({TopicNamespaceType.Topic.class})
 public class TopicType
   extends ExtensibleDocumented

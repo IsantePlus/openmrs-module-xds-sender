@@ -16,7 +16,7 @@ import javax.xml.namespace.QName;
 @XmlRootElement(name = "GetCurrentMessage")
 public class GetCurrentMessage
 {
-  @XmlElementRef(name = "Topic", namespace = "http:docs.oasis-open.orgwsnb-2", type = TopicB2.class)
+  @XmlElementRef(name = "Topic", namespace = "http://docs.oasis-open.org/wsn/b-2", type = TopicB2.class)
   protected TopicB2 topic;
   @XmlAnyElement(lax = true)
   protected List<Object> any;
@@ -42,7 +42,7 @@ public class GetCurrentMessage
   public static class TopicB2
     extends JAXBElement<TopicExpressionType>
   {
-    protected static final QName NAME = new QName("http:docs.oasis-open.orgwsnb-2", "Topic");
+    protected static final QName NAME = new QName("http://docs.oasis-open.org/wsn/b-2", "Topic");
     
     public TopicB2(TopicExpressionType value) {
       super(NAME, TopicExpressionType.class, GetCurrentMessage.class, value);

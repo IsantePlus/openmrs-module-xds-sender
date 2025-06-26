@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "QueryExpressionType", namespace = "http:docs.oasis-open.orgwsnt-1", propOrder = {"content"})
+@XmlType(name = "QueryExpressionType", namespace = "http://docs.oasis-open.org/wsn/t-1", propOrder = {"content"})
 public class QueryExpressionTypeT1
 {
   @XmlMixed

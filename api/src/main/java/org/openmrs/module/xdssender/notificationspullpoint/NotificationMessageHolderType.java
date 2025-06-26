@@ -13,7 +13,7 @@ public class NotificationMessageHolderType
 {
   @XmlElement(name = "SubscriptionReference")
   protected EndpointReferenceType subscriptionReference;
-  @XmlElementRef(name = "Topic", namespace = "http:docs.oasis-open.orgwsnb-2", type = TopicB2.class, required = false)
+  @XmlElementRef(name = "Topic", namespace = "http://docs.oasis-open.org/wsn/b-2", type = TopicB2.class, required = false)
   protected TopicB2 topic;
   @XmlElement(name = "ProducerReference")
   protected EndpointReferenceType producerReference;
