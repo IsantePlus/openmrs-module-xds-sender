@@ -80,7 +80,6 @@ public class EncounterEventListener implements EventListener {
 							if (encounterTypesToProcess.contains(WILDCARD_MATCH)) {
 								LOGGER.debug("Sending for all encounter types");
 								exportEncounter(uuid);
-
 							} else {
 								LOGGER.debug("Found {} encounter types to filter from global config",
 										encounterTypesToProcess.size());
@@ -92,25 +91,7 @@ public class EncounterEventListener implements EventListener {
 									return;
 								}
 
-								// Since we are no longer using the XDSSender to send everything to an XDS Repository,
-								// we want to check that this encounter has an appropriate "order". Note that "orders"
-								// are stored as obs
-								boolean shouldSendEncounter = shouldSendEncounter(e);
-								if (shouldSendEncounter) {
-									LOGGER.debug("Exporting encounter {} to XDS repository", uuid);
-									exportEncounter(uuid);
-
-									Obs sentObs = new Obs();
-									sentObs.setPerson(e.getPatient());
-									sentObs.setConcept(Context.getConceptService().getConcept(ORDER_PLACED_CONCEPT_ID));
-									sentObs.setObsDatetime(new Date());
-									sentObs.setLocation(e.getLocation());
-									sentObs.setEncounter(e);
-
-									Context.getObsService().saveObs(sentObs, null);
-								} else {
-									LOGGER.info("Skipping encounter {} because there are no appropriate lab orders", uuid);
-								}
+								exportEncounter(uuid);
 							}
 						} else {
 							LOGGER.debug("No Encounter types filter detected");
@@ -133,27 +114,46 @@ public class EncounterEventListener implements EventListener {
 		if (encounter.getForm() == null) {
 			LOGGER.warn("Skipped sending Encounter {} (formId is NULL -> probably it's the creating encounter)", encounterUuid);
 		} else {
-			Patient patient = Context.getPatientService().getPatient(encounter.getPatient().getPatientId());
+			// Since we are no longer using the XDSSender to send everything to an XDS Repository,
+			// we want to check that this encounter has an appropriate "order". Note that "orders"
+			// are stored as obs
+			boolean shouldSendEncounter = shouldSendEncounter(encounter);
+			if (shouldSendEncounter) {
+				LOGGER.debug("Exporting encounter {} to XDS repository", encounterUuid);
+				Patient patient = Context.getPatientService().getPatient(encounter.getPatient().getPatientId());
 
-			// TODO: Replace this with a method that queries OpenCR and fetches/updates the patient data
-			// ecidUpdater.fetchEcidIfRequired(patient);
-			
-			XdsExportService service = Context.getService(XdsExportService.class);
-			
-			try {
-				service.exportProvideAndRegister(encounter, patient);
-			}
-			catch (Exception e) {
-				ErrorHandlingService errorHandler = config.getXdsBErrorHandlingService();
-				if (errorHandler != null) {
-					LOGGER.error("XDS export exception occurred", e);
-					errorHandler.handle(prepareParameters(encounter, patient),
-					    XdsBErrorHandlingService.EXPORT_PROVIDE_AND_REGISTER_DESTINATION, true,
-					    ExceptionUtils.getFullStackTrace(e));
-				} else {
-					throw new RuntimeException("XDS export exception occurred " + "with not configured XDS.b error handler",
-					        e);
+				// TODO: Replace this with a method that queries OpenCR and fetches/updates the patient data
+				// ecidUpdater.fetchEcidIfRequired(patient);
+
+				XdsExportService service = Context.getService(XdsExportService.class);
+
+				try {
+					service.exportProvideAndRegister(encounter, patient);
 				}
+				catch (Exception e) {
+					ErrorHandlingService errorHandler = config.getXdsBErrorHandlingService();
+					if (errorHandler != null) {
+						LOGGER.error("XDS export exception occurred", e);
+						errorHandler.handle(prepareParameters(encounter, patient),
+								XdsBErrorHandlingService.EXPORT_PROVIDE_AND_REGISTER_DESTINATION, true,
+								ExceptionUtils.getFullStackTrace(e));
+					} else {
+						throw new RuntimeException("XDS export exception occurred " + "with not configured XDS.b error handler",
+								e);
+					}
+				}
+
+				Obs sentObs = new Obs();
+				sentObs.setPerson(encounter.getPatient());
+				sentObs.setConcept(Context.getConceptService().getConcept(ORDER_PLACED_CONCEPT_ID));
+				sentObs.setObsDatetime(new Date());
+				sentObs.setLocation(encounter.getLocation());
+				sentObs.setEncounter(encounter);
+				sentObs.setValueText("Order generated");
+
+				Context.getObsService().saveObs(sentObs, null);
+			} else {
+				LOGGER.info("Skipping encounter {} because there are no appropriate lab orders", encounterUuid);
 			}
 		}
 	}
