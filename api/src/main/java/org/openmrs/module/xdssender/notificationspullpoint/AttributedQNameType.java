@@ -7,13 +7,16 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AttributedQNameType", namespace = "http://www.w3.org/200508/addressing", propOrder = {"value"})
 public class AttributedQNameType
 {
+
   @XmlValue
+  @XmlJavaTypeAdapter(QNameAdapter.class)
   protected QName value;
   @XmlAnyAttribute
   private Map<QName, String> otherAttributes = new HashMap<>();
