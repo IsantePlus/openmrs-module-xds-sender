@@ -31,6 +31,7 @@ public class TopicType
   @XmlSchemaType(name = "NCName")
   protected String name;
   @XmlAttribute(name = "messageTypes")
+  @XmlJavaTypeAdapter(QNameAdapter.class)
   protected List<QName> messageTypes;
   @XmlAttribute(name = "final")
   protected Boolean _final;
