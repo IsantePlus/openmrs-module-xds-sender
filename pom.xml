@@ -41,7 +41,7 @@
 		<springWsVersion>2.4.7.RELEASE</springWsVersion>
 		<hapiFhirVersion>5.0.2</hapiFhirVersion>
 		<fhirModuleVersion>1.3.0</fhirModuleVersion>
-		<labintegrationVersion>2.5.5-SNAPSHOT</labintegrationVersion>
+		<labintegrationVersion>2.3.7-SNAPSHOT</labintegrationVersion>
 	</properties>
 
 	<dependencyManagement>
