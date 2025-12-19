@@ -414,19 +414,24 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 			if (match.groupCount() > 3 && match.group(3) != null && !match.group(3).isEmpty()) {
 				PQ group2 = new PQ(new BigDecimal(match.group(3)), match.group(4));
 				// Range
-				retVal = new IVL<PQ>(group1, group2);
+				retVal = new IVL<>(group1, group2);
 				if (match.groupCount() > 5 && StringUtils.isNotBlank(match.group(5))) {
 					PQ group3 = new PQ(new BigDecimal(match.group(5)), match.group(6));
-					retVal = new IVL<PQ>(group1, group2);
+					retVal = new IVL<>(group1, group2);
 					retVal.setOriginalText(new ED(group1 + "/" + group2 + "/" + group3));
 				}
-			} else if (valueText.contains("{"))
-				retVal = new IVL<PQ>(group1, null);
-			else
-				retVal = new IVL<PQ>(group1);
+			} else if (valueText.contains("{")) {
+				retVal = new IVL<>(group1, null);
+			}
+			else {
+				retVal = new IVL<>(group1);
+			}
 			
-		} else
-			throw new RuntimeException(String.format("Can't understand value %s", valueText));
+		} else {
+			log.error(String.format("Can't understand value: %s", valueText));
+			retVal = new IVL<>();
+			retVal.setOriginalText(new ED(valueText));
+		}
 		
 		return retVal;
 	}
@@ -688,7 +693,7 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 							}
 								break;
 							default:
-								throw new RuntimeException("Don't understand how to represent medication supply observation");
+								log.error(String.format("Don't understand how to represent medication supply observation: %s", supplyComponent.getConcept().getId()));
 								
 						}
 					}
@@ -779,7 +784,10 @@ public abstract class EntryBuilderImpl implements EntryBuilder {
 					// {0[.##] XX .. } - At least X dose
 					// {0[.##] XX .. 0.[##] YY} - Between X and Y dose
 					// { .. 0.[##] YY} - AT most Y dose
-					retVal.setDoseQuantity(this.parseDoseQuantity(component.getValueText()));
+					IVL<PQ> doseQuantity = this.parseDoseQuantity(component.getValueText());
+					if (doseQuantity != null) {
+						retVal.setDoseQuantity(doseQuantity);
+					}
 					break;
 				case XdsSenderConstants.CONCEPT_ID_MEDICATION_HISTORY: // A sub-observation
 				{
