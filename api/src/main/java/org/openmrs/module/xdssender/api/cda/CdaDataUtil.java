@@ -601,13 +601,16 @@ public class CdaDataUtil {
 	}
 	
 	/**
-	 * Create address set
+	 * Create name set
 	 */
 	public SET<PN> createNameSet(org.openmrs.Person person) {
-		SET<PN> retVal = new SET<PN>();
+		SET<PN> retVal = new SET<>();
 		for (PersonName name : person.getNames()) {
-			if (!name.getFamilyName().equals("*")) { // HACK: Name is requiredso this is the hackery that I use to bypass it
-				retVal.add(createPN(name));
+			if (!name.getFamilyName().equals("*")) { // HACK: Name is required so this is the hackery that I use to bypass it
+				PN pn = createPN(name);
+				if (!retVal.contains(pn)) {
+					retVal.add(pn);
+				}
 			}
 		}
 		if (retVal.size() > 0) {
@@ -680,10 +683,8 @@ public class CdaDataUtil {
 			// Binary data?
 			String mimeType = null, obsTitle = obs.getComplexData().getTitle();
 			if (obsTitle.contains("--")) {
-				if (obsTitle.contains("--")) {
-					int sPos = obsTitle.indexOf("--") + 3, count = obsTitle.lastIndexOf(".") - sPos;
-					mimeType = URLDecoder.decode(obsTitle.substring(sPos, count));
-				}
+				int sPos = obsTitle.indexOf("--") + 3, count = obsTitle.lastIndexOf(".") - sPos;
+				mimeType = URLDecoder.decode(obsTitle.substring(sPos, count));
 			}
 			
 			ED retVal = new ED(data, mimeType);
