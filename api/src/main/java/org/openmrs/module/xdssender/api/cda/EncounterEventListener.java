@@ -39,6 +39,7 @@ public class EncounterEventListener implements EventListener {
 	private static final String WILDCARD_MATCH = "ALL";
 	
 	private static final String PROP_ENCOUNTER_TYPE_TO_PROCESS = "xdssender.encounterTypesToProcess";
+	private static final String PROP_SEND_ALL_ENCOUNTERS = "xdssender.sendAllEncounters";
 
 	// N.B. The following three constants are added to restrict XDSSender to only sending lab orders
 	private static final int TESTS_ORDERED_CONCEPT_ID = 1271;
@@ -114,10 +115,12 @@ public class EncounterEventListener implements EventListener {
 		if (encounter.getForm() == null) {
 			LOGGER.warn("Skipped sending Encounter {} (formId is NULL -> probably it's the creating encounter)", encounterUuid);
 		} else {
-			// Since we are no longer using the XDSSender to send everything to an XDS Repository,
-			// we want to check that this encounter has an appropriate "order". Note that "orders"
-			// are stored as obs
-			boolean shouldSendEncounter = shouldSendEncounter(encounter);
+			// Check if we should bypass the lab order filter and send all encounters.
+			// When xdssender.sendAllEncounters=true, all encounters with a form are exported
+			// to the SHR, not just VL/EID lab orders.
+			String sendAll = Context.getAdministrationService()
+					.getGlobalProperty(PROP_SEND_ALL_ENCOUNTERS, "false");
+			boolean shouldSendEncounter = "true".equalsIgnoreCase(sendAll) || shouldSendEncounter(encounter);
 			if (shouldSendEncounter) {
 				LOGGER.debug("Exporting encounter {} to XDS repository", encounterUuid);
 				Patient patient = Context.getPatientService().getPatient(encounter.getPatient().getPatientId());
