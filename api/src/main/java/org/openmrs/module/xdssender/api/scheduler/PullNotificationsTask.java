@@ -3,6 +3,7 @@ package org.openmrs.module.xdssender.api.scheduler;
 import ca.uhn.hl7v2.model.Message;
 import org.openmrs.api.context.Context;
 import org.openmrs.hl7.HL7Service;
+import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.notificationspullpoint.NotificationsPullPointClient;
 import org.openmrs.module.xdssender.api.notificationspullpoint.impl.NotificationsPullPointClientImpl;
@@ -25,8 +26,13 @@ public class PullNotificationsTask extends AbstractTask {
 	
 	@Override
 	public void execute() {
+		String endpoint = XdsSenderConfig.getInstance().getNotificationsPullPointEndpoint();
+		if (endpoint == null || endpoint.trim().isEmpty()) {
+			return;
+		}
+
 		LOGGER.info("Executing " + TASK_NAME);
-		
+
 		boolean success  = getNotificationsPullPointClient().getNewMessages();
 
 		if(success){

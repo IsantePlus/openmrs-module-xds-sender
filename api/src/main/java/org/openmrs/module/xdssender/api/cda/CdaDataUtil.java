@@ -79,6 +79,8 @@ import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -605,11 +607,13 @@ public class CdaDataUtil {
 	 */
 	public SET<PN> createNameSet(org.openmrs.Person person) {
 		SET<PN> retVal = new SET<>();
+		Set<String> seen = new HashSet<>();
 		for (PersonName name : person.getNames()) {
 			if (!name.getFamilyName().equals("*")) { // HACK: Name is required so this is the hackery that I use to bypass it
-				PN pn = createPN(name);
-				if (!retVal.contains(pn)) {
-					retVal.add(pn);
+				String key = String.format("%s|%s|%s|%s",
+					name.getGivenName(), name.getMiddleName(), name.getFamilyName(), name.getFamilyName2());
+				if (seen.add(key)) {
+					retVal.add(createPN(name));
 				}
 			}
 		}
