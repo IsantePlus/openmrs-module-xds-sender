@@ -12,9 +12,7 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Author;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.ContextControl;
 import org.openmrs.*;
 import org.openmrs.api.context.Context;
-import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.fhir2.api.translators.PatientTranslator;
-import org.openmrs.module.fhir2.api.translators.impl.PatientTranslatorImpl;
 import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.XdsSenderConstants;
 import org.openmrs.module.xdssender.api.cda.CdaDataUtil;
@@ -22,12 +20,8 @@ import org.openmrs.module.xdssender.api.cda.model.DocumentModel;
 import org.openmrs.module.xdssender.api.fhir.exceptions.ResourceGenerationException;
 import org.openmrs.module.xdssender.api.xds.XdsUtil;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
-import lombok.AccessLevel;
-import lombok.Setter;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -35,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Component("fhirResourceDocumentBuilder")
-@Setter(AccessLevel.PACKAGE)
 public class FhirResourceDocumentBuilderImpl implements FhirResourceDocumentBuilder, ApplicationContextAware {
 
 	private static final String FORMAT_CODE = "TEXT";
@@ -49,13 +41,19 @@ public class FhirResourceDocumentBuilderImpl implements FhirResourceDocumentBuil
 
 	private final Log log = LogFactory.getLog(this.getClass());
 
-    @Autowired
     private CdaDataUtil cdaDataUtil;
 
     private Patient patient;
 
-    @Autowired
     private PatientTranslator patientTranslator;
+
+    public void setCdaDataUtil(CdaDataUtil cdaDataUtil) {
+        this.cdaDataUtil = cdaDataUtil;
+    }
+
+    public void setPatientTranslator(PatientTranslator patientTranslator) {
+        this.patientTranslator = patientTranslator;
+    }
 
     private ApplicationContext applicationContext;
 

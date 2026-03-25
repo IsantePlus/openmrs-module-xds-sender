@@ -24,7 +24,6 @@ import org.openmrs.module.xdssender.XdsSenderConfig;
 import org.openmrs.module.xdssender.api.errorhandling.ErrorHandlingService;
 import org.openmrs.module.xdssender.api.errorhandling.ExportProvideAndRegisterParameters;
 import org.openmrs.module.xdssender.api.errorhandling.XdsBErrorHandlingService;
-import org.openmrs.module.xdssender.api.patient.PatientEcidUpdater;
 import org.openmrs.module.xdssender.api.service.XdsExportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +41,8 @@ public class EncounterEventListener implements EventListener {
 
 	// N.B. The following three constants are added to restrict XDSSender to only sending lab orders
 	private static final int TESTS_ORDERED_CONCEPT_ID = 1271;
-	private static volatile int VIRAL_LOAD_CONCEPT_ID = -1;
-	private static volatile int EARLY_INFANT_DIAGNOSIS_CONCEPT_ID = -1;
+	private static volatile int VIRAL_LOAD_CONCEPT_ID = Integer.MIN_VALUE;
+	private static volatile int EARLY_INFANT_DIAGNOSIS_CONCEPT_ID = Integer.MIN_VALUE;
 	private static final int ORDER_PLACED_CONCEPT_ID = 165384;
 
 	private static final String CREATED = Event.Action.CREATED.toString();
@@ -97,6 +96,9 @@ public class EncounterEventListener implements EventListener {
 							LOGGER.debug("No Encounter types filter detected");
 							exportEncounter(uuid);
 						}
+					} else {
+						LOGGER.debug("No Encounter types filter detected");
+						exportEncounter(uuid);
 					}
 
 				}
@@ -142,19 +144,19 @@ public class EncounterEventListener implements EventListener {
 								e);
 					}
 				}
-
-				Obs sentObs = new Obs();
-				sentObs.setPerson(encounter.getPatient());
-				sentObs.setConcept(Context.getConceptService().getConcept(ORDER_PLACED_CONCEPT_ID));
-				sentObs.setObsDatetime(new Date());
-				sentObs.setLocation(encounter.getLocation());
-				sentObs.setEncounter(encounter);
-				sentObs.setValueText("Order generated");
-
-				Context.getObsService().saveObs(sentObs, null);
 			} else {
 				LOGGER.info("Skipping encounter {} because there are no appropriate lab orders", encounterUuid);
 			}
+
+			Obs sentObs = new Obs();
+			sentObs.setPerson(encounter.getPatient());
+			sentObs.setConcept(Context.getConceptService().getConcept(ORDER_PLACED_CONCEPT_ID));
+			sentObs.setObsDatetime(new Date());
+			sentObs.setLocation(encounter.getLocation());
+			sentObs.setEncounter(encounter);
+			sentObs.setValueText("Order generated");
+
+			Context.getObsService().saveObs(sentObs, null);
 		}
 	}
 	
@@ -171,7 +173,7 @@ public class EncounterEventListener implements EventListener {
 
 	private boolean shouldSendEncounter(Encounter e) {
 		boolean shouldSendEncounter = false;
-		if (getViralLoadConceptId() != -1 && getEarlyInfantDiagnosisConceptId() != -1) {
+		if (getViralLoadConceptId() > 0 || getEarlyInfantDiagnosisConceptId() > 0) {
 			for (Obs obs : e.getObs()) {
 				if (obs.getConcept() != null &&
 						obs.getConcept().getConceptId() == TESTS_ORDERED_CONCEPT_ID &&
@@ -208,9 +210,9 @@ public class EncounterEventListener implements EventListener {
 	}
 
 	private int getViralLoadConceptId() {
-		if (VIRAL_LOAD_CONCEPT_ID == -1) {
+		if (VIRAL_LOAD_CONCEPT_ID == Integer.MIN_VALUE) {
 			synchronized (EncounterEventListener.class) {
-				if (VIRAL_LOAD_CONCEPT_ID == -1) {
+				if (VIRAL_LOAD_CONCEPT_ID == Integer.MIN_VALUE) {
 					ConceptService conceptService = Context.getConceptService();
 					Concept concept = conceptService.getConceptByMapping("856", "CIEL");
 					if (concept == null) {
@@ -219,6 +221,8 @@ public class EncounterEventListener implements EventListener {
 
 					if (concept != null) {
 						VIRAL_LOAD_CONCEPT_ID = concept.getConceptId();
+					} else {
+						VIRAL_LOAD_CONCEPT_ID = 0;
 					}
 				}
 			}
@@ -228,9 +232,9 @@ public class EncounterEventListener implements EventListener {
 	}
 
 	private int getEarlyInfantDiagnosisConceptId() {
-		if (EARLY_INFANT_DIAGNOSIS_CONCEPT_ID == -1) {
+		if (EARLY_INFANT_DIAGNOSIS_CONCEPT_ID == Integer.MIN_VALUE) {
 			synchronized (EncounterEventListener.class) {
-				if (EARLY_INFANT_DIAGNOSIS_CONCEPT_ID == -1) {
+				if (EARLY_INFANT_DIAGNOSIS_CONCEPT_ID == Integer.MIN_VALUE) {
 					ConceptService conceptService = Context.getConceptService();
 					Concept concept = conceptService.getConceptByMapping("844", "CIEL");
 					if (concept == null) {
@@ -239,6 +243,8 @@ public class EncounterEventListener implements EventListener {
 
 					if (concept != null) {
 						EARLY_INFANT_DIAGNOSIS_CONCEPT_ID = concept.getConceptId();
+					} else {
+						EARLY_INFANT_DIAGNOSIS_CONCEPT_ID = 0;
 					}
 				}
 			}

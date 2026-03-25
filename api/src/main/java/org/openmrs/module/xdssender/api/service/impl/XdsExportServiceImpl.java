@@ -28,31 +28,46 @@ import org.openmrs.module.xdssender.api.service.XdsExportService;
 import org.openmrs.module.xdssender.api.xds.MessageUtil;
 import org.openmrs.module.xdssender.api.xds.XdsSender;
 import org.openmrs.module.xdssender.api.xds.XdsUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component("xdsSender.XdsExportService")
 public class XdsExportServiceImpl extends BaseOpenmrsService implements XdsExportService {
 
 	private final Log log = LogFactory.getLog(this.getClass());
 
-	@Autowired
 	private ClinicalDocumentBuilder clinicalDocBuilder;
 
-	@Autowired
 	private ORM_O01DocumentBuilder ormDocBuilder;
-	
-	@Autowired 
+
 	private FhirResourceDocumentBuilder fhirResourceBuilder;
 
-	@Autowired
 	private MessageUtil messageUtil;
 
-	@Autowired
 	private XdsSenderConfig config;
 
-	@Autowired
 	private XdsSender xdsSender;
+
+	public void setClinicalDocBuilder(ClinicalDocumentBuilder clinicalDocBuilder) {
+		this.clinicalDocBuilder = clinicalDocBuilder;
+	}
+
+	public void setOrmDocBuilder(ORM_O01DocumentBuilder ormDocBuilder) {
+		this.ormDocBuilder = ormDocBuilder;
+	}
+
+	public void setFhirResourceBuilder(FhirResourceDocumentBuilder fhirResourceBuilder) {
+		this.fhirResourceBuilder = fhirResourceBuilder;
+	}
+
+	public void setMessageUtil(MessageUtil messageUtil) {
+		this.messageUtil = messageUtil;
+	}
+
+	public void setConfig(XdsSenderConfig config) {
+		this.config = config;
+	}
+
+	public void setXdsSender(XdsSender xdsSender) {
+		this.xdsSender = xdsSender;
+	}
 
 	@Override
 	public DocumentInfo exportProvideAndRegister(Encounter encounter, Patient patient) {

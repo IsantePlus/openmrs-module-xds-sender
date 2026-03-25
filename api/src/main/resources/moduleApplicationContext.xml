@@ -7,6 +7,15 @@
 
 <context:component-scan base-package="org.openmrs.module.xdssender"/>
 
+    <bean id="xdsSender.XdsExportService" class="org.openmrs.module.xdssender.api.service.impl.XdsExportServiceImpl">
+        <property name="clinicalDocBuilder" ref="xdsender.ClinicalDocumentBuilder" />
+        <property name="ormDocBuilder" ref="ORM_O01DocumentBuilder" />
+        <property name="fhirResourceBuilder" ref="fhirResourceDocumentBuilder" />
+        <property name="messageUtil" ref="xdssender.MessageUtil" />
+        <property name="config" ref="xdssender.XdsSenderConfig" />
+        <property name="xdsSender" ref="xdssender.XdsSender" />
+    </bean>
+
     <bean parent="serviceContext">
         <property name="moduleService">
             <list>
@@ -14,6 +23,11 @@
                 <ref bean="xdsSender.XdsExportService" />
             </list>
         </property>
+    </bean>
+
+    <bean id="fhirResourceDocumentBuilder" class="org.openmrs.module.xdssender.api.fhir.FhirResourceDocumentBuilderImpl">
+        <property name="cdaDataUtil" ref="xdssender.CdaDataUtil" />
+        <property name="patientTranslator" ref="patientTranslatorImpl" />
     </bean>
 
     <bean parent="serviceContext">
