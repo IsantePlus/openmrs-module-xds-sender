@@ -32,6 +32,11 @@ public class XdsSenderSchedulerServiceImpl extends BaseOpenmrsService implements
 	}
 	
 	private void schedulePullNotificationsTask() {
+		String endpoint = config.getNotificationsPullPointEndpoint();
+		if (endpoint == null || endpoint.trim().isEmpty()) {
+			LOGGER.info("Notifications pull point endpoint not configured, skipping task scheduling");
+			return;
+		}
 		TaskDefinition task = createTask(PullNotificationsTask.TASK_NAME, PullNotificationsTask.TASK_DESCRIPTION,
 		    PullNotificationsTask.class.getName(), config.getPullNotificationsTaskInterval());
 		
