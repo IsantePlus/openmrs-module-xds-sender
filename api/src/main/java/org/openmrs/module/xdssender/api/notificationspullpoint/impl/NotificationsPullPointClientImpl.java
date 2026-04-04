@@ -49,6 +49,12 @@ import org.springframework.xml.transform.StringResult;
 import org.w3c.dom.Element;
 
 import ca.uhn.hl7v2.model.Message;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.SSLSocketFactory;
+import java.security.cert.X509Certificate;
+
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -162,7 +168,22 @@ public class NotificationsPullPointClientImpl extends WebServiceGatewaySupport i
 		StringResult result = new StringResult();
 		marshaller.marshal(requestPayload, result);
 
-		OkHttpClient client = new OkHttpClient().newBuilder().build();
+		OkHttpClient.Builder clientBuilder = new OkHttpClient().newBuilder();
+		if (config.getExportCcdIgnoreCerts()) {
+			final TrustManager[] trustAllCerts = new TrustManager[]{
+				new X509TrustManager() {
+					@Override public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+					@Override public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+					@Override public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[]{}; }
+				}
+			};
+			SSLContext sslContext = SSLContext.getInstance("TLS");
+			sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+			SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+			clientBuilder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
+			clientBuilder.hostnameVerifier((hostname, session) -> true);
+		}
+		OkHttpClient client = clientBuilder.build();
 		MediaType mediaType = MediaType.parse("text/xml; charset=utf-8");
 		String facilitySiteCode = requestPayload.getOtherAttributes().get(new QName(FACILITY_QNAME));
 		String sinceAttribute = StringUtils.isNotBlank(lastRequestDate) && isValidISODate(lastRequestDate) ? String.format("since=\"%s\"", lastRequestDate)
