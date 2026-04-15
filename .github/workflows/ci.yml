@@ -31,23 +31,3 @@ jobs:
 
       - name: Build and test
         run: mvn -B -P github-packages clean package
-
-      - name: Set settings.xml
-        uses: s4u/maven-settings-action@v3.1.0
-        with:
-          servers: |
-            [{
-              "id": "uwdigi-repo-central",
-              "username": "${{ secrets.MAVEN_REPO_USERNAME }}",
-              "password": "${{ secrets.MAVEN_REPO_PASSWORD }}"
-            },
-            {
-              "id": "uwdigi-repo-snapshots",
-              "username": "${{ secrets.MAVEN_REPO_USERNAME }}",
-              "password": "${{ secrets.MAVEN_REPO_PASSWORD }}"
-            }]
-        if: ${{ github.ref == 'refs/heads/main' && github.repository_owner == 'IsantePlus' && github.event_name != 'pull_request' }}
-
-      - name: Deploy
-        run: mvn -B clean deploy -DskipTests
-        if: ${{ github.ref == 'refs/heads/main' && github.repository_owner == 'IsantePlus' && github.event_name != 'pull_request' }}
