@@ -59,6 +59,11 @@
 						<artifactId>maven-deploy-plugin</artifactId>
 						<executions>
 							<execution>
+								<!-- Skip default deploy to avoid 409 with deploy-file -->
+								<id>default-deploy</id>
+								<phase>none</phase>
+							</execution>
+							<execution>
 								<!-- Deploy OpenMRS omod file -->
 								<id>deploy-file</id>
 								<phase>deploy</phase>
@@ -73,7 +78,7 @@
 									<generatePom>false</generatePom>
 									<artifactId>${project.parent.artifactId}</artifactId>
 									<version>${project.version}</version>
-									<groupId>${groupId}</groupId>
+									<groupId>${project.groupId}</groupId>
 								</configuration>
 							</execution>
 						</executions>

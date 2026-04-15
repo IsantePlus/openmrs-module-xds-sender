@@ -247,15 +247,6 @@
 			<url>https://dcm4che.org/maven2</url>
 		</repository>
 		<repository>
-			<id>santesuite-main</id>
-			<url>http://santesuite.org/mvn</url>
-			<name>SanteSuite</name>
-		</repository>
-		<!-- <repository>
-			<id>marc-te-main</id>
-			<url>http://te.marc-hi.ca/mvn</url>
-		</repository> -->
-		<repository>
 			<id>OscarMcMaster</id>
 			<url>https://oscarmcmaster.sourceforge.net/m2/</url>
 		</repository>

@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    env:
+      RELEASE_USERNAME: ${{ github.actor }}
+      RELEASE_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v5.2.0
+        with:
+          java-version: '8'
+          distribution: zulu
+          cache: maven
+          server-id: github-packages
+          server-username: RELEASE_USERNAME
+          server-password: RELEASE_TOKEN
+
+      - name: Set release version
+        run: |
+          sed -i "s/<revision>.*<\/revision>/<revision>${{ github.event.inputs.version }}<\/revision>/" pom.xml
+          echo "Set version to ${{ github.event.inputs.version }}"
+
+      - name: Build
+        run: mvn -B -P github-packages -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true clean package
+
+      - name: Publish to GitHub Packages
+        run: mvn -B -P github-packages -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true deploy
+
+      - name: Create release
+        uses: softprops/action-gh-release@v3.0.0
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: v${{ github.event.inputs.version }}
+          generate_release_notes: true
+          files: omod/target/*.omod
+
+      - name: Bump to next SNAPSHOT
+        run: |
+          IFS='.' read -r major minor patch <<< "${{ github.event.inputs.version }}"
+          next_patch=$((patch + 1))
+          next_version="${major}.${minor}.${next_patch}-SNAPSHOT"
+          sed -i "s/<revision>.*<\/revision>/<revision>${next_version}<\/revision>/" pom.xml
+          echo "Bumped to ${next_version}"
+
+      - name: Commit version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add pom.xml
+          git commit -m "Bump version to next SNAPSHOT after v${{ github.event.inputs.version }} release"
+          git push
