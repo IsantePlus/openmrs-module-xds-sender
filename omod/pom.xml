@@ -76,7 +76,7 @@
 									<repositoryId>github-packages</repositoryId>
 									<packaging>omod</packaging>
 									<generatePom>false</generatePom>
-									<artifactId>${project.parent.artifactId}</artifactId>
+									<artifactId>${project.parent.artifactId}-omod</artifactId>
 									<version>${project.version}</version>
 									<groupId>${project.groupId}</groupId>
 								</configuration>
