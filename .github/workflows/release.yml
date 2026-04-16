@@ -33,14 +33,12 @@ jobs:
 
       - name: Set release version
         run: |
+          mvn versions:set -DnewVersion=${{ github.event.inputs.version }} -DgenerateBackupPoms=false
           sed -i "s/<revision>.*<\/revision>/<revision>${{ github.event.inputs.version }}<\/revision>/" pom.xml
           echo "Set version to ${{ github.event.inputs.version }}"
 
-      - name: Build
-        run: mvn -B -P github-packages -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true clean package
-
-      - name: Publish to GitHub Packages
-        run: mvn -B -P github-packages -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true deploy
+      - name: Build and publish
+        run: mvn -B -P github-packages -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true clean deploy
 
       - name: Create release
         uses: softprops/action-gh-release@v3.0.0
@@ -55,6 +53,7 @@ jobs:
           IFS='.' read -r major minor patch <<< "${{ github.event.inputs.version }}"
           next_patch=$((patch + 1))
           next_version="${major}.${minor}.${next_patch}-SNAPSHOT"
+          mvn versions:set -DnewVersion=${next_version} -DgenerateBackupPoms=false
           sed -i "s/<revision>.*<\/revision>/<revision>${next_version}<\/revision>/" pom.xml
           echo "Bumped to ${next_version}"
 
@@ -62,6 +61,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add pom.xml
+          git add -A
           git commit -m "Bump version to next SNAPSHOT after v${{ github.event.inputs.version }} release"
           git push
