@@ -11,7 +11,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>xds-sender</artifactId>
-	<version>2.5.9</version>
+	<version>2.6.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>XDS Sender</name>
 	<description>Module for sending XDS.b documents for encounters</description>
@@ -28,7 +28,7 @@
 	</modules>
 
 	<properties>
-		<revision>2.5.7-SNAPSHOT</revision>
+		<revision>2.6.1-SNAPSHOT</revision>
 		<openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
 		<everestVersion>1.1.0</everestVersion>
 		<dcm4chee-xds2Version>2.0.6</dcm4chee-xds2Version>
