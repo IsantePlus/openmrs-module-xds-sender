@@ -66,6 +66,19 @@ public class EncounterEventListener implements EventListener {
 
 				if (CREATED.equals(messageAction) || UPDATED.equals(messageAction)) {
 					LOGGER.debug("Encounter event detected");
+
+					// If no export endpoint is configured, the module is effectively disabled:
+					// skip the export cleanly instead of letting getExportCcdEndpoint() throw an
+					// APIException on every encounter (which is only swallowed by the XDS.b error
+					// handler, producing noise and error-queue growth). Mirrors the
+					// mpi-client.endpoint.cr.addr guard in santedb-mpiclient.
+					String exportCcdEndpoint = Context.getAdministrationService()
+							.getGlobalProperty("xdssender.exportCcdEndpoint");
+					if (exportCcdEndpoint == null || exportCcdEndpoint.trim().isEmpty()) {
+						LOGGER.info("xdssender.exportCcdEndpoint is blank - XDS export disabled, skipping");
+						return;
+					}
+
 					String uuid = ((MapMessage) message).getString("uuid");
 					List<String> encounterTypesToProcess;
 					String propEncounterTypesToProcess = Context.getAdministrationService()
