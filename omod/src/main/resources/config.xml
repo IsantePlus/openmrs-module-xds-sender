@@ -91,6 +91,12 @@
 	</globalProperty>
 
 	<globalProperty>
+		<property>xdssender.ipsEndpoint</property>
+		<defaultValue>https://openhimcore.sedishtest.live/SHR/ips</defaultValue>
+		<description>Base URL of the consolidated IPS mediator used to pull a patient's cross-facility summary by CRUID (continuity of care)</description>
+	</globalProperty>
+
+	<globalProperty>
 		<property>xdssender.oshr.username</property>
 		<description>Specifies the OpenSHR username</description>
 	</globalProperty>

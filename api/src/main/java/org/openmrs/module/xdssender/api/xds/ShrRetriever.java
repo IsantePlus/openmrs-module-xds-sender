@@ -27,6 +27,10 @@ public class ShrRetriever {
 
 	private static final String ECID_NAME = "ECID";
 
+	private static final String GOLDEN_RECORD_TAG = "5c827da5-4858-4f3d-a50c-62ece001efea";
+
+	private static final String ISANTEPLUS_ID_TYPE = "iSantePlus ID";
+
 	@Autowired
 	private XdsSenderConfig config;
 
@@ -139,6 +143,54 @@ public class ShrRetriever {
 		}
 		catch (Exception ex) {
 			LOGGER.error("Error when fetching ccd", ex);
+			return null;
+		}
+	}
+
+	/**
+	 * Pull the consolidated IPS for this patient from the SHR IPS mediator (continuity of care).
+	 * Resolves the patient's golden-record id (CRUID) from the MPI by iSantePlus ID, then GETs
+	 * {@code <ipsEndpoint>/Patient/cruid/<cruid>}. Returns null if no golden record resolves.
+	 */
+	public Bundle fetchIps(Patient patient) {
+		try {
+			IGenericClient mpiClient = getAuthenticatedClient(config.getMpiEndpoint(), config.getOshrUsername(),
+					config.getOshrPassword());
+
+			PatientIdentifier mpiIdentifier = patient.getPatientIdentifier(ISANTEPLUS_ID_TYPE);
+			if (mpiIdentifier == null) {
+				LOGGER.warn("Patient has no iSantePlus ID; cannot resolve CRUID for IPS retrieval");
+				return null;
+			}
+			String systemUrl = patientIdentifierSystemService.getUrlByPatientIdentifierType(mpiIdentifier.getIdentifierType());
+
+			Bundle linkedPatientBundle = mpiClient.search()
+					.byUrl("/Patient?identifier=" + systemUrl + "|" + mpiIdentifier.getIdentifier() + "&_include=Patient:link")
+					.returnBundle(Bundle.class).execute();
+
+			String cruid = null;
+			for (Bundle.BundleEntryComponent entry : linkedPatientBundle.getEntry()) {
+				if (entry.hasResource() && entry.getResource() instanceof org.hl7.fhir.r4.model.Patient) {
+					org.hl7.fhir.r4.model.Patient candidate = (org.hl7.fhir.r4.model.Patient) entry.getResource();
+					if (candidate.hasMeta() && candidate.getMeta().hasTag() && candidate.getMeta().getTagFirstRep().hasCode()
+							&& GOLDEN_RECORD_TAG.equals(candidate.getMeta().getTagFirstRep().getCode())) {
+						cruid = candidate.getIdElement().getIdPart();
+						break;
+					}
+				}
+			}
+
+			if (cruid == null) {
+				LOGGER.warn("No golden record (CRUID) resolved from MPI; cannot fetch IPS");
+				return null;
+			}
+
+			IGenericClient ipsClient = getAuthenticatedClient(config.getIpsEndpoint(), config.getOshrUsername(),
+					config.getOshrPassword());
+			return ipsClient.fetchResourceFromUrl(Bundle.class, config.getIpsEndpoint() + "/Patient/cruid/" + cruid);
+		}
+		catch (Exception ex) {
+			LOGGER.error("Error fetching IPS", ex);
 			return null;
 		}
 	}

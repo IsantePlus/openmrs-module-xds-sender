@@ -130,6 +130,20 @@ public class CcdServiceImpl implements CcdService {
     }
 
     @Override
+    public Ccd downloadAndSaveIps(Patient patient) {
+        Ccd ccd;
+
+        shrImportService.setFhirContext(fhirContext);
+        ccd = shrImportService.retrieveIps(patient);
+
+        if (ccd != null) {
+            ccd = ccdDao.saveOrUpdate(ccd);
+        }
+
+        return ccd;
+    }
+
+    @Override
     public void downloadCcdAsPDF(OutputStream stream, Patient patient) {
         LOGGER.info("CCD PDF is being downloaded.");
     }
