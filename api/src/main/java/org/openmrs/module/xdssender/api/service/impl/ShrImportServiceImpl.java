@@ -59,4 +59,29 @@ public class ShrImportServiceImpl implements XdsImportService {
 
 		return ccd;
 	}
+
+	/**
+	 * Retrieve the consolidated IPS document for a patient from the SHR IPS mediator and wrap it as
+	 * a Ccd (raw FHIR JSON), mirroring {@link #retrieveCCD(Patient)}. IPS document bundles carry no
+	 * total, so presence is judged by entries.
+	 */
+	public Ccd retrieveIps(Patient patient) {
+		Ccd ccd = null;
+		Bundle result;
+		try {
+			shrRetriever.setFhirContext(this.getFhirContext());
+			result = shrRetriever.fetchIps(patient);
+		} catch (Exception e) {
+			LOGGER.error("Unable to load IPS content", e);
+			return null;
+		}
+
+		if (result != null && result.hasEntry() && !result.getEntry().isEmpty()) {
+			ccd = new Ccd();
+			ccd.setPatient(patient);
+			ccd.setDocument(fhirContext.newJsonParser().encodeResourceToString(result));
+		}
+
+		return ccd;
+	}
 }
