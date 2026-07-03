@@ -92,8 +92,7 @@
 
 	<globalProperty>
 		<property>xdssender.ipsEndpoint</property>
-		<defaultValue>https://openhimcore.sedishtest.live/SHR/ips</defaultValue>
-		<description>Base URL of the consolidated IPS mediator used to pull a patient's cross-facility summary by CRUID (continuity of care)</description>
+		<description>Base URL of the consolidated IPS mediator (e.g. https://&lt;openhim&gt;/SHR/ips). When set, patient retrieval (downloadAndSaveCcd) pulls the consolidated IPS by CRUID for continuity of care; when blank, the legacy client-side CCD aggregation is used.</description>
 	</globalProperty>
 
 	<globalProperty>

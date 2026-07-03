@@ -21,9 +21,6 @@ public interface CcdService {
 	@Transactional
 	Ccd downloadAndSaveCcd(Patient patient) throws XDSException;
 
-	@Transactional
-	Ccd downloadAndSaveIps(Patient patient);
-
 	@Transactional(readOnly = true)
 	void downloadCcdAsPDF(OutputStream stream, Patient patient);
 }
