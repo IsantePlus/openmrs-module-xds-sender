@@ -183,10 +183,10 @@ public class XdsSenderConfig {
 		return getProperty(XDSSENDER_EXPORT_CCD_ENDPOINT);
 	}
 
-	// Base URL of the consolidated IPS mediator (e.g. https://<openhim>/SHR/ips). Used to pull a
-	// patient's cross-facility summary by CRUID for continuity of care.
+	// Opt-in: empty by default so existing deployments keep the legacy CCD retrieval. Set this to
+	// the SHR IPS mediator base (e.g. https://<openhim>/SHR/ips) to enable IPS-based retrieval.
 	public String getIpsEndpoint() {
-		return getProperty(XDSSENDER_IPS_ENDPOINT);
+		return getProperty(XDSSENDER_IPS_ENDPOINT, "");
 	}
 
 	public String getLocalPatientIdRoot() { return getProperty("mpi-client.pid.local"); }
