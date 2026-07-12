@@ -92,7 +92,7 @@
 
 	<globalProperty>
 		<property>xdssender.ipsEndpoint</property>
-		<description>Base URL of the consolidated IPS mediator (e.g. https://&lt;openhim&gt;/SHR/ips). When set, patient retrieval (downloadAndSaveCcd) pulls the consolidated IPS by CRUID for continuity of care; when blank, the legacy client-side CCD aggregation is used.</description>
+		<description>Base URL of the consolidated IPS mediator (e.g. https://&lt;openhim&gt;/SHR/fhir/ips). When set, patient retrieval (downloadAndSaveCcd) sends the patient's iSantePlus ID to the mediator, which resolves the golden record in the CR and returns the consolidated IPS; when blank, the legacy client-side CCD aggregation is used.</description>
 	</globalProperty>
 
 	<globalProperty>
