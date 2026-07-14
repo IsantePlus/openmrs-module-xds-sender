@@ -36,7 +36,13 @@ public class XdsSenderActivator extends BaseModuleActivator {
 	public void started() {
 		log.info("Started Xds Sender");
 		Event.subscribe(Encounter.class, null, getEncounterEventListener());
-		Context.getRegisteredComponents(XdsSenderSchedulerServiceImpl.class).get(0).runXdsSenderScheduler();
+		// Never let optional scheduler/config setup abort module startup: log and continue.
+		try {
+			Context.getRegisteredComponents(XdsSenderSchedulerServiceImpl.class).get(0).runXdsSenderScheduler();
+		}
+		catch (Exception e) {
+			log.error("Unable to start the XDS Sender scheduler; continuing module startup without it", e);
+		}
 	}
 	
 	/**
