@@ -84,6 +84,8 @@
         .card, .patient, .ips__head { border: 1px solid #ccc; box-shadow: none; }
         .ips__head { background: #566a8b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
+    .card__head h2 .en { color: var(--muted); font-weight: 400; font-size: .82em; }
+    .field .k .en, .empty .en { color: var(--faint); font-weight: 400; }
 </style>
 
 <div class="ips">
@@ -100,12 +102,12 @@
     <div class="patient">
         <p class="patient__name">${givenName} ${familyName}</p>
         <div class="patient__grid">
-            <div class="field"><div class="k">Identifiant</div><div class="v">${patientId}</div></div>
-            <div class="field"><div class="k">Sexe</div><div class="v">${gender}</div></div>
-            <div class="field"><div class="k">Date de naissance</div><div class="v">${birthDate}</div></div>
-            <div class="field"><div class="k">Téléphone</div><div class="v">${telephone}</div></div>
-            <div class="field"><div class="k">Ville</div><div class="v">${address.city ?: "—"}</div></div>
-            <div class="field"><div class="k">Région</div><div class="v">${address.state ?: ""} ${address.country ?: ""}</div></div>
+            <div class="field"><div class="k">Identifiant <span class="en">· ID</span></div><div class="v">${patientId}</div></div>
+            <div class="field"><div class="k">Sexe <span class="en">· Sex</span></div><div class="v">${gender}</div></div>
+            <div class="field"><div class="k">Date de naissance <span class="en">· Birth date</span></div><div class="v">${birthDate}</div></div>
+            <div class="field"><div class="k">Téléphone <span class="en">· Phone</span></div><div class="v">${telephone}</div></div>
+            <div class="field"><div class="k">Ville <span class="en">· City</span></div><div class="v">${address.city ?: "—"}</div></div>
+            <div class="field"><div class="k">Région <span class="en">· Region</span></div><div class="v">${address.state ?: ""} ${address.country ?: ""}</div></div>
         </div>
     </div>
 
@@ -125,7 +127,7 @@
 
     <!-- Allergies -->
     <section id="allergies" class="card">
-        <div class="card__head"><h2>Allergies et réactions indésirables</h2><span class="badge">${intolerances?.size() ?: 0}</span></div>
+        <div class="card__head"><h2>Allergies et réactions indésirables <span class="en">· Allergies &amp; adverse reactions</span></h2><span class="badge">${intolerances?.size() ?: 0}</span></div>
         <% if(intolerances){ %>
         <div class="table-wrap"><table>
             <thead><tr><th>Type</th><th>Description</th><th>Substance</th><th>Réaction</th><th>Statut</th><th>Sévérité</th><th>Lieu</th><th>Date</th></tr></thead>
@@ -144,12 +146,12 @@
             <% } %>
             </tbody>
         </table></div>
-        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+        <% }else{ %><div class="empty">Aucune donnée disponible <span class="en">/ No data available</span></div><% } %>
     </section>
 
     <!-- Problems / Conditions / Diagnoses -->
     <section id="problems" class="card">
-        <div class="card__head"><h2>Problèmes, conditions et diagnostics</h2><span class="badge">${conditions?.size() ?: 0}</span></div>
+        <div class="card__head"><h2>Problèmes, conditions et diagnostics <span class="en">· Problems, conditions &amp; diagnoses</span></h2><span class="badge">${conditions?.size() ?: 0}</span></div>
         <% if(conditions){ %>
         <div class="table-wrap"><table>
             <thead><tr><th>Nom</th><th>Type</th><th>Dates</th><th>Lieu</th></tr></thead>
@@ -164,12 +166,12 @@
             <% } %>
             </tbody>
         </table></div>
-        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+        <% }else{ %><div class="empty">Aucune donnée disponible <span class="en">/ No data available</span></div><% } %>
     </section>
 
     <!-- Medications -->
     <section id="medications" class="card">
-        <div class="card__head"><h2>Médicaments</h2><span class="badge">${medications?.size() ?: 0}</span></div>
+        <div class="card__head"><h2>Médicaments <span class="en">· Medications</span></h2><span class="badge">${medications?.size() ?: 0}</span></div>
         <% if(medications){ %>
         <div class="table-wrap"><table>
             <thead><tr><th>Médicament</th><th>Date de dispensation</th><th>Prochain renouvellement</th><th>Nombre de jours</th><th>Source</th></tr></thead>
@@ -185,12 +187,12 @@
             <% } %>
             </tbody>
         </table></div>
-        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+        <% }else{ %><div class="empty">Aucune donnée disponible <span class="en">/ No data available</span></div><% } %>
     </section>
 
     <!-- Medication Requests -->
     <section id="medications_requests" class="card">
-        <div class="card__head"><h2>Prescriptions médicamenteuses</h2><span class="badge">${medicationPrescriptions?.size() ?: 0}</span></div>
+        <div class="card__head"><h2>Prescriptions médicamenteuses <span class="en">· Medication requests</span></h2><span class="badge">${medicationPrescriptions?.size() ?: 0}</span></div>
         <% if(medicationPrescriptions){ %>
         <div class="table-wrap"><table>
             <thead><tr><th>Médicament</th><th>Date de la demande</th><th>Catégorie</th><th>Lieu</th></tr></thead>
@@ -205,12 +207,12 @@
             <% } %>
             </tbody>
         </table></div>
-        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+        <% }else{ %><div class="empty">Aucune donnée disponible <span class="en">/ No data available</span></div><% } %>
     </section>
 
     <!-- Immunizations -->
     <section id="immunizations" class="card">
-        <div class="card__head"><h2>Vaccinations</h2><span class="badge">${immunizations?.size() ?: 0}</span></div>
+        <div class="card__head"><h2>Vaccinations <span class="en">· Immunizations</span></h2><span class="badge">${immunizations?.size() ?: 0}</span></div>
         <% if(immunizations){ %>
         <div class="table-wrap"><table>
             <thead><tr><th>Identifiant</th><th>Date</th><th>Lieu</th><th>Code vaccin</th></tr></thead>
@@ -225,12 +227,12 @@
             <% } %>
             </tbody>
         </table></div>
-        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+        <% }else{ %><div class="empty">Aucune donnée disponible <span class="en">/ No data available</span></div><% } %>
     </section>
 
     <!-- Procedures -->
     <section id="procedures" class="card">
-        <div class="card__head"><h2>Chirurgies / procédures</h2><span class="badge">${procedures?.size() ?: 0}</span></div>
+        <div class="card__head"><h2>Chirurgies / procédures <span class="en">· Surgeries / procedures</span></h2><span class="badge">${procedures?.size() ?: 0}</span></div>
         <% if(procedures){ %>
         <div class="table-wrap"><table>
             <thead><tr><th>Procédure</th><th>Description</th><th>Date</th><th>Indications</th><th>Résultat</th><th>Lieu</th></tr></thead>
@@ -247,12 +249,12 @@
             <% } %>
             </tbody>
         </table></div>
-        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+        <% }else{ %><div class="empty">Aucune donnée disponible <span class="en">/ No data available</span></div><% } %>
     </section>
 
     <!-- Results -->
     <section id="results" class="card">
-        <div class="card__head"><h2>Résultats</h2><span class="badge">${diagnosticReports?.size() ?: 0}</span></div>
+        <div class="card__head"><h2>Résultats <span class="en">· Results</span></h2><span class="badge">${diagnosticReports?.size() ?: 0}</span></div>
         <% if(diagnosticReports){ %>
         <div class="table-wrap"><table>
             <thead><tr><th>Nom</th><th>Catégorie</th><th>Date</th><th>Résultat</th><th>Lieu</th></tr></thead>
@@ -268,12 +270,12 @@
             <% } %>
             </tbody>
         </table></div>
-        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+        <% }else{ %><div class="empty">Aucune donnée disponible <span class="en">/ No data available</span></div><% } %>
     </section>
 
     <!-- Clinical Observations -->
     <section id="observations" class="card">
-        <div class="card__head"><h2>Observations cliniques</h2><span class="badge">${otherObservations?.size() ?: 0}</span></div>
+        <div class="card__head"><h2>Observations cliniques <span class="en">· Clinical observations</span></h2><span class="badge">${otherObservations?.size() ?: 0}</span></div>
         <% if(otherObservations){ %>
         <div class="table-wrap"><table>
             <thead><tr><th>Nom</th><th>Catégorie</th><th>Date</th><th>Résultat</th><th>Lieu</th></tr></thead>
@@ -289,12 +291,12 @@
             <% } %>
             </tbody>
         </table></div>
-        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+        <% }else{ %><div class="empty">Aucune donnée disponible <span class="en">/ No data available</span></div><% } %>
     </section>
 
     <!-- Vital Signs -->
     <section id="vitals" class="card">
-        <div class="card__head"><h2>Signes vitaux</h2><span class="badge">${vitalSigns?.size() ?: 0}</span></div>
+        <div class="card__head"><h2>Signes vitaux <span class="en">· Vital signs</span></h2><span class="badge">${vitalSigns?.size() ?: 0}</span></div>
         <% if(vitalSigns){ %>
         <div class="table-wrap"><table>
             <thead><tr><th>Nom</th><th>Valeur</th><th>Date</th><th>Lieu</th></tr></thead>
@@ -309,12 +311,12 @@
             <% } %>
             </tbody>
         </table></div>
-        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+        <% }else{ %><div class="empty">Aucune donnée disponible <span class="en">/ No data available</span></div><% } %>
     </section>
 
     <!-- Encounters -->
     <section id="encounters" class="card">
-        <div class="card__head"><h2>Consultations</h2><span class="badge">${encounters?.size() ?: 0}</span></div>
+        <div class="card__head"><h2>Consultations <span class="en">· Encounters</span></h2><span class="badge">${encounters?.size() ?: 0}</span></div>
         <% if(encounters){ %>
         <div class="table-wrap"><table>
             <thead><tr><th>Consultation</th><th>Lieu</th><th>Date</th></tr></thead>
@@ -328,7 +330,7 @@
             <% } %>
             </tbody>
         </table></div>
-        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+        <% }else{ %><div class="empty">Aucune donnée disponible <span class="en">/ No data available</span></div><% } %>
     </section>
 
 </div>
