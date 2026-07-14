@@ -226,7 +226,9 @@ public class XdsSenderConfig {
 	}
 
 	public String getNotificationsPullPointEndpoint() {
-		return getProperty(NOTIFICATIONS_PULL_POINT_ENDPOINT);
+		// Optional feature: return null (rather than throwing) when unset so the scheduler
+		// simply skips the pull-notifications task instead of aborting module startup.
+		return getProperty(NOTIFICATIONS_PULL_POINT_ENDPOINT, null);
 	}
 
 	public String getNotificationsPullPointUsername() {
