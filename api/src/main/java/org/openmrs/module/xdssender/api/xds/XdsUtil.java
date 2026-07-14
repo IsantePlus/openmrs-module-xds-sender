@@ -84,6 +84,9 @@ public final class XdsUtil {
         List<ProcedureRequest> procedureRequests = new ArrayList<>();
         List<Procedure> procedures = new ArrayList<>();
         List<DiagnosticReport> diagnosticReports = new ArrayList<>();
+        // Any Observation that isn't a recognised vital, lab result, immunization, condition or
+        // medication construct used to be silently dropped; collect them here so nothing is lost.
+        List<DiagnosticReport> otherObservations = new ArrayList<>();
         List<InsuranceCoverage> coverages = new ArrayList<>();
         List<Condition> conditions = new ArrayList<>();
         List<AllergyIntolerance> intolerances = new ArrayList<>();
@@ -93,6 +96,10 @@ public final class XdsUtil {
 
         for (Bundle.BundleEntryComponent bundleEntry : entry) {
             Resource eResource = bundleEntry.getResource();
+            if (eResource == null) { continue; }
+            // A consolidated cross-facility IPS mixes resources/codings from many sources; never let a
+            // single malformed resource abort the whole render — log it and carry on.
+            try {
             switch (eResource.getResourceType().name()) {
                 case "Patient": {
                     mapPatientResource(ccdStringMap, (org.hl7.fhir.r4.model.Patient) eResource);
@@ -143,6 +150,11 @@ public final class XdsUtil {
                                         medications.get(i).setNextRefill(obs.getValueDateTimeType().getValue());
                                     }
                                 }
+                                break;
+                            }
+                            default: {
+                                // Unrecognised clinical observation: surface it rather than drop it.
+                                otherObservations.add(mapDiagnosticReportResource(obs));
                                 break;
                             }
 
@@ -209,6 +221,10 @@ public final class XdsUtil {
                 }
 
             }
+            } catch (Exception ex) {
+                logger.warn("Skipping a resource that could not be rendered into the IPS view: "
+                        + eResource.getResourceType() + "/" + eResource.getIdElement().getIdPart(), ex);
+            }
 
         }
 
@@ -222,6 +238,7 @@ public final class XdsUtil {
         Collections.sort(procedures, Collections.reverseOrder());
         Collections.sort(conditions, Collections.reverseOrder());
         Collections.sort(diagnosticReports, Collections.reverseOrder());
+        Collections.sort(otherObservations, Collections.reverseOrder());
 
         ccdStringMap.put("vitalSigns", vitalSigns);
         ccdStringMap.put("encounters", encounters);
@@ -233,6 +250,7 @@ public final class XdsUtil {
         ccdStringMap.put("procedures", procedures);
         ccdStringMap.put("conditions", conditions);
         ccdStringMap.put("diagnosticReports", diagnosticReports);
+        ccdStringMap.put("otherObservations", otherObservations);
         GStringTemplateEngine templateEngine = new GStringTemplateEngine();
         String htmlString;
         try {

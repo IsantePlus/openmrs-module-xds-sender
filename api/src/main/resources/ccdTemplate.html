@@ -139,6 +139,7 @@
         <p class="section_links ft15"><a href="#problems">Problems, Conditions, and Diagnoses</a></p>
         <p class="section_links ft15"><a href="#procedures">Surgeries/Procedures</a></p>
         <p class="section_links ft15"><a href="#results">Results</a></p>
+        <p class="section_links ft15"><a href="#observations">Clinical Observations</a></p>
         <p class="section_links ft15"><a href="#immunizations">Immunizations</a></p>
         <p class="section_links ft15"><a href="#vitals">Vital Signs</a></p>
 
@@ -413,6 +414,43 @@
                 <%}
                 }else{ %>
                 <tr><td colspan = "8">No Data</td></tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div> <!--/.tWrap-->
+
+    <p id="observations" class="p_header">Clinical Observations</p>
+
+    <div>
+        <div class="head">
+            <table>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Result</th>
+                    <th>Location</th>
+                </tr>
+                </thead>
+            </table>
+        </div> <!--/.tWrap__head-->
+        <div>
+            <table>
+                <tbody>
+                <% if(otherObservations){ %>
+                <% otherObservations.each{ observation -> %>
+                <tr>
+                    <td><%= observation.name %></td>
+                    <td><%= observation.category %></td>
+                    <td><%= observation.formattedDate %></td>
+                    <td><%= observation.result %></td>
+                    <td><%= observation.location %></td>
+                </tr>
+                <%}
+                }else{ %>
+                <tr><td colspan = "5">No Data</td></tr>
                 <%}%>
                 </tbody>
             </table>
