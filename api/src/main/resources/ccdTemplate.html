@@ -1,11 +1,15 @@
 <style>
     :root {
-        --ink: #1f2933;
-        --muted: #6b7684;
-        --line: #e3e8ef;
-        --bg: #f4f6f9;
-        --accent: #14539a;
-        --accent-soft: #eaf1fb;
+        --ink: #0f172a;
+        --muted: #586674;
+        --line: #e6e9ee;
+        --line-soft: #eef1f4;
+        --bg: #eef1f4;
+        --accent: #566a8b;
+        --accent-ink: #1f3a5f;
+        --accent-soft: #eef3f9;
+        --accent-line: #d3e0ef;
+        --row-alt: #fafbfc;
         --card: #ffffff;
         --radius: 10px;
     }
@@ -48,17 +52,17 @@
     /* ---- Table of contents ---- */
     .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }
     .toc a {
-        text-decoration: none; color: var(--accent); background: var(--accent-soft);
-        border: 1px solid #d4e2f6; padding: 6px 12px; border-radius: 999px;
+        text-decoration: none; color: var(--accent-ink); background: var(--accent-soft);
+        border: 1px solid var(--accent-line); padding: 6px 12px; border-radius: 999px;
         font-size: 12.5px; font-weight: 500; white-space: nowrap;
     }
-    .toc a:hover { background: #dce8fa; }
+    .toc a:hover { background: #e3ebf4; }
 
     /* ---- Section cards ---- */
     .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; scroll-margin-top: 12px; }
-    .card__head { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-bottom: 1px solid var(--line); background: #fbfcfe; }
+    .card__head { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-bottom: 1px solid var(--line-soft); background: #f7f9fb; }
     .card__head h2 { margin: 0; font-size: 14.5px; font-weight: 600; color: var(--ink); }
-    .badge { font-size: 11.5px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 9px; min-width: 22px; text-align: center; }
+    .badge { font-size: 11.5px; font-weight: 600; color: var(--accent-ink); background: var(--accent-soft); border: 1px solid var(--accent-line); border-radius: 999px; padding: 1px 9px; min-width: 22px; text-align: center; }
 
     .table-wrap { width: 100%; overflow-x: auto; }
     table { border-collapse: collapse; width: 100%; font-size: 13px; }
@@ -67,9 +71,9 @@
         font-size: 11px; letter-spacing: .4px; padding: 10px 16px; border-bottom: 1px solid var(--line);
         background: #fff; white-space: nowrap;
     }
-    tbody td { padding: 11px 16px; border-bottom: 1px solid #f0f3f7; vertical-align: top; word-break: break-word; }
+    tbody td { padding: 11px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: top; word-break: break-word; }
     tbody tr:last-child td { border-bottom: none; }
-    tbody tr:nth-child(even) td { background: #fafbfc; }
+    tbody tr:nth-child(even) td { background: var(--row-alt); }
     tbody tr:hover td { background: var(--accent-soft); }
 
     .empty { padding: 18px 20px; color: var(--muted); font-style: italic; font-size: 13px; }
@@ -78,7 +82,7 @@
         body { background: #fff; }
         .toc { display: none; }
         .card, .patient, .ips__head { border: 1px solid #ccc; box-shadow: none; }
-        .ips__head { background: #14539a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .ips__head { background: #566a8b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
 </style>
 
