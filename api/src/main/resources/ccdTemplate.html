@@ -1,367 +1,237 @@
 <style>
-    * {
-        box-sizing: border-box;
+    :root {
+        --ink: #1f2933;
+        --muted: #6b7684;
+        --line: #e3e8ef;
+        --bg: #f4f6f9;
+        --accent: #14539a;
+        --accent-soft: #eaf1fb;
+        --card: #ffffff;
+        --radius: 10px;
     }
+
+    * { box-sizing: border-box; }
 
     body {
-        font-family: sans-serif;
-        color: rgb(64,64,64);
-        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
         margin: 0;
+        padding: 0;
+        font-size: 14px;
+        line-height: 1.45;
     }
 
-    table {
-        border-collapse: collapse;
-        table-layout: fixed;
-        width: 100%;
-        background: white;
+    .ips { max-width: 1080px; margin: 0 auto; padding: 20px 20px 60px; }
+
+    /* ---- Document header ---- */
+    .ips__head {
+        display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        padding: 20px 24px; background: var(--accent); color: #fff;
+        border-radius: var(--radius); margin-bottom: 18px;
+    }
+    .ips__head h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: .2px; }
+    .ips__head .sub { margin-top: 4px; font-size: 12.5px; opacity: .85; }
+    .ips__tag {
+        font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+        background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.35);
+        padding: 6px 12px; border-radius: 999px; white-space: nowrap;
     }
 
-    th, td {
-        border: 1px solid lightgray;
-        padding: 8px;
-        text-align: left;
-        overflow: hidden;
-        /*white-space: nowrap;*/
-        /*text-overflow: ellipsis;*/
-        word-break: break-all;
-        word-break: break-all;
+    /* ---- Patient identity ---- */
+    .patient { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 22px; margin-bottom: 18px; }
+    .patient__name { font-size: 18px; font-weight: 600; margin: 0 0 12px; }
+    .patient__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 26px; }
+    .field .k { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+    .field .v { font-size: 14px; font-weight: 500; margin-top: 1px; word-break: break-word; }
 
-    th {
-        background: #163160 !important;
-        color: white;
-        text-transform: uppercase;
-        font-weight: normal;
+    /* ---- Table of contents ---- */
+    .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }
+    .toc a {
+        text-decoration: none; color: var(--accent); background: var(--accent-soft);
+        border: 1px solid #d4e2f6; padding: 6px 12px; border-radius: 999px;
+        font-size: 12.5px; font-weight: 500; white-space: nowrap;
     }
+    .toc a:hover { background: #dce8fa; }
 
-    table tr:first-child td {
-        border-top: none;
+    /* ---- Section cards ---- */
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; scroll-margin-top: 12px; }
+    .card__head { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-bottom: 1px solid var(--line); background: #fbfcfe; }
+    .card__head h2 { margin: 0; font-size: 14.5px; font-weight: 600; color: var(--ink); }
+    .badge { font-size: 11.5px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 9px; min-width: 22px; text-align: center; }
+
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; }
+    thead th {
+        text-align: left; font-weight: 600; color: var(--muted); text-transform: uppercase;
+        font-size: 11px; letter-spacing: .4px; padding: 10px 16px; border-bottom: 1px solid var(--line);
+        background: #fff; white-space: nowrap;
     }
+    tbody td { padding: 11px 16px; border-bottom: 1px solid #f0f3f7; vertical-align: top; word-break: break-word; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:nth-child(even) td { background: #fafbfc; }
+    tbody tr:hover td { background: var(--accent-soft); }
 
-    .container {
-        width: 100%;
-        padding: 24px;
+    .empty { padding: 18px 20px; color: var(--muted); font-style: italic; font-size: 13px; }
+
+    @media print {
+        body { background: #fff; }
+        .toc { display: none; }
+        .card, .patient, .ips__head { border: 1px solid #ccc; box-shadow: none; }
+        .ips__head { background: #14539a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
-
-    .head {
-        flex: 0 0 37px; // for Safari and IE
-    overflow-y: scroll;
-    }
-
-    .doc_head {
-        flex: 0 0 37px; // for Safari and IE
-    overflow-y: scroll;
-        text-align: center !important;
-    }
-
-    .p_header{
-        text-align: left;
-        padding-left: 59px;
-        margin-top: 11px;
-        margin-bottom: 11px;
-        font: bold 11px 'Verdana';
-        text-decoration: underline;
-        color: #444444;
-        line-height: 13px;
-    }
-
-    .section_links{
-        text-align: left;
-        padding-left: 93px;
-        margin-top: 1px;
-        margin-bottom: 0px;
-        font: 11px 'Verdana';
-        text-decoration: underline;
-        color: #444444;
-        line-height: 13px;
-    }
-
-
 </style>
-<div class="container"> <!--provides a wrapper for testing the scroll-->
-    <!--Patient Demographic Summary-->
 
-    <div class="doc_head">
+<div class="ips">
 
-        <p>Continuity of Care Document <br>Created On: ${createdDate}</p>
-
-    </div> <!--/.tWrap__head-->
-
-
-    <!--Patient Demographic Summary-->
-    <div>
-        <div class="head">
-            <table>
-                <thead>
-                <tr>
-                    <th colspan = "6">Demographics</th>
-                </tr>
-                </thead>
-            </table>
-        </div> <!--/.tWrap__head-->
+    <div class="ips__head">
         <div>
-            <table>
-                <tbody>
-                <tr>
-                    <td>Patient:</td>
-                    <td>${givenName} ${familyName}</td>
-                    <td>Identifier:</td>
-                    <td>${patientId}</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>${address.city ?: ""}</td>
-                    <td>Gender:</td>
-                    <td>${gender}</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>${address.state ?: ""} ${address.country ?: ""}</td>
-                    <td>Birth Date:</td>
-                    <td>${birthDate}</td>
-                </tr>
-                <tr>
-                    <td>Telephone:</td>
-                    <td>${telephone}</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                </tbody>
-            </table>
+            <h1>Résumé consolidé du patient</h1>
+            <div class="sub">International Patient Summary &middot; Créé le ${createdDate}</div>
         </div>
+        <span class="ips__tag">SEDISH &middot; IPS</span>
+    </div>
 
+    <!-- Patient identity -->
+    <div class="patient">
+        <p class="patient__name">${givenName} ${familyName}</p>
+        <div class="patient__grid">
+            <div class="field"><div class="k">Identifiant</div><div class="v">${patientId}</div></div>
+            <div class="field"><div class="k">Sexe</div><div class="v">${gender}</div></div>
+            <div class="field"><div class="k">Date de naissance</div><div class="v">${birthDate}</div></div>
+            <div class="field"><div class="k">Téléphone</div><div class="v">${telephone}</div></div>
+            <div class="field"><div class="k">Ville</div><div class="v">${address.city ?: "—"}</div></div>
+            <div class="field"><div class="k">Région</div><div class="v">${address.state ?: ""} ${address.country ?: ""}</div></div>
+        </div>
+    </div>
 
-        <p class="p_header">Table of Contents</p>
-        <p class="section_links ft15"><a href="#allergies">Allergies and Adverse Reactions</a></p>
-        <p class="section_links ft15"><a href="#encounters">Encounters</a></p>
-        <p class="section_links ft15"><a href="#medications_requests">Medication Requests</a></p>
-        <p class="section_links ft15"><a href="#medications">Medications</a></p>
-        <p class="section_links ft15"><a href="#problems">Problems, Conditions, and Diagnoses</a></p>
-        <p class="section_links ft15"><a href="#procedures">Surgeries/Procedures</a></p>
-        <p class="section_links ft15"><a href="#results">Results</a></p>
-        <p class="section_links ft15"><a href="#observations">Clinical Observations</a></p>
-        <p class="section_links ft15"><a href="#immunizations">Immunizations</a></p>
-        <p class="section_links ft15"><a href="#vitals">Vital Signs</a></p>
+    <!-- Table of contents -->
+    <nav class="toc">
+        <a href="#allergies">Allergies</a>
+        <a href="#problems">Problèmes &amp; diagnostics</a>
+        <a href="#medications">Médicaments</a>
+        <a href="#medications_requests">Prescriptions</a>
+        <a href="#immunizations">Vaccinations</a>
+        <a href="#procedures">Procédures</a>
+        <a href="#results">Résultats</a>
+        <a href="#observations">Observations cliniques</a>
+        <a href="#vitals">Signes vitaux</a>
+        <a href="#encounters">Consultations</a>
+    </nav>
 
-    </div> <!--/.tWrap-->
-
-    <p id="allergies" class="p_header">Allergies and Adverse Reactions</p>
-
-    <div>
-        <div class="head">
-            <table>
-                <thead>
+    <!-- Allergies -->
+    <section id="allergies" class="card">
+        <div class="card__head"><h2>Allergies et réactions indésirables</h2><span class="badge">${intolerances?.size() ?: 0}</span></div>
+        <% if(intolerances){ %>
+        <div class="table-wrap"><table>
+            <thead><tr><th>Type</th><th>Description</th><th>Substance</th><th>Réaction</th><th>Statut</th><th>Sévérité</th><th>Lieu</th><th>Date</th></tr></thead>
+            <tbody>
+            <% intolerances.each{ intolerance -> %>
                 <tr>
-                    <th>Type</th>
-                    <th>Description</th>
-                    <th>Substance</th>
-                    <th>Reaction</th>
-                    <th>Status</th>
-                    <th>Severity</th>
-                    <th>Location</th>
-                    <th>Date</th>
-                </tr>
-                </thead>
-            </table>
-        </div> <!--/.tWrap__head-->
-        <div>
-            <table>
-                <tbody>
-                <% if(intolerances){ %>
-                <% intolerances.each{ intolerance -> %>
-                <tr>
-                    <td><%= intolerance.type  %></td>
-                    <td><%= intolerance.description  %></td>
-                    <td><%= intolerance.substance  %></td>
-                    <td><%= intolerance.reaction  %></td>
-                    <td><%= intolerance.status  %></td>
-                    <td><%= intolerance.criticality  %></td>
+                    <td><%= intolerance.type %></td>
+                    <td><%= intolerance.description %></td>
+                    <td><%= intolerance.substance %></td>
+                    <td><%= intolerance.reaction %></td>
+                    <td><%= intolerance.status %></td>
+                    <td><%= intolerance.criticality %></td>
                     <td><%= intolerance.location %></td>
                     <td><%= intolerance.date %></td>
                 </tr>
-                <%}
-                }else{ %>
-                <tr><td colspan = "7">No Data</td></tr>
-                <%}%>
-                </tbody>
-            </table>
-        </div>
-    </div> <!--/.tWrap-->
+            <% } %>
+            </tbody>
+        </table></div>
+        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+    </section>
 
-
-    <p id="encounters" class="p_header">Encounters</p>
-
-    <div>
-
-        <div class="head">
-            <table>
-                <thead>
-                <tr>
-                    <th>Encounter</th>
-                   <!-- <th>Providers</th> -->
-                    <th>Location</th>
-                    <th>Date</th>
-                </tr>
-                </thead>
-            </table>
-        </div> <!--/.tWrap__head-->
-        <div>
-            <table>
-                <tbody>
-                <% if(encounters){ %>
-                <% encounters.each{ encounter -> %>
-                <tr>
-                    <td><%= encounter.type  %></td>
-                   <!-- <td><%= encounter.providers  %></td> -->
-                    <td><%= encounter.location  %></td>
-                    <td><%= encounter.formattedDate  %></td>
-                </tr>
-                <%}
-                }else{ %>
-                <tr><td colspan = "6">No Data</td></tr>
-                <%}%>
-                </tbody>
-            </table>
-        </div>
-    </div> <!--/.tWrap-->
-
-    <p id="medications_requests" class="p_header">Medication Requests</p>
-
-    <div>
-        <div class="head">
-            <table>
-                <thead>
-                <tr>
-                    <th>Medication</th>
-                    <th>Date Requested</th>
-                   <!-- <th>Requester</th> -->
-                    <th>Category</th>
-                    <th>Location</th>
-                </tr>
-                </thead>
-            </table>
-        </div> <!--/.tWrap__head-->
-        <div>
-            <table>
-                <tbody>
-                <% if(medicationPrescriptions){ %>
-                <% medicationPrescriptions.each{ medicationPrescription -> %>
-                <tr>
-                    <td><%= medicationPrescription.identifier  %></td>
-                    <td><%= medicationPrescription.formattedDate  %></td>
-                   <!-- <td><%= medicationPrescription.requester  %></td> -->
-                    <td><%= medicationPrescription.category  %></td>
-                    <td><%= medicationPrescription.location %></td>
-
-                </tr>
-                <%}
-                }else{ %>
-                <tr><td colspan = "9">No Data</td></tr>
-                <%}%>
-                </tbody>
-            </table>
-        </div>
-    </div> <!--/.tWrap-->
-
-    <p id="medications" class="p_header">Medications</p>
-
-    <div>
-        <div class="head">
-            <table>
-                <thead>
-                <tr>
-                    <th>Medication</th>
-                    <th>Dispense Date</th>
-                    <th>Next Refill Date</th>
-                    <th>Number of Days</th>
-                    <th>Location</th>
-                </tr>
-                </thead>
-            </table>
-        </div> <!--/.tWrap__head-->
-        <div>
-            <table>
-                <tbody>
-                <% if(medications){ %>
-                <% medications.each{ medication -> %>
-                <tr>
-                    <td><%= medication.brandName  %></td>
-                    <td><%= medication.formattedDate  %></td>
-                    <!--TODO fill in the appropriate next refill date and number of days-->
-                    <td><%= medication.nextRefill  %></td>
-                    <td><%= medication.numberOfDays  %></td>
-                    <td><%= medication.dataSource  %></td>
-                </tr>
-                <%}
-                }else{ %>
-                <tr><td colspan = "13">No Data</td></tr>
-                <%}%>
-                </tbody>
-            </table>
-        </div>
-    </div> <!--/.tWrap-->
-
-    <p id="problems" class="p_header">Problems, Conditions, and Diagnoses</p>
-
-    <div>
-
-        <div class="head">
-            <table>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Problem Type</th>
-                    <th>Effective Dates</th>
-                    <th>Location</th>
-                   <!-- <th>Code</th> -->
-                </tr>
-                </thead>
-            </table>
-        </div> <!--/.tWrap__head-->
-        <div>
-            <table>
-                <tbody>
-                <% if(conditions){ %>
-                <% conditions.each{ condition -> %>
+    <!-- Problems / Conditions / Diagnoses -->
+    <section id="problems" class="card">
+        <div class="card__head"><h2>Problèmes, conditions et diagnostics</h2><span class="badge">${conditions?.size() ?: 0}</span></div>
+        <% if(conditions){ %>
+        <div class="table-wrap"><table>
+            <thead><tr><th>Nom</th><th>Type</th><th>Dates</th><th>Lieu</th></tr></thead>
+            <tbody>
+            <% conditions.each{ condition -> %>
                 <tr>
                     <td><%= condition.displayName %></td>
                     <td><%= condition.type %></td>
                     <td><%= condition.formattedDate %></td>
                     <td><%= condition.location %></td>
-                   <!-- <td><%= condition.code %></td> -->
                 </tr>
-                <%}
-                }else{ %>
-                <tr><td colspan = "7">No Data</td></tr>
-                <%}%>
-                </tbody>
-            </table>
-        </div>
-    </div> <!--/.tWrap-->
+            <% } %>
+            </tbody>
+        </table></div>
+        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+    </section>
 
-    <p id="procedures" class="p_header">Surgeries/Procedures</p>
-
-    <div>
-        <div class="head">
-            <table>
-                <thead>
+    <!-- Medications -->
+    <section id="medications" class="card">
+        <div class="card__head"><h2>Médicaments</h2><span class="badge">${medications?.size() ?: 0}</span></div>
+        <% if(medications){ %>
+        <div class="table-wrap"><table>
+            <thead><tr><th>Médicament</th><th>Date de dispensation</th><th>Prochain renouvellement</th><th>Nombre de jours</th><th>Source</th></tr></thead>
+            <tbody>
+            <% medications.each{ medication -> %>
                 <tr>
-                    <th>Procedure</th>
-                    <th>Description</th>
-                    <th>Date</th>
-                    <th>Indications</th>
-                    <th>Outcome</th>
-                    <th>Location</th>
-                  <!--  <th>Code</th> -->
+                    <td><%= medication.brandName %></td>
+                    <td><%= medication.formattedDate %></td>
+                    <td><%= medication.nextRefill %></td>
+                    <td><%= medication.numberOfDays %></td>
+                    <td><%= medication.dataSource %></td>
                 </tr>
-                </thead>
-            </table>
-        </div> <!--/.tWrap__head-->
-        <div>
-            <table>
-                <tbody>
-                <% if(procedures){ %>
-                <% procedures.each{ procedure -> %>
+            <% } %>
+            </tbody>
+        </table></div>
+        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+    </section>
+
+    <!-- Medication Requests -->
+    <section id="medications_requests" class="card">
+        <div class="card__head"><h2>Prescriptions médicamenteuses</h2><span class="badge">${medicationPrescriptions?.size() ?: 0}</span></div>
+        <% if(medicationPrescriptions){ %>
+        <div class="table-wrap"><table>
+            <thead><tr><th>Médicament</th><th>Date de la demande</th><th>Catégorie</th><th>Lieu</th></tr></thead>
+            <tbody>
+            <% medicationPrescriptions.each{ medicationPrescription -> %>
+                <tr>
+                    <td><%= medicationPrescription.identifier %></td>
+                    <td><%= medicationPrescription.formattedDate %></td>
+                    <td><%= medicationPrescription.category %></td>
+                    <td><%= medicationPrescription.location %></td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table></div>
+        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+    </section>
+
+    <!-- Immunizations -->
+    <section id="immunizations" class="card">
+        <div class="card__head"><h2>Vaccinations</h2><span class="badge">${immunizations?.size() ?: 0}</span></div>
+        <% if(immunizations){ %>
+        <div class="table-wrap"><table>
+            <thead><tr><th>Identifiant</th><th>Date</th><th>Lieu</th><th>Code vaccin</th></tr></thead>
+            <tbody>
+            <% immunizations.each{ immunization -> %>
+                <tr>
+                    <td><%= immunization.identifier %></td>
+                    <td><%= immunization.occurrenceDate %></td>
+                    <td><%= immunization.site %></td>
+                    <td><%= immunization.vaccineCode %></td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table></div>
+        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+    </section>
+
+    <!-- Procedures -->
+    <section id="procedures" class="card">
+        <div class="card__head"><h2>Chirurgies / procédures</h2><span class="badge">${procedures?.size() ?: 0}</span></div>
+        <% if(procedures){ %>
+        <div class="table-wrap"><table>
+            <thead><tr><th>Procédure</th><th>Description</th><th>Date</th><th>Indications</th><th>Résultat</th><th>Lieu</th></tr></thead>
+            <tbody>
+            <% procedures.each{ procedure -> %>
                 <tr>
                     <td><%= procedure.procedure %></td>
                     <td><%= procedure.description %></td>
@@ -369,78 +239,42 @@
                     <td><%= procedure.indications %></td>
                     <td><%= procedure.outcome %></td>
                     <td><%= procedure.location %></td>
-                   <!-- <td><%= procedure.code %></td> -->
                 </tr>
-                <%}
-                }else{ %>
-                <tr><td colspan = "6">No Data</td></tr>
-                <%}%>
-                </tbody>
-            </table>
-        </div>
-    </div> <!--/.tWrap-->
+            <% } %>
+            </tbody>
+        </table></div>
+        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+    </section>
 
-
-    <p id="results" class="p_header">Results</p>
-
-    <div>
-        <div class="head">
-            <table>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Date</th>
-                    <th>Result</th>
-                   <!-- <th>Code</th> -->
-                    <th>Location</th>
-                </tr>
-                </thead>
-            </table>
-        </div> <!--/.tWrap__head-->
-        <div>
-            <table>
-                <tbody>
-                <% if(diagnosticReports){ %>
-                <% diagnosticReports.each{ diagnosticReport -> %>
+    <!-- Results -->
+    <section id="results" class="card">
+        <div class="card__head"><h2>Résultats</h2><span class="badge">${diagnosticReports?.size() ?: 0}</span></div>
+        <% if(diagnosticReports){ %>
+        <div class="table-wrap"><table>
+            <thead><tr><th>Nom</th><th>Catégorie</th><th>Date</th><th>Résultat</th><th>Lieu</th></tr></thead>
+            <tbody>
+            <% diagnosticReports.each{ diagnosticReport -> %>
                 <tr>
                     <td><%= diagnosticReport.name %></td>
                     <td><%= diagnosticReport.category %></td>
                     <td><%= diagnosticReport.formattedDate %></td>
                     <td><%= diagnosticReport.result %></td>
-                   <!-- <td><%= diagnosticReport.identifier %></td> -->
                     <td><%= diagnosticReport.location %></td>
                 </tr>
-                <%}
-                }else{ %>
-                <tr><td colspan = "8">No Data</td></tr>
-                <%}%>
-                </tbody>
-            </table>
-        </div>
-    </div> <!--/.tWrap-->
+            <% } %>
+            </tbody>
+        </table></div>
+        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+    </section>
 
-    <p id="observations" class="p_header">Clinical Observations</p>
-
-    <div>
-        <div class="head">
-            <table>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Date</th>
-                    <th>Result</th>
-                    <th>Location</th>
-                </tr>
-                </thead>
-            </table>
-        </div> <!--/.tWrap__head-->
-        <div>
-            <table>
-                <tbody>
-                <% if(otherObservations){ %>
-                <% otherObservations.each{ observation -> %>
+    <!-- Clinical Observations -->
+    <section id="observations" class="card">
+        <div class="card__head"><h2>Observations cliniques</h2><span class="badge">${otherObservations?.size() ?: 0}</span></div>
+        <% if(otherObservations){ %>
+        <div class="table-wrap"><table>
+            <thead><tr><th>Nom</th><th>Catégorie</th><th>Date</th><th>Résultat</th><th>Lieu</th></tr></thead>
+            <tbody>
+            <% otherObservations.each{ observation -> %>
                 <tr>
                     <td><%= observation.name %></td>
                     <td><%= observation.category %></td>
@@ -448,83 +282,49 @@
                     <td><%= observation.result %></td>
                     <td><%= observation.location %></td>
                 </tr>
-                <%}
-                }else{ %>
-                <tr><td colspan = "5">No Data</td></tr>
-                <%}%>
-                </tbody>
-            </table>
-        </div>
-    </div> <!--/.tWrap-->
+            <% } %>
+            </tbody>
+        </table></div>
+        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+    </section>
 
-    <p id="immunizations" class="p_header">Immunizations</p>
+    <!-- Vital Signs -->
+    <section id="vitals" class="card">
+        <div class="card__head"><h2>Signes vitaux</h2><span class="badge">${vitalSigns?.size() ?: 0}</span></div>
+        <% if(vitalSigns){ %>
+        <div class="table-wrap"><table>
+            <thead><tr><th>Nom</th><th>Valeur</th><th>Date</th><th>Lieu</th></tr></thead>
+            <tbody>
+            <% vitalSigns.each{ vitalSign -> %>
+                <tr>
+                    <td><%= vitalSign.name %></td>
+                    <td><%= vitalSign.value %></td>
+                    <td><%= vitalSign.formattedDate %></td>
+                    <td><%= vitalSign.location %></td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table></div>
+        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+    </section>
 
-    <div>
-        <div class="head">
-            <table>
-                <thead>
+    <!-- Encounters -->
+    <section id="encounters" class="card">
+        <div class="card__head"><h2>Consultations</h2><span class="badge">${encounters?.size() ?: 0}</span></div>
+        <% if(encounters){ %>
+        <div class="table-wrap"><table>
+            <thead><tr><th>Consultation</th><th>Lieu</th><th>Date</th></tr></thead>
+            <tbody>
+            <% encounters.each{ encounter -> %>
                 <tr>
-                    <th>ID</th>
-                    <th>Date</th>
-                    <th>Location</th>
-                    <th>Vaccine Code</th>
+                    <td><%= encounter.type %></td>
+                    <td><%= encounter.location %></td>
+                    <td><%= encounter.formattedDate %></td>
                 </tr>
-                </thead>
-            </table>
-        </div> <!--/.tWrap__head-->
-        <div>
-            <table>
-                <tbody>
-                <% if(immunizations){ %>
-                <% immunizations.each{ immunization -> %>
-                <tr>
-                    <td><%= immunization.identifier %></td>
-                    <td><%= immunization.occurrenceDate %></td>
-                    <td><%= immunization.site %></td>
-                    <td><%= immunization.vaccineCode %></td>
-                </tr>
-                <%}
-                }else{ %>
-                <tr><td colspan = "8">No Data</td></tr>
-                <%}%>
-                </tbody>
-            </table>
-        </div>
-    </div> <!--/.tWrap-->
-    <p id="vitals" class="p_header">Vital Signs</p>
+            <% } %>
+            </tbody>
+        </table></div>
+        <% }else{ %><div class="empty">Aucune donnée disponible</div><% } %>
+    </section>
 
-    <div>
-        <div class="head">
-            <table>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Value</th>
-                    <th>Date</th>
-                    <th>Location</th>
-                  <!--  <th>Code</th> -->
-                </tr>
-                </thead>
-            </table>
-        </div> <!--/.tWrap__head-->
-        <div>
-            <table>
-                <tbody>
-                <% if(vitalSigns){ %>
-                <% vitalSigns.each{ vitalSign -> %>
-                <tr>
-                    <td><%= vitalSign.name  %></td>
-                    <td><%= vitalSign.value  %></td>
-                    <td><%= vitalSign.formattedDate  %></td>
-                    <td><%= vitalSign.location  %></td>
-                  <!--  <td><%= vitalSign.id  %></td> -->
-                </tr>
-                <%}
-                }else{ %>
-                <tr><td colspan = "8">No Data</td></tr>
-                <%}%>
-                </tbody>
-            </table>
-        </div>
-    </div> <!--/.tWrap-->
-</div> <!--/.container-->
+</div>
